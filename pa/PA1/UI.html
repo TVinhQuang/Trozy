@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trozy - Quản lý nhà trọ thông minh</title>
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --bg-color: #F3F4F6;
+            --sidebar-bg: #FFFFFF;
+            --text-main: #111827;
+            --text-muted: #6B7280;
+            --card-bg: #FFFFFF;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 250px; background-color: var(--sidebar-bg); border-right: 1px solid #E5E7EB; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; font-size: 24px; font-weight: bold; color: var(--primary-color); border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 10px; }
+        .sidebar-menu { list-style: none; padding: 10px 0; flex-grow: 1; }
+        .sidebar-menu li { padding: 0 10px; margin-bottom: 5px; }
+        .sidebar-menu a { display: block; padding: 12px 15px; text-decoration: none; color: var(--text-muted); border-radius: 8px; font-weight: 500; transition: 0.2s; cursor: pointer; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background-color: #EEF2FF; color: var(--primary-color); }
+        
+        /* Main Content Area */
+        .main-wrapper { flex-grow: 1; padding: 30px; overflow-y: auto; }
+        .view-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Components */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 24px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .user-avatar { width: 40px; height: 40px; background-color: var(--primary-color); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 14px; color: var(--text-muted); margin-bottom: 10px; }
+        .stat-card .value { font-size: 28px; font-weight: bold; }
+        
+        .action-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        .card-title { font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #E5E7EB; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 10px; border-bottom: 1px solid #E5E7EB; }
+        th { color: var(--text-muted); font-weight: 500; font-size: 14px; }
+        .status { padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status.unpaid { background-color: #FEE2E2; color: #DC2626; }
+        .status.paid { background-color: #D1FAE5; color: #059669; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #4338CA; }
+        .btn-outline { background-color: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+        .btn-outline:hover { background-color: #EEF2FF; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">🏠 Trozy</div>
+        <ul class="sidebar-menu">
+            <li><a class="nav-item active" data-target="view-dashboard">📊 Tổng quan</a></li>
+            <li><a class="nav-item" data-target="view-rooms">🚪 Quản lý Phòng</a></li>
+            <li><a class="nav-item" data-target="view-tenants">👥 Khách thuê</a></li>
+            <li><a class="nav-item" data-target="view-ai">📸 Quét Công tơ AI</a></li>
+            <li><a class="nav-item" data-target="view-invoices">🧾 Hóa đơn & Thu tiền</a></li>
+            <li><a class="nav-item" data-target="view-incidents">⚠️ Báo cáo sự cố</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper">
+
+        <!-- 1. VIEW: DASHBOARD -->
+        <main id="view-dashboard" class="view-content active">
+            <header class="header">
+                <h1>Tổng quan Nhà trọ</h1>
+                <div class="user-profile"><span>Chủ trọ</span><div class="user-avatar">A</div></div>
+            </header>
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Tổng số phòng</h3><div class="value">25</div></div>
+                <div class="stat-card"><h3>Phòng trống</h3><div class="value" style="color: #DC2626;">3</div></div>
+                <div class="stat-card"><h3>Doanh thu dự kiến</h3><div class="value">45.000.000 ₫</div></div>
+                <div class="stat-card"><h3>Hóa đơn chưa thu</h3><div class="value" style="color: #D97706;">5</div></div>
+            </div>
+            <div class="action-section">
+                <div class="card">
+                    <div class="card-title"><span>Hóa đơn gần đây</span><button class="btn btn-outline">Xem tất cả</button></div>
+                    <table>
+                        <thead><tr><th>Phòng</th><th>Khách thuê</th><th>Số tiền (VNĐ)</th><th>Trạng thái</th></tr></thead>
+                        <tbody>
+                            <tr><td>Phòng 101</td><td>Nguyễn Văn A</td><td>3.500.000</td><td><span class="status unpaid">Chưa thanh toán</span></td></tr>
+                            <tr><td>Phòng 102</td><td>Trần Thị B</td><td>4.200.000</td><td><span class="status paid">Đã thanh toán</span></td></tr>
+                            <tr><td>Phòng 201</td><td>Lê Văn C</td><td>3.800.000</td><td><span class="status unpaid">Chưa thanh toán</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span>Trợ lý AI Trozy 🤖</span></div>
+                    <div style="margin-bottom: 20px;">
+                        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">Chụp ảnh đồng hồ điện/nước để tự động ghi nhận chỉ số.</p>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="document.querySelector('[data-target=\'view-ai\']').click()">📸 Quét chỉ số công tơ</button>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #E5E7EB; margin-bottom: 20px;">
+                    <div>
+                        <h4 style="margin-bottom: 10px; font-size: 14px;">Cảnh báo thông minh</h4>
+                        <ul style="font-size: 13px; color: var(--text-muted); line-height: 1.6; padding-left: 20px;">
+                            <li><span style="color: #DC2626; font-weight: bold;">!</span> Phòng 101 tiêu thụ điện tăng 150% so với tháng trước.</li>
+                            <li>Sự cố "Rò rỉ nước" tại Phòng 201 (Mức độ: Khẩn cấp).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 2. VIEW: ROOMS -->
+        <main id="view-rooms" class="view-content">
+            <header class="header">
+                <h1>Quản lý Phòng</h1>
+                <button class="btn btn-primary">+ Thêm phòng mới</button>
+            </header>
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+                <div class="card" style="border-left: 4px solid #10B981;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <h3 style="font-size: 18px;">Phòng 101</h3><span class="status paid">Đang thuê</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 5px;">Khách: Nguyễn Văn A</p>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Giá: 3.500.000 ₫</p>
+                    <button class="btn btn-outline" style="width: 100%; font-size: 12px;">Xem chi tiết</button>
+                </div>
+                <div class="card" style="border-left: 4px solid #EF4444;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <h3 style="font-size: 18px;">Phòng 102</h3><span class="status unpaid" style="background-color: #FEE2E2; color: #EF4444;">Phòng trống</span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 5px;">Khách: Trống</p>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Giá: 4.000.000 ₫</p>
+                    <button class="btn btn-primary" style="width: 100%; font-size: 12px;">Lập hợp đồng mới</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 3. VIEW: TENANTS -->
+        <main id="view-tenants" class="view-content">
+            <header class="header">
+                <h1>Khách thuê</h1>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" placeholder="Tìm kiếm tên, phòng..." style="padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+                    <button class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </header>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Họ và tên</th><th>Phòng</th><th>Số ĐT</th><th>CCCD (Đã mã hóa)</th><th>Hạn hợp đồng</th><th>Thao tác</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="font-weight: bold;">Nguyễn Văn A</td><td>101</td><td>0901***234</td><td>0790***889</td><td>15/12/2026 <span style="color: #D97706; font-size: 12px;">(Sắp hết hạn)</span></td><td><button class="btn btn-outline" style="font-size: 12px;">Sửa</button></td></tr>
+                        <tr><td style="font-weight: bold;">Trần Thị B</td><td>205</td><td>0988***567</td><td>0010***123</td><td>20/05/2027</td><td><button class="btn btn-outline" style="font-size: 12px;">Sửa</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- 4. VIEW: AI METER SCANNING -->
+        <main id="view-ai" class="view-content">
+            <header class="header">
+                <h1>📸 Quét Công tơ AI</h1>
+                <button class="btn btn-outline">Xem lịch sử quét</button>
+            </header>
+            <div class="action-section">
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <div style="width: 100px; height: 100px; background-color: #EEF2FF; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <span style="font-size: 40px;">📷</span>
+                    </div>
+                    <h3 style="margin-bottom: 10px;">Chụp ảnh công tơ điện/nước</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Hệ thống AI sẽ tự động đọc chỉ số và cảnh báo nếu có bất thường.</p>
+                    <button class="btn btn-primary" style="font-size: 16px; padding: 12px 24px;">Mở Camera / Tải ảnh lên</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">Kết quả OCR AI</div>
+                    <div style="background-color: #F9FAFB; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #D1D5DB;">
+                        <p style="font-size: 12px; color: var(--text-muted);">Ảnh công tơ (Đã cắt tự động)</p>
+                        <div style="height: 80px; background-color: #E5E7EB; margin-top: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; letter-spacing: 5px; font-size: 24px;">0 2 4 5 8</div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-size: 12px; color: var(--text-muted);">Chỉ số đọc được (Có thể sửa thủ công):</label>
+                        <input type="number" value="2458" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 16px; font-weight: bold;">
+                    </div>
+                    <p style="font-size: 12px; color: #059669; margin-bottom: 15px;">✓ Độ tin cậy: 95% - Hình ảnh rõ nét.</p>
+                    <button class="btn btn-primary" style="width: 100%;">Xác nhận & Lưu</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 5. VIEW: INVOICES -->
+        <main id="view-invoices" class="view-content">
+            <header class="header">
+                <h1>Hóa đơn & Thu tiền</h1>
+                <button class="btn btn-primary">Tạo hóa đơn hàng loạt</button>
+            </header>
+            <div class="action-section">
+                <div class="card">
+                    <table style="font-size: 14px;">
+                        <thead>
+                            <tr><th>Mã HĐ</th><th>Phòng</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>#HD-1026-01</td><td>101</td><td>3.850.000 ₫</td><td><span class="status unpaid">Chưa thu</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Gửi Zalo</button></td></tr>
+                            <tr><td>#HD-1026-02</td><td>102</td><td>4.100.000 ₫</td><td><span class="status paid">Đã thu</span></td><td><button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; color: #6B7280; border-color: #D1D5DB;">Xem</button></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card" style="text-align: center;">
+                    <div class="card-title" style="justify-content: center;">Thanh toán VietQR</div>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Phòng 101 - Nguyễn Văn A</p>
+                    <div style="width: 150px; height: 150px; background-color: #F3F4F6; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border: 1px solid #D1D5DB;">
+                        [ Hình QR Code ]
+                    </div>
+                    <p style="font-size: 18px; font-weight: bold; color: var(--primary-color); margin-bottom: 15px;">3.850.000 ₫</p>
+                    <button class="btn btn-primary" style="width: 100%;">Xác nhận đã nhận tiền</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- 6. VIEW: INCIDENTS -->
+        <main id="view-incidents" class="view-content">
+            <header class="header">
+                <h1>Báo cáo sự cố</h1>
+            </header>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr><th>Ngày báo cáo</th><th>Phòng</th><th>Mô tả sự cố</th><th>Phân loại AI</th><th>Trạng thái</th><th>Thao tác</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>18/10/2026</td><td>201</td><td>"Ống nước nhà vệ sinh bị vỡ, tràn ra sàn."</td><td><span style="background-color: #FEE2E2; color: #DC2626; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Khẩn cấp</span></td><td><span class="status unpaid" style="background-color: #FEF3C7; color: #D97706;">Chờ xử lý</span></td><td><button class="btn btn-primary" style="font-size: 12px;">Cập nhật</button></td></tr>
+                        <tr><td>15/10/2026</td><td>105</td><td>"Bóng đèn hành lang bị cháy."</td><td><span style="background-color: #E0E7FF; color: #4338CA; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">Bình thường</span></td><td><span class="status paid">Đã sửa</span></td><td><button class="btn btn-outline" style="font-size: 12px; border-color: #D1D5DB; color: #6B7280;">Xem</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- JavaScript for Tab Switching -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const views = document.querySelectorAll('.view-content');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    // Xóa class active khỏi tất cả menu
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    // Thêm class active cho menu được click
+                    item.classList.add('active');
+
+                    // Ẩn tất cả các màn hình
+                    views.forEach(view => view.classList.remove('active'));
+                    // Hiển thị màn hình tương ứng với data-target
+                    const targetId = item.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
