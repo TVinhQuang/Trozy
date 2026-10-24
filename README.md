@@ -10,7 +10,7 @@ Repository lưu mã nguồn, tài liệu dự án, minh chứng kiểm thử và
 | --- | --- |
 | Repository | [TVinhQuang/Trozy](https://github.com/TVinhQuang/Trozy) |
 | Nhánh tích hợp | `main` |
-| Jira của nhóm | Chưa bổ sung đường dẫn trong README; PM cập nhật khi chia sẻ board |
+| Jira của nhóm | [Trozy — Jira (projectId 10001)](https://projectse-1.atlassian.net/welcome/software?projectId=10001) |
 | Kế hoạch tham chiếu | [Project Plan v2.0](<pa/PA2/rup_sdpln_sp (2.0).docx>) |
 | Prototype mới nhất | [UI PA2](pa/PA2/Trozy_UI_PA2_Team11.html) — tải file hoặc clone repo để chạy |
 
@@ -204,7 +204,8 @@ Sau đó mở pull request về `main` trên GitHub. Không dùng tài khoản G
 
 ## Các việc nhóm cần cập nhật tiếp
 
-- [ ] Bổ sung đường dẫn Jira và xác nhận quyền truy cập của các thành viên/giảng viên theo yêu cầu môn học.
+- [x] Bổ sung đường dẫn Jira của nhóm.
+- [ ] Xác nhận quyền truy cập Jira của các thành viên/giảng viên theo yêu cầu môn học.
 - [ ] Thiết lập bảo vệ `main` và quy trình review PR trên GitHub.
 - [ ] Bổ sung báo cáo tuần, biên bản và tài liệu làm việc vào đúng thư mục `docs/`.
 - [ ] Rà soát PA2: cập nhật Vision, use-case model/specifications, yêu cầu bổ sung, kiến trúc/thiết kế ban đầu và các artifact theo đề bài.
