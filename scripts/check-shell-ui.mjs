@@ -109,6 +109,8 @@ globalThis.fetch = async (url, options = {}) => {
     ];
     result = { user: { id: fixtureUserId, name: 'Người dùng mẫu', email: 'shell@example.test', role }, data };
   } else if (path === '/api/meter/updates') result = { revision: fixtureRevision.toString(16).padStart(64, '0') };
+  else if (path === '/api/ai/history?feature=B01') result = { entries: [] };
+  else if (path === '/api/ai/status') result = { available: false, modelInstalled: false, message: 'Trạng thái AI giả lập cho kiểm thử điều hướng.' };
   else assert.fail(`Unexpected shell API request: ${path}`);
   return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
 };
@@ -301,6 +303,15 @@ try {
   assert.equal(secondaryNavigation().getByRole('button', { name: 'Quản lý cơ sở', exact: true }).getAttribute('aria-expanded'), 'true');
   assert.ok(secondaryNavigation().getByRole('button', { name: 'Cơ sở nhà trọ', exact: true }));
   pass('Quick routes and single-open secondary groups cover all 23 owner pages once; secondary hash routes open their group and primary navigation preserves active state');
+
+  fireEvent.click(screen.getByRole('button', { name: /Cần một chút hỗ trợ\? Trao đổi với Trợ lý Trozy/ }));
+  await screen.findByRole('heading', { name: 'Trợ lý Trozy', level: 1 });
+  assert.equal(location.hash, '#assistant');
+  assert.ok(document.getElementById('main-content').contains(screen.getByRole('heading', { name: 'Trợ lý Trozy', level: 1 })));
+  assert.equal(screen.queryByRole('button', { name: 'Tạo yêu cầu', exact: true }), null);
+  fireEvent.click(quickNavigation().getByRole('button', { name: 'Tổng quan', exact: true }));
+  await screen.findByRole('heading', { name: 'Tổng quan', level: 1 });
+  pass('Landlord sidebar help opens the real Trozy assistant instead of ticket creation');
 
   // The compact trigger shows the property name; addresses appear in the open list.
   const propertyPicker = propertyCombobox();
@@ -599,6 +610,14 @@ try {
   assert.equal(document.activeElement, trigger);
   assert.equal(document.body.style.overflow, 'clip');
   assert.equal(quickNavigation().getByRole('button', { name: 'Tổng quan', exact: true }).getAttribute('aria-current'), 'page');
+  trigger = openDrawer();
+  fireEvent.click(within(screen.getByRole('dialog', { name: 'Menu Trozy' })).getByRole('button', { name: /Cần một chút hỗ trợ\? Trao đổi với Trợ lý Trozy/ }));
+  await screen.findByRole('heading', { name: 'Trợ lý Trozy', level: 1 });
+  assert.equal(location.hash, '#assistant');
+  assert.equal(screen.queryByRole('dialog', { name: 'Menu Trozy' }), null);
+  assert.equal(document.activeElement, trigger);
+  assert.equal(document.body.style.overflow, 'clip');
+  pass('Landlord help in the mobile drawer opens the assistant, closes the drawer and restores the menu trigger');
   openDrawer(); await resize(1440);
   assert.equal(screen.queryByRole('dialog', { name: 'Menu Trozy' }), null);
   assert.equal(sidebar().hasAttribute('inert'), false);
@@ -638,6 +657,19 @@ try {
   fireEvent.click(propertyCombobox());
   assert.equal(screen.queryByRole('button', { name: 'Quản lý danh sách cơ sở', exact: true }), null);
   assert.equal(screen.queryByRole('button', { name: 'Thêm cơ sở mới', exact: true }), null);
+  key(propertyCombobox(), 'Escape');
+  fireEvent.click(screen.getByRole('button', { name: /Cần một chút hỗ trợ\? Gửi yêu cầu đến chủ trọ/ }));
+  await screen.findByRole('heading', { name: 'Yêu cầu hỗ trợ', level: 1 });
+  assert.equal(location.hash, '#tickets');
+  assert.ok(screen.getByRole('button', { name: 'Tạo yêu cầu', exact: true }));
+  await resize(390);
+  const tenantMenuTrigger = openDrawer();
+  fireEvent.click(within(screen.getByRole('dialog', { name: 'Menu Trozy' })).getByRole('button', { name: /Cần một chút hỗ trợ\? Gửi yêu cầu đến chủ trọ/ }));
+  assert.equal(location.hash, '#tickets');
+  assert.equal(screen.queryByRole('dialog', { name: 'Menu Trozy' }), null);
+  assert.equal(document.activeElement, tenantMenuTrigger);
+  assert.ok(screen.getByRole('button', { name: 'Tạo yêu cầu', exact: true }));
+  pass('Tenant help continues to support requests with its create action on desktop and mobile, closing the mobile drawer');
   view.unmount();
   assert.equal(screen.queryByRole('menu', { name: 'Chức năng khác' }), null);
   assert.equal(resizeObservers.size, 0, 'Unmount disconnects every layout observer');

@@ -93,7 +93,7 @@ export default function App(){
       <div className="sidebar-brand"><Brand onNavigate={()=>navigate('dashboard')}/><button className="icon-button sidebar-close" onClick={()=>setMobile(false)} aria-label="Đóng menu"><X size={19}/></button></div>
       <SecondaryNavigation role={user.role} page={safePage} navigate={navigate} compact={compact} onExpand={toggleCompact} unread={unread} issues={issues}/>
       <div className="sidebar-footer">
-        <button className="help-link" onClick={()=>navigate('tickets')}><span className="help-icon"><LifeBuoy size={19}/></span><span><b>Cần một chút hỗ trợ?</b><small>Trozy luôn ở đây cùng bạn</small></span><ArrowRight size={16}/></button>
+        <button className="help-link" title={user.role==='landlord'?'Mở Trợ lý Trozy':'Mở yêu cầu hỗ trợ'} onClick={()=>navigate(user.role==='landlord'?'assistant':'tickets')}><span className="help-icon">{user.role==='landlord'?<Sparkles size={19}/>:<LifeBuoy size={19}/>}</span><span><b>Cần một chút hỗ trợ?</b>{' '}<small>{user.role==='landlord'?'Trao đổi với Trợ lý Trozy':'Gửi yêu cầu đến chủ trọ'}</small></span><ArrowRight size={16}/></button>
         <div className="sidebar-bottom"><button className="icon-button" aria-label={compact?'Mở rộng thanh bên':'Thu gọn thanh bên'} onClick={toggleCompact} aria-pressed={compact}>{compact?<PanelLeftOpen size={19}/>:<PanelLeftClose size={19}/>}<span>{compact?'Mở rộng':'Thu gọn menu'}</span></button></div>
       </div>
     </aside>

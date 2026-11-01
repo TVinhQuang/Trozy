@@ -18,6 +18,7 @@
     "check:ui-colors": "node scripts/run-project.mjs scripts/check-ui-colors.mjs",
     "check:readings-entry": "node scripts/run-project.mjs scripts/check-readings-entry.mjs",
     "check:property-management-ui": "node scripts/run-project.mjs scripts/check-property-management-ui.mjs",
+    "check:support-tickets-ui": "node scripts/run-project.mjs scripts/check-support-tickets-ui.mjs",
     "check:room-summary": "node scripts/run-project.mjs scripts/check-room-summary.mjs",
     "check:shell-ui": "node scripts/run-project.mjs scripts/check-shell-ui.mjs",
     "check:scroll-navigation": "node scripts/run-project.mjs scripts/check-scroll-navigation.mjs",

@@ -100,6 +100,28 @@ test('two-party maintenance workflow, support ticket reopen and notification rea
   const scoped=(await request('/api/bootstrap',{cookie:tenant})).body;assert.deepEqual(scoped.data.notifications.find(n=>n.id==='notice_01').readBy,['user_tenant']);
 });
 
+test('only tenants create support tickets while landlords receive and respond within their own scope',async t=>{
+  const {request,login,store}=await fixture(t);const owner=await login(),tenant=await login('thue@trozy.vn'),other=await login('khac@trozy.vn');
+  const input={propertyId:'property_01',roomId:'room_101',tenantId:'tenant_01',title:'Kiểm tra phí Internet',category:'Hóa đơn',body:'Nhờ chủ trọ kiểm tra lại phí Internet của tháng này.'};
+  const beforeTickets=store.list('tickets').length,beforeAudits=store.list('audits').length;
+  const rejected=await request('/api/tickets',post(owner,input));
+  assert.equal(rejected.status,403);assert.match(rejected.body.error,/Chỉ người thuê/);
+  assert.equal((await request('/api/tickets',post(other,input))).status,403);
+  assert.equal(store.list('tickets').length,beforeTickets);assert.equal(store.list('audits').length,beforeAudits);
+  const created=await request('/api/tickets',post(tenant,{...input,propertyId:'property_other',roomId:'room_b01',tenantId:'tenant_02',status:'resolved',messages:[{body:'Nội dung giả'}]}));
+  assert.equal(created.status,201);assert.equal(created.body.propertyId,'property_01');assert.equal(created.body.roomId,'room_101');assert.equal(created.body.tenantId,'tenant_01');assert.equal(created.body.status,'open');
+  assert.equal(created.body.messages.length,1);assert.equal(created.body.messages[0].authorId,'user_tenant');assert.equal(created.body.messages[0].body,input.body);
+  const ticketId=created.body.id;
+  const incoming=(await request('/api/bootstrap',{cookie:owner})).body.data.tickets.find(row=>row.id===ticketId);assert.equal(incoming.title,input.title);
+  assert.equal((await request('/api/actions/ticket-reply',post(other,{id:ticketId,body:'Phản hồi ngoài phạm vi'}))).status,404);
+  assert.equal((await request('/api/actions/ticket-transition',post(owner,{id:ticketId,status:'progress'}))).status,200);
+  const response=await request('/api/actions/ticket-reply',post(owner,{id:ticketId,body:'Tôi đã kiểm tra và cập nhật phí Internet.'}));
+  assert.equal(response.status,200);assert.equal(response.body.messages.at(-1).authorId,'owner_demo');
+  const tenantView=(await request('/api/bootstrap',{cookie:tenant})).body.data.tickets.find(row=>row.id===ticketId);assert.equal(tenantView.messages.at(-1).body,response.body.messages.at(-1).body);
+  assert.equal((await request('/api/actions/ticket-transition',post(owner,{id:ticketId,status:'resolved'}))).status,200);
+  assert.equal((await request('/api/actions/ticket-transition',post(tenant,{id:ticketId,status:'open'}))).status,200);
+});
+
 test('invite linking, local mail tokens, reset invalidation and origin protection',async t=>{
   const {request,login,store}=await fixture(t);const owner=await login();
   const invite=await request('/api/actions/invite-tenant',post(owner,{id:'tenant_02'}));assert.equal(invite.status,200);

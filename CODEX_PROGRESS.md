@@ -1,3 +1,12 @@
+## Hỗ trợ theo vai trò — 01/11/2026 (hoàn tất triển khai và kiểm thử)
+
+- Mục **Cần một chút hỗ trợ?** của chủ trọ mở **Trợ lý Trozy**, của khách trọ mở **Yêu cầu hỗ trợ**. Dòng mô tả, icon và tooltip xác định đúng đích đến. Drawer điện thoại đóng và trả focus như luồng điều hướng hiện tại.
+- Trang ticket của chủ trọ đã bỏ nút/form tạo, đổi mô tả và trạng thái trống thành tiếp nhận yêu cầu từ khách. Giữ xem, phản hồi, tiếp nhận/giải quyết/mở lại. Khách vẫn có nút tạo, gắn đúng phòng/người thuê của mình. API `createRecord` từ chối landlord tạo ticket bằng 403 trước normalize/ghi dữ liệu/audit. Các lối tạo qua hồ sơ/gia hạn/trả phòng vẫn là tenant-only; bảo trì/sự cố riêng giữ nguyên quyền.
+- Kiểm chứng cuối: **157/157 Node**, **21 nhóm shell**, **5 nhóm UI hỗ trợ**, **132 lượt render**, build TypeScript/Vite, JSON và whitespace đạt. Lượt kiểm thử đầu chạy đồng thời với build/shell có lỗi worker OCR tạm thời; lượt đầy đủ sau đó đạt không lỗi/bỏ qua. Không sửa OCR. Shell assertion mới ban đầu giả định focus main không thuộc luồng này; đã sửa kiểm tra đích đến và chạy lại toàn bộ. Chi tiết `docs/test/UI-SUPPORT-ROLES-20261101.md`.
+- PRODUCT.md, DESIGN.md, sidecar và `docs/PROJECT-STATUS.md` cập nhật. OCR/B03 vẫn ghi đang hoàn thiện/thử nghiệm. Không sửa DB/ảnh/model/thư viện hoặc các thay đổi PA2/crop ngoài phạm vi. Browser visual QA vẫn chưa được xác nhận; kiểm tra UI là DOM/fixture cô lập.
+- Đã kiểm tra đường dẫn tuyệt đối, allowlist/không có liên kết và dọn đúng `tmp/support-role-routing-20261101/backend-tests.log` cùng thư mục rỗng. Tác vụ được lưu bằng commit riêng sau `59ba047` trên `main`, với tiêu đề `fix: route support by role and restrict ticket creation to tenants`; theo yêu cầu đồng bộ GitHub hiện tại, dùng push fast-forward và đối chiếu SHA remote. Không force push hoặc thêm tệp ngoài phạm vi.
+- Không còn phần triển khai bắt buộc dang dở cho yêu cầu này. Nếu phiên bị ngắt ở bước xuất bản, kiểm tra `git status`, `git log -3 --oneline`, `git ls-remote origin refs/heads/main`; chỉ push commit còn thiếu, không tạo lại phần đã hoàn tất. Không có cơ chế tự tạo lượt chạy sau khi cấp lại quota; gửi “tiếp tục theo CODEX_PROGRESS.md” khi cần.
+
 ## Gọn nút cơ sở và xuất bản GitHub — 01/11/2026 (hoàn tất)
 
 - Theo yêu cầu mới, đã bỏ địa chỉ khỏi nút cơ sở đóng; tên/caption giữ gọn. Địa chỉ chỉ xuất hiện dưới từng cơ sở khi mở mũi tên. Tests shell cập nhật, **18 nhóm đạt**, build/CSS/JSON đạt; chạy lại đầy đủ **156/156 Node tests đạt**, không lỗi/bỏ qua.

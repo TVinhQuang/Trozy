@@ -199,6 +199,7 @@ export function createRecord(store,user,collection,input){
   must(COLLECTIONS.includes(collection),'Không tìm thấy loại dữ liệu.',404);
   must(!immutable.has(collection),'Dùng thao tác nghiệp vụ để tạo bản ghi này.',403);
   must(user.role==='landlord'||tenantCreate.has(collection),'Bạn không có quyền tạo dữ liệu này.',403);
+  if(collection==='tickets')must(user.role==='tenant','Chỉ người thuê được tạo yêu cầu hỗ trợ. Chủ trọ tiếp nhận và phản hồi yêu cầu đã gửi.',403);
   const row=normalize(store,user,collection,input);
   if(collection==='tickets')row.messages=[{id:id('msg'),authorId:user.id,authorName:user.name,body:row.body,createdAt:now(),...(row.fileId?{fileId:row.fileId}:{})}];
   if(collection==='notifications')row.createdBy=user.id;

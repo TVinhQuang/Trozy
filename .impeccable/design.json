@@ -689,6 +689,11 @@
         "section": "elevation",
         "body": "Use borders and tone for persistent content; reserve diffuse shadows for temporary overlays.",
         "name": "The Flat Workspace Rule"
+      },
+      {
+        "section": "interaction",
+        "body": "Sidebar help opens the Trozy assistant for landlords and support requests for tenants. Only tenants create support tickets; landlords view, reply and manage incoming requests. Keep empty-state copy and API permissions aligned with those roles.",
+        "name": "The Role-Aware Support Rule"
       }
     ],
     "dos": [

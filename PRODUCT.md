@@ -22,6 +22,7 @@ The existing application is React/TypeScript with Vite, a Node.js HTTP API and S
 
 - Landlord workflows include properties, rooms, tenants, contracts, services, meter readings, invoices, payments, deposits, transactions, maintenance, assets, handovers, notifications, support, documents, vehicles, amenities and reports.
 - Tenant workflows are limited to authorized information and actions. Tenant meter submissions remain photo-only.
+- Support tickets originate from tenants; landlords read, respond and manage their status. The sidebar help entry opens the Trozy assistant for landlords and support requests for tenants.
 - OCR/AI produces proposals. Landlords compare the original image and verify readings before saving; proposals must not automatically change readings or invoices.
 - The text assistant and consumption/maintenance AI surfaces are existing capabilities, not evidence of autonomous financial decision-making.
 - Project-specific dependencies, models, caches, logs and generated data stay inside the project. Existing installed dependencies and runtimes should be reused.
