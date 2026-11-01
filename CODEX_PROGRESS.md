@@ -1,3 +1,9 @@
+## Gọn dòng quá hạn dưới công nợ — 01/11/2026 (hoàn tất)
+
+- Theo yêu cầu mới, ô công nợ giữ một số tiền chính in đậm. Bên dưới chỉ còn chữ nhỏ **Quá hạn** khi có nợ quá hạn; bỏ số tiền lặp, nền, viền và kiểu inline để không nằm cạnh số tiền.
+- Sửa Core.tsx và rooms-summary.css, cập nhật DESIGN. Không thay đổi phép tính, dữ liệu quá hạn hoặc số tiền trong Excel. Build TypeScript/Vite và **8 nhóm phòng/dashboard đạt**, whitespace đạt. Không tạo tệp tạm hoặc thay đổi dữ liệu/PA2/tài liệu người dùng khác.
+- Lưu riêng bản sửa sau `817f321` để đồng bộ GitHub theo yêu cầu hiện hành. Nếu xuất bản gián đoạn, kiểm tra `git status`, `git log -3 --oneline`, `git ls-remote origin refs/heads/main`, chỉ push commit còn thiếu; không force push.
+
 ## Ba màu nút, chữ tối và bảng phòng — 01/11/2026 (hoàn tất triển khai và kiểm thử)
 
 - Ba nút dashboard dùng nền xanh dương/xanh ngọc/tím nhạt, chung chữ tối đậm. Các nút xem/trao đổi, lịch sử/in, tạo mới, lưu/xác nhận, sửa/thử lại và xóa ở trang khác được gắn nhóm màu nhất quán; hủy/đóng trung tính. Nội dung/nút/nhãn dùng #171b24, chữ phụ #46505f; màu thể hiện qua nền/viền/icon/chấm và biểu đồ. Điều hướng vẫn giữ hệ xanh dương.

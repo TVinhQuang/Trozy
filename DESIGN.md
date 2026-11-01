@@ -316,6 +316,8 @@ Room management opens on **Bảng tổng hợp**: a naturally sorted table group
 
 Summary metrics reflect the current filter. Listed monthly prices are labelled separately from actual receipts. Room debt includes all unpaid issued invoices for that room, including a former tenancy where applicable. Deposits distinguish the current tenancy from real reservation receipts against draft contracts; a promised contract deposit never counts as received cash. Tenant-profile counts are labelled as maintained profiles rather than inferred occupants.
 
+The room-debt cell shows its amount once in bold. If any debt is overdue, a small plain **Quá hạn** line sits beneath that amount, without another amount, colored fill or enclosing border. The overdue amount remains in the underlying financial data and export.
+
 **Xuất Excel** downloads a real `.xlsx` of the filtered room summaries for landlords. The workbook has Vietnamese headings, numeric money, date cells, frozen headings and room/property columns, an autofilter and wrapped text. Current-lease, reservation and total deposits are separate columns. Notes explain the financial scope; pending AI values, identity documents, account details and internal record IDs are not exported. Empty results disable export, and a failed download leaves a visible error and retry path.
 
 ### Dialogs

@@ -35,7 +35,7 @@
 .room-summary-group th>span { margin-left: 12px; color: var(--foreground); font-weight: 600; font-size: .75rem; }
 .rooms-overview-table td>span, .rooms-overview-table td>small, .rooms-overview-table th>small { display: block; }
 .rooms-overview-table td>small, .rooms-overview-table th>small { color: var(--muted); font-size: .75rem; font-weight: 400; margin-top: 5px; }
-.rooms-overview-table td>small.danger-text { display: inline-flex; align-items: center; padding: 4px 7px; border: 1px solid var(--danger); border-radius: 6px; background: var(--danger-bg); color: var(--foreground); font-size: .6875rem; font-weight: 600; }
+.rooms-overview-table td>small.room-debt-note { display: block; color: var(--muted); font-size: .6875rem; font-weight: 600; margin-top: 4px; }
 .rooms-overview-table td { max-width: 300px; color: var(--foreground); }
 .rooms-overview-table .money { color: var(--foreground); font-weight: 650; }
 .rooms-overview-table td:nth-child(5)>span { color: var(--foreground); font-weight: 600; }
