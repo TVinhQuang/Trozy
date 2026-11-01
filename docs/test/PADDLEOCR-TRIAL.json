@@ -1,0 +1,4342 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-27T12:50:31.100Z",
+  "completedAt": "2026-10-27T12:50:56.613Z",
+  "stage": "complete",
+  "local": true,
+  "visionUsed": false,
+  "appIntegrated": false,
+  "controls": {
+    "previous": 0,
+    "oneRunPerVariant": true,
+    "expectedLabelsSentToEngines": false,
+    "rawImageTransform": "EXIF orientation, white alpha flatten, color PNG or lossless WebP when PNG exceeds 5 MiB; optional declared crop; fixed declared rotation; no resize",
+    "orientationSelectionByExpectedAnswer": false,
+    "maxSamples": 10,
+    "maxVariants": 30
+  },
+  "runtime": {
+    "node": "v24.19.0",
+    "platform": "win32",
+    "arch": "x64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13620H",
+    "logicalCpus": 16,
+    "machineMemoryBytes": 33968578560,
+    "sharp": "0.35.5",
+    "tesseractJs": "7.0.0"
+  },
+  "sourceHashes": {
+    "harness": "49817bdbd97a2c7c4c583e4938a1126d1e3191ab6247aecf078799a7e3c092f0",
+    "ocr": "7203615f59004b6fd0f2d68df1f836df2bc6fd0f94a71f7fdd4106527dfe8388",
+    "preprocessing": "30effd8af36dee65f5c64867d0e1acb4ef958fcf885d3942b21cdfa45adb5bd5",
+    "evidence": "45bc3166e75130afc9a11ca23ff1e5de3506811225f651aa1faa4637cbc74eff"
+  },
+  "manifest": {
+    "path": "D:\\TrozyOCRTrial\\work\\manifest.json",
+    "sha256": "d1173a783a05e801016678fa2c3567fceadef1bc2b9e161350eb128410195aac"
+  },
+  "artifacts": {
+    "runDirectory": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a",
+    "preparedManifestPath": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle-input.json",
+    "rawOutputPath": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle-raw.json"
+  },
+  "samples": [
+    {
+      "id": "water-blue",
+      "deviceId": "water-blue",
+      "path": "E:/Downloads/cach-xem-dong-ho-nuoc-va-tinh-tien-nuoc-don-gian-12.jpg",
+      "utility": "water",
+      "expected": {
+        "integerDigits": "00001",
+        "fractionalDigits": "056",
+        "unit": "m3"
+      },
+      "rotations": [
+        0,
+        90,
+        270
+      ],
+      "manualCrops": [
+        {
+          "id": "register",
+          "rectangle": {
+            "left": 240,
+            "top": 420,
+            "width": 830,
+            "height": 330
+          },
+          "rotationDegrees": 0,
+          "note": "Human-selected diagnostic crop, no automatic localization claim."
+        }
+      ],
+      "kind": "physical_meter",
+      "originalSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+      "originalBytes": 339681,
+      "orientedWidth": 1280,
+      "orientedHeight": 1707
+    },
+    {
+      "id": "water-weathered",
+      "deviceId": "water-weathered",
+      "path": "E:/Downloads/shutterstock7398353801-16623474892361975165326.webp",
+      "utility": "water",
+      "expected": {
+        "integerDigits": "1303",
+        "fractionalDigits": "8",
+        "unit": null
+      },
+      "rotations": [
+        0,
+        90,
+        270
+      ],
+      "manualCrops": [
+        {
+          "id": "register",
+          "rectangle": {
+            "left": 835,
+            "top": 530,
+            "width": 180,
+            "height": 460
+          },
+          "rotationDegrees": 270,
+          "note": "Human-selected and rotated diagnostic crop; unit not visible enough for scoring."
+        }
+      ],
+      "kind": "physical_meter",
+      "originalSha256": "b3f6eb362ad2a4440be011e62fc071edc6dc1cf13e01e409ca93299f8031a425",
+      "originalBytes": 1464196,
+      "orientedWidth": 2000,
+      "orientedHeight": 1502
+    },
+    {
+      "id": "electric-synthetic",
+      "deviceId": "fixture-not-real-meter",
+      "path": "C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Documents\\Nhập môn công nghệ phần mềm\\Trozy/tests/fixtures/meter-synthetic.png",
+      "utility": "electric",
+      "expected": {
+        "integerDigits": "012345",
+        "fractionalDigits": "",
+        "unit": "kWh"
+      },
+      "rotations": [
+        0,
+        90,
+        270
+      ],
+      "kind": "synthetic_fixture",
+      "originalSha256": "588d46bc3342da934bc40042c66fd59414809954cb2d4df81bd4855574b9d13d",
+      "originalBytes": 24359,
+      "orientedWidth": 1000,
+      "orientedHeight": 400
+    },
+    {
+      "id": "blank",
+      "deviceId": "negative-blank",
+      "path": "D:/TrozyOCRTrial/work/controls/blank.png",
+      "utility": "water",
+      "expected": null,
+      "rotations": [
+        0
+      ],
+      "kind": "negative_control",
+      "originalSha256": "ce2f57549833db2fa93f242be12f6ade72b3f0ffcecfc323f99588ac08200d5b",
+      "originalBytes": 2579,
+      "orientedWidth": 700,
+      "orientedHeight": 600
+    },
+    {
+      "id": "specifications",
+      "deviceId": "negative-specifications",
+      "path": "D:/TrozyOCRTrial/work/controls/specifications.png",
+      "utility": "water",
+      "expected": null,
+      "rotations": [
+        0
+      ],
+      "kind": "negative_control",
+      "originalSha256": "327af8221024de93eb878be62585c8a20f1a973b63a879b2b8a3e1ad2cc7f41b",
+      "originalBytes": 19498,
+      "orientedWidth": 700,
+      "orientedHeight": 600
+    }
+  ],
+  "cases": [
+    {
+      "id": "water-blue__full-r0",
+      "sampleId": "water-blue",
+      "variantId": "full-r0",
+      "rotationDegrees": 0,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "00001056\n00001",
+          "confidence": 94,
+          "ocrConfidence": 94,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "OCR đọc ổn định nhóm số nền đen sau khi tìm vùng và nắn thẳng; nhóm màu đỏ, đơn vị và quy ước thập phân vẫn cần đối chiếu riêng.",
+            "Các lượt OCR chưa thống nhất toàn bộ dãy số. Không dùng chuỗi ghép làm chỉ số tính tiền.",
+            "Đã nhận dạng được nhóm chữ số nhưng chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập."
+          ],
+          "registers": [
+            {
+              "digits": "00001056",
+              "confidence": 73,
+              "passes": 1,
+              "stable": false,
+              "regionId": "register-1",
+              "unit": "unknown",
+              "decimalEvidence": "color_groups",
+              "blackDigits": "00001",
+              "redDigits": "056",
+              "blackStable": true,
+              "blackConfidence": 94,
+              "blackPasses": 2,
+              "redStable": false,
+              "redConfidence": 0,
+              "redPasses": 0,
+              "geometry": {
+                "kind": "auto",
+                "angle": -9.7,
+                "rectangle": {
+                  "left": 292,
+                  "top": 503,
+                  "width": 683,
+                  "height": 189
+                }
+              }
+            }
+          ],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 8,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "00001096",
+                "confidence": 70
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "00001056",
+                "confidence": 73
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-100",
+                "text": "80001096",
+                "confidence": 50
+              },
+              {
+                "regionId": "register-1-black",
+                "variant": "threshold-120",
+                "text": "00001",
+                "confidence": 94
+              },
+              {
+                "regionId": "register-1-black",
+                "variant": "threshold-110",
+                "text": "00001",
+                "confidence": 93
+              },
+              {
+                "regionId": "register-1-red",
+                "variant": "threshold-120",
+                "text": "09",
+                "confidence": 56
+              },
+              {
+                "regionId": "register-1-red",
+                "variant": "threshold-110",
+                "text": "05",
+                "confidence": 30
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1308
+        },
+        "measuredWallMs": 1314,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "00001056",
+              "numericTokens": [
+                "00001056"
+              ],
+              "digitsAfterRemovingNonDigits": "00001056"
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "00001",
+              "numericTokens": [
+                "00001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "registers[0].digits",
+              "text": "00001056",
+              "numericTokens": [
+                "00001056"
+              ],
+              "digitsAfterRemovingNonDigits": "00001056"
+            },
+            {
+              "source": "registers[0].blackDigits",
+              "text": "00001",
+              "numericTokens": [
+                "00001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "registers[0].redDigits",
+              "text": "056",
+              "numericTokens": [
+                "056"
+              ],
+              "digitsAfterRemovingNonDigits": "056"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": true,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-blue__full-r0",
+          "pathSha256": "e57280346342225eab4adc452ea372989e8bd09996751e34d436aa8692a92819",
+          "lines": [
+            {
+              "text": "M 110102",
+              "score": 0.9405919909477234,
+              "polygon": [
+                [
+                  507,
+                  370
+                ],
+                [
+                  853,
+                  310
+                ],
+                [
+                  869,
+                  403
+                ],
+                [
+                  523,
+                  463
+                ]
+              ]
+            },
+            {
+              "text": "CE",
+              "score": 0.9983342885971069,
+              "polygon": [
+                [
+                  329,
+                  387
+                ],
+                [
+                  489,
+                  358
+                ],
+                [
+                  510,
+                  480
+                ],
+                [
+                  350,
+                  508
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.9999092817306519,
+              "polygon": [
+                [
+                  1071,
+                  470
+                ],
+                [
+                  1098,
+                  463
+                ],
+                [
+                  1107,
+                  495
+                ],
+                [
+                  1080,
+                  502
+                ]
+              ]
+            },
+            {
+              "text": "000010:56m",
+              "score": 0.9806071519851685,
+              "polygon": [
+                [
+                  250,
+                  572
+                ],
+                [
+                  1104,
+                  443
+                ],
+                [
+                  1127,
+                  596
+                ],
+                [
+                  273,
+                  725
+                ]
+              ]
+            },
+            {
+              "text": "x0,0001",
+              "score": 0.9552592039108276,
+              "polygon": [
+                [
+                  1032,
+                  736
+                ],
+                [
+                  1180,
+                  710
+                ],
+                [
+                  1188,
+                  757
+                ],
+                [
+                  1040,
+                  782
+                ]
+              ]
+            },
+            {
+              "text": "0",
+              "score": 0.9944260120391846,
+              "polygon": [
+                [
+                  887,
+                  756
+                ],
+                [
+                  920,
+                  756
+                ],
+                [
+                  920,
+                  799
+                ],
+                [
+                  887,
+                  799
+                ]
+              ]
+            },
+            {
+              "text": "DE-08-MI001-PTB017",
+              "score": 0.9935290813446045,
+              "polygon": [
+                [
+                  172,
+                  799
+                ],
+                [
+                  614,
+                  732
+                ],
+                [
+                  621,
+                  781
+                ],
+                [
+                  179,
+                  849
+                ]
+              ]
+            },
+            {
+              "text": "2",
+              "score": 0.9999833106994629,
+              "polygon": [
+                [
+                  1061,
+                  848
+                ],
+                [
+                  1099,
+                  846
+                ],
+                [
+                  1103,
+                  893
+                ],
+                [
+                  1065,
+                  896
+                ]
+              ]
+            },
+            {
+              "text": "Q3=2.5",
+              "score": 0.9999844431877136,
+              "polygon": [
+                [
+                  209,
+                  868
+                ],
+                [
+                  365,
+                  844
+                ],
+                [
+                  372,
+                  895
+                ],
+                [
+                  216,
+                  918
+                ]
+              ]
+            },
+            {
+              "text": "8",
+              "score": 0.9996699094772339,
+              "polygon": [
+                [
+                  737,
+                  889
+                ],
+                [
+                  771,
+                  887
+                ],
+                [
+                  775,
+                  928
+                ],
+                [
+                  741,
+                  931
+                ]
+              ]
+            },
+            {
+              "text": "R=80H",
+              "score": 0.9999147653579712,
+              "polygon": [
+                [
+                  257,
+                  928
+                ],
+                [
+                  405,
+                  907
+                ],
+                [
+                  412,
+                  954
+                ],
+                [
+                  264,
+                  975
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.9999793767929077,
+              "polygon": [
+                [
+                  1078,
+                  949
+                ],
+                [
+                  1112,
+                  947
+                ],
+                [
+                  1115,
+                  988
+                ],
+                [
+                  1081,
+                  990
+                ]
+              ]
+            },
+            {
+              "text": "MAP 16",
+              "score": 0.9237020611763,
+              "polygon": [
+                [
+                  311,
+                  974
+                ],
+                [
+                  477,
+                  950
+                ],
+                [
+                  484,
+                  1000
+                ],
+                [
+                  318,
+                  1025
+                ]
+              ]
+            },
+            {
+              "text": "ZR",
+              "score": 0.9999205470085144,
+              "polygon": [
+                [
+                  515,
+                  974
+                ],
+                [
+                  636,
+                  960
+                ],
+                [
+                  645,
+                  1040
+                ],
+                [
+                  524,
+                  1054
+                ]
+              ]
+            },
+            {
+              "text": "T30",
+              "score": 0.9962167143821716,
+              "polygon": [
+                [
+                  364,
+                  1021
+                ],
+                [
+                  454,
+                  1011
+                ],
+                [
+                  460,
+                  1061
+                ],
+                [
+                  370,
+                  1071
+                ]
+              ]
+            },
+            {
+              "text": "6",
+              "score": 0.9999754428863525,
+              "polygon": [
+                [
+                  827,
+                  1079
+                ],
+                [
+                  855,
+                  1079
+                ],
+                [
+                  855,
+                  1117
+                ],
+                [
+                  827,
+                  1117
+                ]
+              ]
+            },
+            {
+              "text": "5",
+              "score": 0.9999951124191284,
+              "polygon": [
+                [
+                  932,
+                  1095
+                ],
+                [
+                  965,
+                  1095
+                ],
+                [
+                  965,
+                  1137
+                ],
+                [
+                  932,
+                  1137
+                ]
+              ]
+            }
+          ],
+          "firstInference": true,
+          "durationMs": 706,
+          "peakMemoryBytes": 645775360
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "M 110102",
+              "numericTokens": [
+                "110102"
+              ],
+              "digitsAfterRemovingNonDigits": "110102"
+            },
+            {
+              "source": "lines[1]",
+              "text": "CE",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[2]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            },
+            {
+              "source": "lines[3]",
+              "text": "000010:56m",
+              "numericTokens": [
+                "000010",
+                "56"
+              ],
+              "digitsAfterRemovingNonDigits": "00001056"
+            },
+            {
+              "source": "lines[4]",
+              "text": "x0,0001",
+              "numericTokens": [
+                "0,0001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "lines[5]",
+              "text": "0",
+              "numericTokens": [
+                "0"
+              ],
+              "digitsAfterRemovingNonDigits": "0"
+            },
+            {
+              "source": "lines[6]",
+              "text": "DE-08-MI001-PTB017",
+              "numericTokens": [
+                "08",
+                "001",
+                "017"
+              ],
+              "digitsAfterRemovingNonDigits": "08001017"
+            },
+            {
+              "source": "lines[7]",
+              "text": "2",
+              "numericTokens": [
+                "2"
+              ],
+              "digitsAfterRemovingNonDigits": "2"
+            },
+            {
+              "source": "lines[8]",
+              "text": "Q3=2.5",
+              "numericTokens": [
+                "3",
+                "2.5"
+              ],
+              "digitsAfterRemovingNonDigits": "325"
+            },
+            {
+              "source": "lines[9]",
+              "text": "8",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "lines[10]",
+              "text": "R=80H",
+              "numericTokens": [
+                "80"
+              ],
+              "digitsAfterRemovingNonDigits": "80"
+            },
+            {
+              "source": "lines[11]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            },
+            {
+              "source": "lines[12]",
+              "text": "MAP 16",
+              "numericTokens": [
+                "16"
+              ],
+              "digitsAfterRemovingNonDigits": "16"
+            },
+            {
+              "source": "lines[13]",
+              "text": "ZR",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[14]",
+              "text": "T30",
+              "numericTokens": [
+                "30"
+              ],
+              "digitsAfterRemovingNonDigits": "30"
+            },
+            {
+              "source": "lines[15]",
+              "text": "6",
+              "numericTokens": [
+                "6"
+              ],
+              "digitsAfterRemovingNonDigits": "6"
+            },
+            {
+              "source": "lines[16]",
+              "text": "5",
+              "numericTokens": [
+                "5"
+              ],
+              "digitsAfterRemovingNonDigits": "5"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-blue__full-r0.png",
+      "mime": "image/png",
+      "sha256": "e57280346342225eab4adc452ea372989e8bd09996751e34d436aa8692a92819",
+      "bytes": 3173699,
+      "limitSkip": null
+    },
+    {
+      "id": "water-blue__full-r90",
+      "sampleId": "water-blue",
+      "variantId": "full-r90",
+      "rotationDegrees": 90,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "4\n—\n-~\n4\nNn\nWN\n1111",
+          "confidence": 41,
+          "ocrConfidence": 41,
+          "candidates": [
+            {
+              "value": 4,
+              "text": "4",
+              "confidence": 62,
+              "reason": "Dãy số riêng trên một dòng."
+            }
+          ],
+          "suggestedValue": null,
+          "warnings": [
+            "Độ tin cậy OCR thấp. Chụp rõ, thẳng mặt số hoặc khoanh vùng dãy số rồi thử lại.",
+            "Các lượt OCR chưa thống nhất toàn bộ dãy số. Không dùng chuỗi ghép làm chỉ số tính tiền."
+          ],
+          "registers": [
+            {
+              "digits": "1111",
+              "confidence": 35,
+              "passes": 1,
+              "stable": false,
+              "regionId": "register-2",
+              "unit": "unknown",
+              "decimalEvidence": "unknown",
+              "geometry": {
+                "kind": "auto",
+                "angle": -7.7,
+                "rectangle": {
+                  "left": 750,
+                  "top": 1036,
+                  "width": 57,
+                  "height": 29
+                }
+              }
+            }
+          ],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 5,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "1",
+                "confidence": 1
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-120",
+                "text": "1111",
+                "confidence": 35
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-110",
+                "text": "1119",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1298
+        },
+        "measuredWallMs": 1302,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "4",
+              "numericTokens": [
+                "4"
+              ],
+              "digitsAfterRemovingNonDigits": "4"
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "—",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[2]",
+              "text": "-~",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[3]",
+              "text": "4",
+              "numericTokens": [
+                "4"
+              ],
+              "digitsAfterRemovingNonDigits": "4"
+            },
+            {
+              "source": "rawText.line[4]",
+              "text": "Nn",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[5]",
+              "text": "WN",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[6]",
+              "text": "1111",
+              "numericTokens": [
+                "1111"
+              ],
+              "digitsAfterRemovingNonDigits": "1111"
+            },
+            {
+              "source": "candidates[0].text",
+              "text": "4",
+              "numericTokens": [
+                "4"
+              ],
+              "digitsAfterRemovingNonDigits": "4"
+            },
+            {
+              "source": "registers[0].digits",
+              "text": "1111",
+              "numericTokens": [
+                "1111"
+              ],
+              "digitsAfterRemovingNonDigits": "1111"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-blue__full-r90",
+          "pathSha256": "8d7fe3dddc65c3e3457493de647f1816b24c2166a33993129356e4373bb8f289",
+          "lines": [
+            {
+              "text": "DE-08-MI001-PTB017",
+              "score": 0.9899442195892334,
+              "polygon": [
+                [
+                  906,
+                  176
+                ],
+                [
+                  971,
+                  613
+                ],
+                [
+                  919,
+                  621
+                ],
+                [
+                  853,
+                  183
+                ]
+              ]
+            },
+            {
+              "text": "Q3=2.5",
+              "score": 0.999983012676239,
+              "polygon": [
+                [
+                  786,
+                  218
+                ],
+                [
+                  836,
+                  211
+                ],
+                [
+                  860,
+                  366
+                ],
+                [
+                  809,
+                  373
+                ]
+              ]
+            },
+            {
+              "text": "R=80H",
+              "score": 0.9999353289604187,
+              "polygon": [
+                [
+                  728,
+                  266
+                ],
+                [
+                  775,
+                  259
+                ],
+                [
+                  798,
+                  404
+                ],
+                [
+                  751,
+                  411
+                ]
+              ]
+            },
+            {
+              "text": "0",
+              "score": 0.93012535572052,
+              "polygon": [
+                [
+                  1009,
+                  301
+                ],
+                [
+                  1093,
+                  286
+                ],
+                [
+                  1104,
+                  349
+                ],
+                [
+                  1020,
+                  364
+                ]
+              ]
+            },
+            {
+              "text": "MAP 16",
+              "score": 0.9771323204040527,
+              "polygon": [
+                [
+                  676,
+                  318
+                ],
+                [
+                  729,
+                  310
+                ],
+                [
+                  755,
+                  478
+                ],
+                [
+                  702,
+                  486
+                ]
+              ]
+            },
+            {
+              "text": "00010:56",
+              "score": 0.978073000907898,
+              "polygon": [
+                [
+                  997,
+                  360
+                ],
+                [
+                  1155,
+                  339
+                ],
+                [
+                  1244,
+                  1000
+                ],
+                [
+                  1086,
+                  1021
+                ]
+              ]
+            },
+            {
+              "text": "CEM110",
+              "score": 0.9253758788108826,
+              "polygon": [
+                [
+                  1182,
+                  351
+                ],
+                [
+                  1315,
+                  323
+                ],
+                [
+                  1399,
+                  723
+                ],
+                [
+                  1266,
+                  751
+                ]
+              ]
+            },
+            {
+              "text": "T30",
+              "score": 0.9978489279747009,
+              "polygon": [
+                [
+                  627,
+                  370
+                ],
+                [
+                  682,
+                  362
+                ],
+                [
+                  695,
+                  454
+                ],
+                [
+                  640,
+                  462
+                ]
+              ]
+            },
+            {
+              "text": "NZ",
+              "score": 0.5147561430931091,
+              "polygon": [
+                [
+                  642,
+                  526
+                ],
+                [
+                  729,
+                  511
+                ],
+                [
+                  749,
+                  630
+                ],
+                [
+                  662,
+                  645
+                ]
+              ]
+            },
+            {
+              "text": "0102",
+              "score": 0.9999803304672241,
+              "polygon": [
+                [
+                  1275,
+                  699
+                ],
+                [
+                  1355,
+                  684
+                ],
+                [
+                  1387,
+                  850
+                ],
+                [
+                  1308,
+                  865
+                ]
+              ]
+            },
+            {
+              "text": "8",
+              "score": 0.9959113597869873,
+              "polygon": [
+                [
+                  774,
+                  742
+                ],
+                [
+                  812,
+                  738
+                ],
+                [
+                  816,
+                  772
+                ],
+                [
+                  778,
+                  776
+                ]
+              ]
+            },
+            {
+              "text": "9",
+              "score": 0.602372407913208,
+              "polygon": [
+                [
+                  868,
+                  794
+                ],
+                [
+                  903,
+                  794
+                ],
+                [
+                  903,
+                  826
+                ],
+                [
+                  868,
+                  826
+                ]
+              ]
+            },
+            {
+              "text": "0",
+              "score": 0.9400602579116821,
+              "polygon": [
+                [
+                  904,
+                  882
+                ],
+                [
+                  943,
+                  875
+                ],
+                [
+                  951,
+                  918
+                ],
+                [
+                  912,
+                  925
+                ]
+              ]
+            },
+            {
+              "text": "5",
+              "score": 0.9972975850105286,
+              "polygon": [
+                [
+                  569,
+                  932
+                ],
+                [
+                  612,
+                  932
+                ],
+                [
+                  612,
+                  965
+                ],
+                [
+                  569,
+                  965
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.9907426238059998,
+              "polygon": [
+                [
+                  1113,
+                  995
+                ],
+                [
+                  1202,
+                  978
+                ],
+                [
+                  1224,
+                  1090
+                ],
+                [
+                  1135,
+                  1107
+                ]
+              ]
+            },
+            {
+              "text": "x0,0001",
+              "score": 0.9697904586791992,
+              "polygon": [
+                [
+                  916,
+                  1038
+                ],
+                [
+                  968,
+                  1028
+                ],
+                [
+                  996,
+                  1178
+                ],
+                [
+                  945,
+                  1188
+                ]
+              ]
+            },
+            {
+              "text": "2",
+              "score": 0.9993444085121155,
+              "polygon": [
+                [
+                  808,
+                  1072
+                ],
+                [
+                  850,
+                  1061
+                ],
+                [
+                  859,
+                  1095
+                ],
+                [
+                  818,
+                  1106
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.8543457388877869,
+              "polygon": [
+                [
+                  716,
+                  1083
+                ],
+                [
+                  753,
+                  1078
+                ],
+                [
+                  757,
+                  1110
+                ],
+                [
+                  721,
+                  1115
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.7749298810958862,
+              "polygon": [
+                [
+                  1200,
+                  1077
+                ],
+                [
+                  1236,
+                  1071
+                ],
+                [
+                  1241,
+                  1100
+                ],
+                [
+                  1205,
+                  1106
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 670,
+          "peakMemoryBytes": 1032298496
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "DE-08-MI001-PTB017",
+              "numericTokens": [
+                "08",
+                "001",
+                "017"
+              ],
+              "digitsAfterRemovingNonDigits": "08001017"
+            },
+            {
+              "source": "lines[1]",
+              "text": "Q3=2.5",
+              "numericTokens": [
+                "3",
+                "2.5"
+              ],
+              "digitsAfterRemovingNonDigits": "325"
+            },
+            {
+              "source": "lines[2]",
+              "text": "R=80H",
+              "numericTokens": [
+                "80"
+              ],
+              "digitsAfterRemovingNonDigits": "80"
+            },
+            {
+              "source": "lines[3]",
+              "text": "0",
+              "numericTokens": [
+                "0"
+              ],
+              "digitsAfterRemovingNonDigits": "0"
+            },
+            {
+              "source": "lines[4]",
+              "text": "MAP 16",
+              "numericTokens": [
+                "16"
+              ],
+              "digitsAfterRemovingNonDigits": "16"
+            },
+            {
+              "source": "lines[5]",
+              "text": "00010:56",
+              "numericTokens": [
+                "00010",
+                "56"
+              ],
+              "digitsAfterRemovingNonDigits": "0001056"
+            },
+            {
+              "source": "lines[6]",
+              "text": "CEM110",
+              "numericTokens": [
+                "110"
+              ],
+              "digitsAfterRemovingNonDigits": "110"
+            },
+            {
+              "source": "lines[7]",
+              "text": "T30",
+              "numericTokens": [
+                "30"
+              ],
+              "digitsAfterRemovingNonDigits": "30"
+            },
+            {
+              "source": "lines[8]",
+              "text": "NZ",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[9]",
+              "text": "0102",
+              "numericTokens": [
+                "0102"
+              ],
+              "digitsAfterRemovingNonDigits": "0102"
+            },
+            {
+              "source": "lines[10]",
+              "text": "8",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "lines[11]",
+              "text": "9",
+              "numericTokens": [
+                "9"
+              ],
+              "digitsAfterRemovingNonDigits": "9"
+            },
+            {
+              "source": "lines[12]",
+              "text": "0",
+              "numericTokens": [
+                "0"
+              ],
+              "digitsAfterRemovingNonDigits": "0"
+            },
+            {
+              "source": "lines[13]",
+              "text": "5",
+              "numericTokens": [
+                "5"
+              ],
+              "digitsAfterRemovingNonDigits": "5"
+            },
+            {
+              "source": "lines[14]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            },
+            {
+              "source": "lines[15]",
+              "text": "x0,0001",
+              "numericTokens": [
+                "0,0001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "lines[16]",
+              "text": "2",
+              "numericTokens": [
+                "2"
+              ],
+              "digitsAfterRemovingNonDigits": "2"
+            },
+            {
+              "source": "lines[17]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            },
+            {
+              "source": "lines[18]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-blue__full-r90.png",
+      "mime": "image/png",
+      "sha256": "8d7fe3dddc65c3e3457493de647f1816b24c2166a33993129356e4373bb8f289",
+      "bytes": 3457321,
+      "limitSkip": null
+    },
+    {
+      "id": "water-blue__full-r270",
+      "sampleId": "water-blue",
+      "variantId": "full-r270",
+      "rotationDegrees": 270,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "1111",
+          "confidence": 13,
+          "ocrConfidence": 13,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Các lượt OCR chưa thống nhất toàn bộ dãy số. Không dùng chuỗi ghép làm chỉ số tính tiền.",
+            "Đã nhận dạng được nhóm chữ số nhưng chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập."
+          ],
+          "registers": [
+            {
+              "digits": "1111",
+              "confidence": 13,
+              "passes": 1,
+              "stable": false,
+              "regionId": "register-2",
+              "unit": "unknown",
+              "decimalEvidence": "unknown",
+              "geometry": {
+                "kind": "auto",
+                "angle": -7.7,
+                "rectangle": {
+                  "left": 900,
+                  "top": 215,
+                  "width": 57,
+                  "height": 29
+                }
+              }
+            }
+          ],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 5,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "1",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "1111",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-120",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-110",
+                "text": "1111",
+                "confidence": 13
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1251
+        },
+        "measuredWallMs": 1255,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "1111",
+              "numericTokens": [
+                "1111"
+              ],
+              "digitsAfterRemovingNonDigits": "1111"
+            },
+            {
+              "source": "registers[0].digits",
+              "text": "1111",
+              "numericTokens": [
+                "1111"
+              ],
+              "digitsAfterRemovingNonDigits": "1111"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-blue__full-r270",
+          "pathSha256": "7acfebe109d9b1c8d9a3baace3a228b4c00cead01a1f7d3ed2b7338e512b7c6a",
+          "lines": [
+            {
+              "text": "1000'0",
+              "score": 0.8299669623374939,
+              "polygon": [
+                [
+                  708,
+                  97
+                ],
+                [
+                  758,
+                  87
+                ],
+                [
+                  787,
+                  237
+                ],
+                [
+                  736,
+                  247
+                ]
+              ]
+            },
+            {
+              "text": "3",
+              "score": 0.9998290538787842,
+              "polygon": [
+                [
+                  950,
+                  165
+                ],
+                [
+                  986,
+                  165
+                ],
+                [
+                  986,
+                  196
+                ],
+                [
+                  950,
+                  196
+                ]
+              ]
+            },
+            {
+              "text": "m",
+              "score": 0.969774067401886,
+              "polygon": [
+                [
+                  477,
+                  187
+                ],
+                [
+                  570,
+                  167
+                ],
+                [
+                  596,
+                  287
+                ],
+                [
+                  503,
+                  307
+                ]
+              ]
+            },
+            {
+              "text": "2",
+              "score": 0.9998608827590942,
+              "polygon": [
+                [
+                  849,
+                  182
+                ],
+                [
+                  891,
+                  176
+                ],
+                [
+                  896,
+                  210
+                ],
+                [
+                  855,
+                  216
+                ]
+              ]
+            },
+            {
+              "text": "u95:0",
+              "score": 0.6496939659118652,
+              "polygon": [
+                [
+                  473,
+                  246
+                ],
+                [
+                  617,
+                  235
+                ],
+                [
+                  640,
+                  533
+                ],
+                [
+                  496,
+                  544
+                ]
+              ]
+            },
+            {
+              "text": "5",
+              "score": 0.99993896484375,
+              "polygon": [
+                [
+                  1092,
+                  318
+                ],
+                [
+                  1131,
+                  312
+                ],
+                [
+                  1136,
+                  342
+                ],
+                [
+                  1097,
+                  348
+                ]
+              ]
+            },
+            {
+              "text": "M1102",
+              "score": 0.6913149356842041,
+              "polygon": [
+                [
+                  294,
+                  420
+                ],
+                [
+                  407,
+                  399
+                ],
+                [
+                  477,
+                  768
+                ],
+                [
+                  364,
+                  789
+                ]
+              ]
+            },
+            {
+              "text": "6",
+              "score": 0.9634456038475037,
+              "polygon": [
+                [
+                  1078,
+                  423
+                ],
+                [
+                  1113,
+                  419
+                ],
+                [
+                  1117,
+                  451
+                ],
+                [
+                  1082,
+                  455
+                ]
+              ]
+            },
+            {
+              "text": "9",
+              "score": 0.5030942559242249,
+              "polygon": [
+                [
+                  802,
+                  455
+                ],
+                [
+                  837,
+                  455
+                ],
+                [
+                  837,
+                  486
+                ],
+                [
+                  802,
+                  486
+                ]
+              ]
+            },
+            {
+              "text": "8",
+              "score": 0.9758644700050354,
+              "polygon": [
+                [
+                  889,
+                  503
+                ],
+                [
+                  927,
+                  499
+                ],
+                [
+                  931,
+                  535
+                ],
+                [
+                  892,
+                  539
+                ]
+              ]
+            },
+            {
+              "text": "7",
+              "score": 0.8934536576271057,
+              "polygon": [
+                [
+                  996,
+                  495
+                ],
+                [
+                  1027,
+                  485
+                ],
+                [
+                  1036,
+                  512
+                ],
+                [
+                  1005,
+                  522
+                ]
+              ]
+            },
+            {
+              "text": "0000",
+              "score": 0.9991853833198547,
+              "polygon": [
+                [
+                  522,
+                  642
+                ],
+                [
+                  645,
+                  616
+                ],
+                [
+                  727,
+                  999
+                ],
+                [
+                  604,
+                  1025
+                ]
+              ]
+            },
+            {
+              "text": "ZR",
+              "score": 0.5339328050613403,
+              "polygon": [
+                [
+                  955,
+                  642
+                ],
+                [
+                  1041,
+                  629
+                ],
+                [
+                  1060,
+                  750
+                ],
+                [
+                  973,
+                  763
+                ]
+              ]
+            },
+            {
+              "text": "E-0---017",
+              "score": 0.738142728805542,
+              "polygon": [
+                [
+                  783,
+                  657
+                ],
+                [
+                  851,
+                  1091
+                ],
+                [
+                  797,
+                  1100
+                ],
+                [
+                  729,
+                  666
+                ]
+              ]
+            },
+            {
+              "text": "C",
+              "score": 0.39948606491088867,
+              "polygon": [
+                [
+                  365,
+                  770
+                ],
+                [
+                  479,
+                  754
+                ],
+                [
+                  503,
+                  921
+                ],
+                [
+                  390,
+                  937
+                ]
+              ]
+            },
+            {
+              "text": "MA16",
+              "score": 0.87553471326828,
+              "polygon": [
+                [
+                  948,
+                  800
+                ],
+                [
+                  1001,
+                  792
+                ],
+                [
+                  1028,
+                  962
+                ],
+                [
+                  975,
+                  970
+                ]
+              ]
+            },
+            {
+              "text": "T30",
+              "score": 0.6161696314811707,
+              "polygon": [
+                [
+                  1010,
+                  820
+                ],
+                [
+                  1065,
+                  813
+                ],
+                [
+                  1077,
+                  908
+                ],
+                [
+                  1021,
+                  915
+                ]
+              ]
+            },
+            {
+              "text": "H8=H",
+              "score": 0.8388399481773376,
+              "polygon": [
+                [
+                  904,
+                  871
+                ],
+                [
+                  958,
+                  864
+                ],
+                [
+                  979,
+                  1016
+                ],
+                [
+                  925,
+                  1023
+                ]
+              ]
+            },
+            {
+              "text": "0=2.5",
+              "score": 0.7047317028045654,
+              "polygon": [
+                [
+                  844,
+                  911
+                ],
+                [
+                  896,
+                  904
+                ],
+                [
+                  919,
+                  1061
+                ],
+                [
+                  868,
+                  1068
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 638,
+          "peakMemoryBytes": 1032773632
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "1000'0",
+              "numericTokens": [
+                "1000",
+                "0"
+              ],
+              "digitsAfterRemovingNonDigits": "10000"
+            },
+            {
+              "source": "lines[1]",
+              "text": "3",
+              "numericTokens": [
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3"
+            },
+            {
+              "source": "lines[2]",
+              "text": "m",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[3]",
+              "text": "2",
+              "numericTokens": [
+                "2"
+              ],
+              "digitsAfterRemovingNonDigits": "2"
+            },
+            {
+              "source": "lines[4]",
+              "text": "u95:0",
+              "numericTokens": [
+                "95",
+                "0"
+              ],
+              "digitsAfterRemovingNonDigits": "950"
+            },
+            {
+              "source": "lines[5]",
+              "text": "5",
+              "numericTokens": [
+                "5"
+              ],
+              "digitsAfterRemovingNonDigits": "5"
+            },
+            {
+              "source": "lines[6]",
+              "text": "M1102",
+              "numericTokens": [
+                "1102"
+              ],
+              "digitsAfterRemovingNonDigits": "1102"
+            },
+            {
+              "source": "lines[7]",
+              "text": "6",
+              "numericTokens": [
+                "6"
+              ],
+              "digitsAfterRemovingNonDigits": "6"
+            },
+            {
+              "source": "lines[8]",
+              "text": "9",
+              "numericTokens": [
+                "9"
+              ],
+              "digitsAfterRemovingNonDigits": "9"
+            },
+            {
+              "source": "lines[9]",
+              "text": "8",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "lines[10]",
+              "text": "7",
+              "numericTokens": [
+                "7"
+              ],
+              "digitsAfterRemovingNonDigits": "7"
+            },
+            {
+              "source": "lines[11]",
+              "text": "0000",
+              "numericTokens": [
+                "0000"
+              ],
+              "digitsAfterRemovingNonDigits": "0000"
+            },
+            {
+              "source": "lines[12]",
+              "text": "ZR",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[13]",
+              "text": "E-0---017",
+              "numericTokens": [
+                "0",
+                "017"
+              ],
+              "digitsAfterRemovingNonDigits": "0017"
+            },
+            {
+              "source": "lines[14]",
+              "text": "C",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[15]",
+              "text": "MA16",
+              "numericTokens": [
+                "16"
+              ],
+              "digitsAfterRemovingNonDigits": "16"
+            },
+            {
+              "source": "lines[16]",
+              "text": "T30",
+              "numericTokens": [
+                "30"
+              ],
+              "digitsAfterRemovingNonDigits": "30"
+            },
+            {
+              "source": "lines[17]",
+              "text": "H8=H",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "lines[18]",
+              "text": "0=2.5",
+              "numericTokens": [
+                "0",
+                "2.5"
+              ],
+              "digitsAfterRemovingNonDigits": "025"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-blue__full-r270.png",
+      "mime": "image/png",
+      "sha256": "7acfebe109d9b1c8d9a3baace3a228b4c00cead01a1f7d3ed2b7338e512b7c6a",
+      "bytes": 3457025,
+      "limitSkip": null
+    },
+    {
+      "id": "water-blue__crop-register-r0",
+      "sampleId": "water-blue",
+      "variantId": "crop-register-r0",
+      "rotationDegrees": 0,
+      "assistance": "human-assisted",
+      "crop": {
+        "left": 240,
+        "top": 420,
+        "width": 830,
+        "height": 330
+      },
+      "cropNote": "Human-selected diagnostic crop, no automatic localization claim.",
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "80001056\n00001",
+          "confidence": 94,
+          "ocrConfidence": 94,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "OCR đọc ổn định nhóm số nền đen sau khi tìm vùng và nắn thẳng; nhóm màu đỏ, đơn vị và quy ước thập phân vẫn cần đối chiếu riêng.",
+            "Các lượt OCR chưa thống nhất toàn bộ dãy số. Không dùng chuỗi ghép làm chỉ số tính tiền.",
+            "Đã nhận dạng được nhóm chữ số nhưng chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập."
+          ],
+          "registers": [
+            {
+              "digits": "80001056",
+              "confidence": 79,
+              "passes": 1,
+              "stable": false,
+              "regionId": "register-1",
+              "unit": "unknown",
+              "decimalEvidence": "color_groups",
+              "blackDigits": "00001",
+              "redDigits": "056",
+              "blackStable": true,
+              "blackConfidence": 94,
+              "blackPasses": 2,
+              "redStable": false,
+              "redConfidence": 0,
+              "redPasses": 0,
+              "geometry": {
+                "kind": "auto",
+                "angle": -9.8,
+                "rectangle": {
+                  "left": 52,
+                  "top": 83,
+                  "width": 683,
+                  "height": 189
+                }
+              }
+            }
+          ],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 9,
+            "regions": 1,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "000010456",
+                "confidence": 12
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "00001056",
+                "confidence": 60
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-100",
+                "text": "80001056",
+                "confidence": 79
+              },
+              {
+                "regionId": "register-1-black",
+                "variant": "threshold-120",
+                "text": "00001",
+                "confidence": 94
+              },
+              {
+                "regionId": "register-1-black",
+                "variant": "threshold-110",
+                "text": "00001",
+                "confidence": 94
+              },
+              {
+                "regionId": "register-1-red",
+                "variant": "threshold-120",
+                "text": "09",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1-red",
+                "variant": "threshold-110",
+                "text": "05",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1164
+        },
+        "measuredWallMs": 1166,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "80001056",
+              "numericTokens": [
+                "80001056"
+              ],
+              "digitsAfterRemovingNonDigits": "80001056"
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "00001",
+              "numericTokens": [
+                "00001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "registers[0].digits",
+              "text": "80001056",
+              "numericTokens": [
+                "80001056"
+              ],
+              "digitsAfterRemovingNonDigits": "80001056"
+            },
+            {
+              "source": "registers[0].blackDigits",
+              "text": "00001",
+              "numericTokens": [
+                "00001"
+              ],
+              "digitsAfterRemovingNonDigits": "00001"
+            },
+            {
+              "source": "registers[0].redDigits",
+              "text": "056",
+              "numericTokens": [
+                "056"
+              ],
+              "digitsAfterRemovingNonDigits": "056"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": true,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-blue__crop-register-r0",
+          "pathSha256": "6629179f5f6ab115ccf46da13a389cbe6c15d8148ccb03b44747a670d875444b",
+          "lines": [
+            {
+              "text": "000010:56m",
+              "score": 0.9714375734329224,
+              "polygon": [
+                [
+                  9,
+                  160
+                ],
+                [
+                  823,
+                  16
+                ],
+                [
+                  830,
+                  181
+                ],
+                [
+                  36,
+                  325
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 58,
+          "peakMemoryBytes": 954953728
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "000010:56m",
+              "numericTokens": [
+                "000010",
+                "56"
+              ],
+              "digitsAfterRemovingNonDigits": "00001056"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-blue__crop-register-r0.png",
+      "mime": "image/png",
+      "sha256": "6629179f5f6ab115ccf46da13a389cbe6c15d8148ccb03b44747a670d875444b",
+      "bytes": 389966,
+      "limitSkip": null
+    },
+    {
+      "id": "water-weathered__full-r0",
+      "sampleId": "water-weathered",
+      "variantId": "full-r0",
+      "rotationDegrees": 0,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "",
+          "confidence": 0,
+          "ocrConfidence": 0,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Chưa đọc được dãy số phù hợp. Chọn vùng mặt số rõ hơn hoặc nhập chỉ số bằng tay."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 5,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "3",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-120",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-110",
+                "text": "",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1659
+        },
+        "measuredWallMs": 1665,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-weathered__full-r0",
+          "pathSha256": "17bb6551317cfe0078c7cd2593235bde20fd7169063fc25bd55e1987d93742fe",
+          "lines": [
+            {
+              "text": "0.000,",
+              "score": 0.8778542876243591,
+              "polygon": [
+                [
+                  624,
+                  532
+                ],
+                [
+                  719,
+                  628
+                ],
+                [
+                  681,
+                  666
+                ],
+                [
+                  585,
+                  569
+                ]
+              ]
+            },
+            {
+              "text": "1303",
+              "score": 0.8269931077957153,
+              "polygon": [
+                [
+                  842,
+                  558
+                ],
+                [
+                  959,
+                  555
+                ],
+                [
+                  968,
+                  888
+                ],
+                [
+                  851,
+                  891
+                ]
+              ]
+            },
+            {
+              "text": "8",
+              "score": 0.7417460680007935,
+              "polygon": [
+                [
+                  853,
+                  875
+                ],
+                [
+                  938,
+                  882
+                ],
+                [
+                  932,
+                  952
+                ],
+                [
+                  847,
+                  945
+                ]
+              ]
+            },
+            {
+              "text": "X0.07",
+              "score": 0.8355939984321594,
+              "polygon": [
+                [
+                  775,
+                  940
+                ],
+                [
+                  823,
+                  938
+                ],
+                [
+                  826,
+                  1040
+                ],
+                [
+                  778,
+                  1041
+                ]
+              ]
+            },
+            {
+              "text": "建",
+              "score": 0.29873767495155334,
+              "polygon": [
+                [
+                  895,
+                  938
+                ],
+                [
+                  921,
+                  938
+                ],
+                [
+                  921,
+                  972
+                ],
+                [
+                  895,
+                  972
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 696,
+          "peakMemoryBytes": 1264394240
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "0.000,",
+              "numericTokens": [
+                "0.000"
+              ],
+              "digitsAfterRemovingNonDigits": "0000"
+            },
+            {
+              "source": "lines[1]",
+              "text": "1303",
+              "numericTokens": [
+                "1303"
+              ],
+              "digitsAfterRemovingNonDigits": "1303"
+            },
+            {
+              "source": "lines[2]",
+              "text": "8",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "lines[3]",
+              "text": "X0.07",
+              "numericTokens": [
+                "0.07"
+              ],
+              "digitsAfterRemovingNonDigits": "007"
+            },
+            {
+              "source": "lines[4]",
+              "text": "建",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": true,
+          "unitTextPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-weathered__full-r0.webp",
+      "mime": "image/webp",
+      "sha256": "17bb6551317cfe0078c7cd2593235bde20fd7169063fc25bd55e1987d93742fe",
+      "bytes": 4572290,
+      "limitSkip": null
+    },
+    {
+      "id": "water-weathered__full-r90",
+      "sampleId": "water-weathered",
+      "variantId": "full-r90",
+      "rotationDegrees": 90,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "",
+          "confidence": 0,
+          "ocrConfidence": 0,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Chưa đọc được dãy số phù hợp. Chọn vùng mặt số rõ hơn hoặc nhập chỉ số bằng tay."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 3,
+            "regions": 1,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1414
+        },
+        "measuredWallMs": 1420,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-weathered__full-r90",
+          "pathSha256": "c2caa0e969e00eafd33ff5d57a47c7cc175442d40de9a8aeb043d1e404113d2e",
+          "lines": [
+            {
+              "text": "NOOOX",
+              "score": 0.48875123262405396,
+              "polygon": [
+                [
+                  590,
+                  679
+                ],
+                [
+                  705,
+                  624
+                ],
+                [
+                  732,
+                  681
+                ],
+                [
+                  617,
+                  736
+                ]
+              ]
+            },
+            {
+              "text": "000",
+              "score": 0.6042018532752991,
+              "polygon": [
+                [
+                  821,
+                  681
+                ],
+                [
+                  931,
+                  584
+                ],
+                [
+                  970,
+                  630
+                ],
+                [
+                  860,
+                  726
+                ]
+              ]
+            },
+            {
+              "text": "20.0X",
+              "score": 0.6174865961074829,
+              "polygon": [
+                [
+                  460,
+                  777
+                ],
+                [
+                  555,
+                  773
+                ],
+                [
+                  557,
+                  821
+                ],
+                [
+                  462,
+                  825
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 664,
+          "peakMemoryBytes": 1388150784
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "NOOOX",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[1]",
+              "text": "000",
+              "numericTokens": [
+                "000"
+              ],
+              "digitsAfterRemovingNonDigits": "000"
+            },
+            {
+              "source": "lines[2]",
+              "text": "20.0X",
+              "numericTokens": [
+                "20.0"
+              ],
+              "digitsAfterRemovingNonDigits": "200"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-weathered__full-r90.webp",
+      "mime": "image/webp",
+      "sha256": "c2caa0e969e00eafd33ff5d57a47c7cc175442d40de9a8aeb043d1e404113d2e",
+      "bytes": 4566964,
+      "limitSkip": null
+    },
+    {
+      "id": "water-weathered__full-r270",
+      "sampleId": "water-weathered",
+      "variantId": "full-r270",
+      "rotationDegrees": 270,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "",
+          "confidence": 0,
+          "ocrConfidence": 0,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Chưa đọc được dãy số phù hợp. Chọn vùng mặt số rõ hơn hoặc nhập chỉ số bằng tay."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 3,
+            "regions": 1,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1412
+        },
+        "measuredWallMs": 1418,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-weathered__full-r270",
+          "pathSha256": "fc539600792411cd8441beee5ef457f50850212566e953631ab89508cffe1d2c",
+          "lines": [
+            {
+              "text": "13038",
+              "score": 0.7986599206924438,
+              "polygon": [
+                [
+                  560,
+                  1039
+                ],
+                [
+                  957,
+                  1034
+                ],
+                [
+                  958,
+                  1145
+                ],
+                [
+                  561,
+                  1150
+                ]
+              ]
+            },
+            {
+              "text": "必",
+              "score": 0.48094233870506287,
+              "polygon": [
+                [
+                  956,
+                  1075
+                ],
+                [
+                  970,
+                  1089
+                ],
+                [
+                  956,
+                  1103
+                ],
+                [
+                  942,
+                  1089
+                ]
+              ]
+            },
+            {
+              "text": "XO.07",
+              "score": 0.8404102325439453,
+              "polygon": [
+                [
+                  944,
+                  1173
+                ],
+                [
+                  1038,
+                  1170
+                ],
+                [
+                  1039,
+                  1219
+                ],
+                [
+                  946,
+                  1222
+                ]
+              ]
+            },
+            {
+              "text": "x0001",
+              "score": 0.544127881526947,
+              "polygon": [
+                [
+                  772,
+                  1316
+                ],
+                [
+                  875,
+                  1266
+                ],
+                [
+                  898,
+                  1315
+                ],
+                [
+                  795,
+                  1365
+                ]
+              ]
+            },
+            {
+              "text": "0.000,",
+              "score": 0.8513095378875732,
+              "polygon": [
+                [
+                  531,
+                  1368
+                ],
+                [
+                  635,
+                  1271
+                ],
+                [
+                  675,
+                  1315
+                ],
+                [
+                  571,
+                  1412
+                ]
+              ]
+            },
+            {
+              "text": "690",
+              "score": 0.9164974093437195,
+              "polygon": [
+                [
+                  605,
+                  1387
+                ],
+                [
+                  695,
+                  1347
+                ],
+                [
+                  717,
+                  1397
+                ],
+                [
+                  627,
+                  1436
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 700,
+          "peakMemoryBytes": 1388142592
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "13038",
+              "numericTokens": [
+                "13038"
+              ],
+              "digitsAfterRemovingNonDigits": "13038"
+            },
+            {
+              "source": "lines[1]",
+              "text": "必",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[2]",
+              "text": "XO.07",
+              "numericTokens": [
+                "07"
+              ],
+              "digitsAfterRemovingNonDigits": "07"
+            },
+            {
+              "source": "lines[3]",
+              "text": "x0001",
+              "numericTokens": [
+                "0001"
+              ],
+              "digitsAfterRemovingNonDigits": "0001"
+            },
+            {
+              "source": "lines[4]",
+              "text": "0.000,",
+              "numericTokens": [
+                "0.000"
+              ],
+              "digitsAfterRemovingNonDigits": "0000"
+            },
+            {
+              "source": "lines[5]",
+              "text": "690",
+              "numericTokens": [
+                "690"
+              ],
+              "digitsAfterRemovingNonDigits": "690"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-weathered__full-r270.webp",
+      "mime": "image/webp",
+      "sha256": "fc539600792411cd8441beee5ef457f50850212566e953631ab89508cffe1d2c",
+      "bytes": 4565008,
+      "limitSkip": null
+    },
+    {
+      "id": "water-weathered__crop-register-r270",
+      "sampleId": "water-weathered",
+      "variantId": "crop-register-r270",
+      "rotationDegrees": 270,
+      "assistance": "human-assisted",
+      "crop": {
+        "left": 835,
+        "top": 530,
+        "width": 180,
+        "height": 460
+      },
+      "cropNote": "Human-selected and rotated diagnostic crop; unit not visible enough for scoring.",
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "8 : : a",
+          "confidence": 58,
+          "ocrConfidence": 58,
+          "candidates": [
+            {
+              "value": 8,
+              "text": "8",
+              "confidence": 44,
+              "reason": "Số được nhận dạng trong ảnh; cần đối chiếu mặt công tơ."
+            }
+          ],
+          "suggestedValue": null,
+          "warnings": [
+            "Độ tin cậy OCR thấp. Chụp rõ, thẳng mặt số hoặc khoanh vùng dãy số rồi thử lại."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 2,
+            "regions": 0,
+            "passes": []
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1093
+        },
+        "measuredWallMs": 1094,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "8 : : a",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            },
+            {
+              "source": "candidates[0].text",
+              "text": "8",
+              "numericTokens": [
+                "8"
+              ],
+              "digitsAfterRemovingNonDigits": "8"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": true,
+          "unitTextPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "water-weathered__crop-register-r270",
+          "pathSha256": "a2a58d5a9935e27943415853bdd671f2dfa27024ba39ca4d32019dc0a45a92d5",
+          "lines": [
+            {
+              "text": "13038",
+              "score": 0.8991800546646118,
+              "polygon": [
+                [
+                  0,
+                  55
+                ],
+                [
+                  453,
+                  55
+                ],
+                [
+                  453,
+                  157
+                ],
+                [
+                  0,
+                  157
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 28,
+          "peakMemoryBytes": 1269645312
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "13038",
+              "numericTokens": [
+                "13038"
+              ],
+              "digitsAfterRemovingNonDigits": "13038"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": false,
+          "unitTextPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\water-weathered__crop-register-r270.png",
+      "mime": "image/png",
+      "sha256": "a2a58d5a9935e27943415853bdd671f2dfa27024ba39ca4d32019dc0a45a92d5",
+      "bytes": 214296,
+      "limitSkip": null
+    },
+    {
+      "id": "electric-synthetic__full-r0",
+      "sampleId": "electric-synthetic",
+      "variantId": "full-r0",
+      "rotationDegrees": 0,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "electric",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "ELECTRIC METER                                        -\n012345",
+          "confidence": 96,
+          "ocrConfidence": 96,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Đã nhận dạng được nhóm chữ số nhưng chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập."
+          ],
+          "registers": [
+            {
+              "digits": "012345",
+              "confidence": 96,
+              "passes": 2,
+              "stable": true,
+              "regionId": "register-1",
+              "unit": "unknown",
+              "decimalEvidence": "unknown",
+              "geometry": {
+                "kind": "auto",
+                "angle": 0.1,
+                "rectangle": {
+                  "left": 120,
+                  "top": 173,
+                  "width": 430,
+                  "height": 86
+                }
+              }
+            }
+          ],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 4,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "012345",
+                "confidence": 96
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "012345",
+                "confidence": 95
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "electric",
+          "elapsedMs": 1114
+        },
+        "measuredWallMs": 1116,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "ELECTRIC METER                                        -",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "012345",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            },
+            {
+              "source": "registers[0].digits",
+              "text": "012345",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "electric-synthetic__full-r0",
+          "pathSha256": "a9d851a9ce2fd56662d1f42ac675d01447ace6455a7411bb982d0e6b072aac3e",
+          "lines": [
+            {
+              "text": "ELECTRIC METER",
+              "score": 0.9993825554847717,
+              "polygon": [
+                [
+                  90,
+                  70
+                ],
+                [
+                  352,
+                  70
+                ],
+                [
+                  352,
+                  98
+                ],
+                [
+                  90,
+                  98
+                ]
+              ]
+            },
+            {
+              "text": "012345",
+              "score": 0.9999189972877502,
+              "polygon": [
+                [
+                  108,
+                  158
+                ],
+                [
+                  561,
+                  162
+                ],
+                [
+                  560,
+                  271
+                ],
+                [
+                  108,
+                  267
+                ]
+              ]
+            },
+            {
+              "text": "kWh",
+              "score": 0.9987854361534119,
+              "polygon": [
+                [
+                  784,
+                  199
+                ],
+                [
+                  885,
+                  199
+                ],
+                [
+                  885,
+                  249
+                ],
+                [
+                  784,
+                  249
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 108,
+          "peakMemoryBytes": 1275555840
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "ELECTRIC METER",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[1]",
+              "text": "012345",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            },
+            {
+              "source": "lines[2]",
+              "text": "kWh",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": true
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\electric-synthetic__full-r0.png",
+      "mime": "image/png",
+      "sha256": "a9d851a9ce2fd56662d1f42ac675d01447ace6455a7411bb982d0e6b072aac3e",
+      "bytes": 20029,
+      "limitSkip": null
+    },
+    {
+      "id": "electric-synthetic__full-r90",
+      "sampleId": "electric-synthetic",
+      "variantId": "full-r90",
+      "rotationDegrees": 90,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "electric",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "(                                                           2)\nELECTRIC METER\n\n012345     wh",
+          "confidence": 80,
+          "ocrConfidence": 80,
+          "candidates": [
+            {
+              "value": 12345,
+              "text": "012345",
+              "confidence": 96,
+              "reason": "Số được nhận dạng trong ảnh; cần đối chiếu mặt công tơ."
+            },
+            {
+              "value": 2,
+              "text": "2",
+              "confidence": 80,
+              "reason": "Số được nhận dạng trong ảnh; cần đối chiếu mặt công tơ."
+            }
+          ],
+          "suggestedValue": 12345,
+          "warnings": [],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 1,
+            "regions": 0,
+            "passes": []
+          },
+          "requiresConfirmation": true,
+          "utility": "electric",
+          "elapsedMs": 867
+        },
+        "measuredWallMs": 869,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "(                                                           2)",
+              "numericTokens": [
+                "2"
+              ],
+              "digitsAfterRemovingNonDigits": "2"
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "ELECTRIC METER",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[2]",
+              "text": "012345     wh",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            },
+            {
+              "source": "candidates[0].text",
+              "text": "012345",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            },
+            {
+              "source": "candidates[1].text",
+              "text": "2",
+              "numericTokens": [
+                "2"
+              ],
+              "digitsAfterRemovingNonDigits": "2"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "electric-synthetic__full-r90",
+          "pathSha256": "1103cf28413622eb886ae90b678a693c5e6d57977119d5b6f4364bcf1d42e9cb",
+          "lines": [
+            {
+              "text": "ELECTRIC METER",
+              "score": 0.9994760751724243,
+              "polygon": [
+                [
+                  298,
+                  87
+                ],
+                [
+                  330,
+                  87
+                ],
+                [
+                  330,
+                  354
+                ],
+                [
+                  298,
+                  354
+                ]
+              ]
+            },
+            {
+              "text": "012345",
+              "score": 0.9999398589134216,
+              "polygon": [
+                [
+                  111,
+                  103
+                ],
+                [
+                  248,
+                  102
+                ],
+                [
+                  251,
+                  570
+                ],
+                [
+                  115,
+                  571
+                ]
+              ]
+            },
+            {
+              "text": "AN",
+              "score": 0.2751254737377167,
+              "polygon": [
+                [
+                  136,
+                  777
+                ],
+                [
+                  216,
+                  777
+                ],
+                [
+                  216,
+                  892
+                ],
+                [
+                  136,
+                  892
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 102,
+          "peakMemoryBytes": 1276755968
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "ELECTRIC METER",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[1]",
+              "text": "012345",
+              "numericTokens": [
+                "012345"
+              ],
+              "digitsAfterRemovingNonDigits": "012345"
+            },
+            {
+              "source": "lines[2]",
+              "text": "AN",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": true,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": true,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\electric-synthetic__full-r90.png",
+      "mime": "image/png",
+      "sha256": "1103cf28413622eb886ae90b678a693c5e6d57977119d5b6f4364bcf1d42e9cb",
+      "bytes": 22718,
+      "limitSkip": null
+    },
+    {
+      "id": "electric-synthetic__full-r270",
+      "sampleId": "electric-synthetic",
+      "variantId": "full-r270",
+      "rotationDegrees": 270,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "electric",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "am    Gveclio\n\nY313N 01103713\n\nJ",
+          "confidence": 67,
+          "ocrConfidence": 67,
+          "candidates": [
+            {
+              "value": 1103713,
+              "text": "01103713",
+              "confidence": 7,
+              "reason": "Số được nhận dạng trong ảnh; cần đối chiếu mặt công tơ."
+            }
+          ],
+          "suggestedValue": null,
+          "warnings": [
+            "Độ tin cậy OCR thấp. Chụp rõ, thẳng mặt số hoặc khoanh vùng dãy số rồi thử lại."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 1,
+            "regions": 0,
+            "passes": []
+          },
+          "requiresConfirmation": true,
+          "utility": "electric",
+          "elapsedMs": 847
+        },
+        "measuredWallMs": 849,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "am    Gveclio",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "Y313N 01103713",
+              "numericTokens": [
+                "313",
+                "01103713"
+              ],
+              "digitsAfterRemovingNonDigits": "31301103713"
+            },
+            {
+              "source": "rawText.line[2]",
+              "text": "J",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "candidates[0].text",
+              "text": "01103713",
+              "numericTokens": [
+                "01103713"
+              ],
+              "digitsAfterRemovingNonDigits": "01103713"
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": false
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "electric-synthetic__full-r270",
+          "pathSha256": "2c0a241eda4b187b7eee069556ba1a92a35d158369947abfeac8cbb2ea87e7cc",
+          "lines": [
+            {
+              "text": "kKwk",
+              "score": 0.4399217963218689,
+              "polygon": [
+                [
+                  186,
+                  107
+                ],
+                [
+                  261,
+                  107
+                ],
+                [
+                  261,
+                  220
+                ],
+                [
+                  186,
+                  220
+                ]
+              ]
+            },
+            {
+              "text": "0345",
+              "score": 0.7755836844444275,
+              "polygon": [
+                [
+                  146,
+                  432
+                ],
+                [
+                  282,
+                  432
+                ],
+                [
+                  282,
+                  899
+                ],
+                [
+                  146,
+                  899
+                ]
+              ]
+            },
+            {
+              "text": "ELEC MMER",
+              "score": 0.7390654683113098,
+              "polygon": [
+                [
+                  66,
+                  643
+                ],
+                [
+                  101,
+                  643
+                ],
+                [
+                  99,
+                  912
+                ],
+                [
+                  63,
+                  912
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 97,
+          "peakMemoryBytes": 1276755968
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "kKwk",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            },
+            {
+              "source": "lines[1]",
+              "text": "0345",
+              "numericTokens": [
+                "0345"
+              ],
+              "digitsAfterRemovingNonDigits": "0345"
+            },
+            {
+              "source": "lines[2]",
+              "text": "ELEC MMER",
+              "numericTokens": [],
+              "digitsAfterRemovingNonDigits": ""
+            }
+          ],
+          "expectedAvailable": true,
+          "normalizedConcatMatch": false,
+          "normalizedConcatMeaning": "At least one complete text observation equals the reference after removing all non-digits. This does not establish unit, color groups, decimal boundary, register identity or billing value.",
+          "exactIntegerTokenPresent": false,
+          "exactFractionalTokenPresent": null,
+          "unitTextPresent": false
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\electric-synthetic__full-r270.png",
+      "mime": "image/png",
+      "sha256": "2c0a241eda4b187b7eee069556ba1a92a35d158369947abfeac8cbb2ea87e7cc",
+      "bytes": 22551,
+      "limitSkip": null
+    },
+    {
+      "id": "blank__full-r0",
+      "sampleId": "blank",
+      "variantId": "full-r0",
+      "rotationDegrees": 0,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "",
+          "confidence": 0,
+          "ocrConfidence": 0,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Chưa đọc được dãy số phù hợp. Chọn vùng mặt số rõ hơn hoặc nhập chỉ số bằng tay."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 1,
+            "regions": 0,
+            "passes": []
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 823
+        },
+        "measuredWallMs": 824,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [],
+          "expectedAvailable": false,
+          "normalizedConcatMatch": null,
+          "exactIntegerTokenPresent": null,
+          "exactFractionalTokenPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "blank__full-r0",
+          "pathSha256": "ce2f57549833db2fa93f242be12f6ade72b3f0ffcecfc323f99588ac08200d5b",
+          "lines": [],
+          "firstInference": false,
+          "durationMs": 76,
+          "peakMemoryBytes": 1278513152
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [],
+          "expectedAvailable": false,
+          "normalizedConcatMatch": null,
+          "exactIntegerTokenPresent": null,
+          "exactFractionalTokenPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\blank__full-r0.png",
+      "mime": "image/png",
+      "sha256": "ce2f57549833db2fa93f242be12f6ade72b3f0ffcecfc323f99588ac08200d5b",
+      "bytes": 2579,
+      "limitSkip": null
+    },
+    {
+      "id": "specifications__full-r0",
+      "sampleId": "specifications",
+      "variantId": "full-r0",
+      "rotationDegrees": 0,
+      "assistance": "full-photo",
+      "crop": null,
+      "utility": "water",
+      "tesseract": {
+        "result": {
+          "feature": "B03",
+          "engine": "tesseract",
+          "rawText": "S/N 99887766\n\n230 V 50 Hz\n\nQ3=2.5 m3/h",
+          "confidence": 89,
+          "ocrConfidence": 89,
+          "candidates": [],
+          "suggestedValue": null,
+          "warnings": [
+            "Đã bỏ qua dòng giống số sê-ri, ngày hoặc thông số thiết bị; vẫn cần kiểm tra số trên màn hình công tơ.",
+            "Chưa đọc được dãy số phù hợp. Chọn vùng mặt số rõ hơn hoặc nhập chỉ số bằng tay."
+          ],
+          "registers": [],
+          "preprocessing": {
+            "version": 2,
+            "attempts": 5,
+            "regions": 2,
+            "passes": [
+              {
+                "regionId": "register-1",
+                "variant": "threshold-120",
+                "text": "99887766",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-1",
+                "variant": "threshold-110",
+                "text": "99887766",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-120",
+                "text": "2305042",
+                "confidence": 0
+              },
+              {
+                "regionId": "register-2",
+                "variant": "threshold-110",
+                "text": "230502",
+                "confidence": 0
+              }
+            ]
+          },
+          "requiresConfirmation": true,
+          "utility": "water",
+          "elapsedMs": 1116
+        },
+        "measuredWallMs": 1117,
+        "peakMemoryBytes": null,
+        "memoryMeasurement": "unavailable for worker subprocess",
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "rawText.line[0]",
+              "text": "S/N 99887766",
+              "numericTokens": [
+                "99887766"
+              ],
+              "digitsAfterRemovingNonDigits": "99887766"
+            },
+            {
+              "source": "rawText.line[1]",
+              "text": "230 V 50 Hz",
+              "numericTokens": [
+                "230",
+                "50"
+              ],
+              "digitsAfterRemovingNonDigits": "23050"
+            },
+            {
+              "source": "rawText.line[2]",
+              "text": "Q3=2.5 m3/h",
+              "numericTokens": [
+                "3",
+                "2.5",
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3253"
+            }
+          ],
+          "expectedAvailable": false,
+          "normalizedConcatMatch": null,
+          "exactIntegerTokenPresent": null,
+          "exactFractionalTokenPresent": null
+        }
+      },
+      "paddle": {
+        "result": {
+          "id": "specifications__full-r0",
+          "pathSha256": "4ad6091b4716490ec48a7960db6510142978223a2ab73a1d31d1771f7769e065",
+          "lines": [
+            {
+              "text": "S/N 99887766",
+              "score": 0.9921402335166931,
+              "polygon": [
+                [
+                  49,
+                  118
+                ],
+                [
+                  357,
+                  118
+                ],
+                [
+                  357,
+                  166
+                ],
+                [
+                  49,
+                  166
+                ]
+              ]
+            },
+            {
+              "text": "230 V 50 Hz",
+              "score": 0.9958224892616272,
+              "polygon": [
+                [
+                  47,
+                  237
+                ],
+                [
+                  316,
+                  239
+                ],
+                [
+                  316,
+                  286
+                ],
+                [
+                  47,
+                  284
+                ]
+              ]
+            },
+            {
+              "text": "Q3=2.5 m3/h",
+              "score": 0.9998903870582581,
+              "polygon": [
+                [
+                  48,
+                  356
+                ],
+                [
+                  330,
+                  358
+                ],
+                [
+                  330,
+                  409
+                ],
+                [
+                  48,
+                  406
+                ]
+              ]
+            }
+          ],
+          "firstInference": false,
+          "durationMs": 90,
+          "peakMemoryBytes": 1277517824
+        },
+        "sameBytesVerified": true,
+        "diagnostics": {
+          "evidence": [
+            {
+              "source": "lines[0]",
+              "text": "S/N 99887766",
+              "numericTokens": [
+                "99887766"
+              ],
+              "digitsAfterRemovingNonDigits": "99887766"
+            },
+            {
+              "source": "lines[1]",
+              "text": "230 V 50 Hz",
+              "numericTokens": [
+                "230",
+                "50"
+              ],
+              "digitsAfterRemovingNonDigits": "23050"
+            },
+            {
+              "source": "lines[2]",
+              "text": "Q3=2.5 m3/h",
+              "numericTokens": [
+                "3",
+                "2.5",
+                "3"
+              ],
+              "digitsAfterRemovingNonDigits": "3253"
+            }
+          ],
+          "expectedAvailable": false,
+          "normalizedConcatMatch": null,
+          "exactIntegerTokenPresent": null,
+          "exactFractionalTokenPresent": null
+        }
+      },
+      "path": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\specifications__full-r0.png",
+      "mime": "image/png",
+      "sha256": "4ad6091b4716490ec48a7960db6510142978223a2ab73a1d31d1771f7769e065",
+      "bytes": 20315,
+      "limitSkip": null
+    }
+  ],
+  "limitations": [
+    "Known supplied photos and correlated variants are an exploratory comparison, not a held-out accuracy estimate.",
+    "A digit-string diagnostic does not establish decimal boundary, unit, color groups, register identity or billing correctness.",
+    "Tesseract elapsed time includes its subprocess and worker initialization; Paddle inference time is warm after model initialization. Compare the labeled timings separately.",
+    "Tesseract worker peak memory is unavailable in this harness; parent Node RSS is not substituted.",
+    "Paddle threads are explicitly configured; Tesseract uses the existing engine-specific defaults, so thread settings are not claimed to be identical.",
+    "No engine output is recorded into application data. Manual crops are human-assisted."
+  ],
+  "paddleExecution": {
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "spawnError": null,
+    "stdoutTruncated": false,
+    "stderrTruncated": false,
+    "totalProcessMs": 10065,
+    "command": {
+      "executable": "D:\\TrozyOCRTrial\\python\\python.exe",
+      "arguments": [
+        "C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Documents\\Nhập môn công nghệ phần mềm\\Trozy\\scripts\\paddle-ocr-trial.py",
+        "--manifest",
+        "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle-input.json",
+        "--output",
+        "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle-raw.json",
+        "--det-model",
+        "D:\\TrozyOCRTrial\\models\\PP-OCRv6_small_det_onnx_infer",
+        "--rec-model",
+        "D:\\TrozyOCRTrial\\models\\PP-OCRv6_small_rec_onnx_infer",
+        "--threads",
+        "4",
+        "--source",
+        "C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Documents\\Nhập môn công nghệ phần mềm\\PaddleOCR-main"
+      ]
+    },
+    "logs": {
+      "stdout": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle.stdout.log",
+      "stderr": "D:\\TrozyOCRTrial\\work\\benchmark-2026-10-27T12-50-27-186Z-7f4afb3a\\paddle.stderr.log"
+    }
+  },
+  "paddle": {
+    "engine": "paddleocr",
+    "model": {
+      "det": "PP-OCRv6_small_det",
+      "rec": "PP-OCRv6_small_rec",
+      "detSha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e",
+      "recSha256": "5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634"
+    },
+    "runtime": {
+      "source": "C:\\Users\\Admin\\OneDrive - VNU-HCMUS\\Documents\\Nhập môn công nghệ phần mềm\\PaddleOCR-main\\paddleocr\\__init__.py",
+      "python": "3.11.9",
+      "versions": {
+        "paddleocr": "3.7.0",
+        "paddlex": "3.7.2",
+        "onnxruntime": "1.23.2"
+      },
+      "backend": "onnxruntime-cpu",
+      "threads": 4,
+      "pythonSocketNetworkBlocked": true,
+      "initMs": 4636,
+      "initPeakMemoryBytes": 216342528,
+      "sourceHashes": {
+        "paddleocr/_pipelines/ocr.py": "fc870f7a7f1b33756020d75c63c6dc0dc04981df1ff46627a040336ead9a9b88",
+        "pyproject.toml": "63e8bfa19e197e47649a95dad422bcb09c1d2959367cafd40b0a7f19e4452412"
+      }
+    },
+    "extraOutputIds": []
+  },
+  "summary": {
+    "sourceImages": 5,
+    "physicalMeterPhotos": 2,
+    "distinctDeclaredPhysicalMeters": 2,
+    "syntheticFixtures": 1,
+    "negativeControls": 2,
+    "unclassifiedImages": 0,
+    "variants": 13,
+    "limitSkippedVariants": 0,
+    "humanAssistedVariants": 2,
+    "tesseractErrors": 0,
+    "paddleErrors": 0,
+    "accuracyPercentage": null
+  }
+}

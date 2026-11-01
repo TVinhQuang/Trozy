@@ -1,0 +1,736 @@
+{
+  "checkedAt": "2026-10-28T10:17:11.445Z",
+  "passed": true,
+  "validationScope": "Actual local background models after explicit photo submission; tenant API privacy, owner notification/review; not general recognition accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-cells.mjs": "0bdf93f6051b219c5c36eb047e2f1dbe26f0214434acd685e214f75ffefb4c57",
+    "src/ai/meter-cell-geometry.mjs": "d5e99ff3fae0c2bf142e1cb5f5651a10b11d2ef728511df2aa00f9b013ac4e66",
+    "src/ai/meter-vision.mjs": "03d96478920c7c28de89fed5dda7b06fb560f71cd08a589be99ebc3b2830c221",
+    "src/ai/meter-vision-reader.mjs": "7d75949174b4f5b4b755ac41313f32563d2ea136be09a3d9cea770d9cb6890db",
+    "src/ai/meter-consensus.mjs": "6e54336ff1c8852babade4345cf0e0c76a8ba7170c22cb4e2d5a042f8b12be1a",
+    "src/ai/ollama.mjs": "b2874c590a24164e55be1a951a90255f5be5bd9af4b77fc56165b1ed4591d06a",
+    "src/backend/meter-submissions.mjs": "56ee5721209698fdc888e6a65a041ee730df70ff870d80f14df26596acb855b6",
+    "src/backend/meter-jobs.mjs": "8094ecaba2ae4f1d4908010926f92190f99b3dca49777daabb1ccbcc31ee0139",
+    "src/backend/meter-visibility.mjs": "1f6f243069bf86dc7bf139e569707d9cc8c5a507960a379577935af1a37a5d83",
+    "src/backend/domain.mjs": "ed46690b642f8830fcdae8dcfbdfee0e47fc174332ac81493a353de5b1892c6c",
+    "src/backend/server.mjs": "b8647334d7e0fbeeafb80500c1e4a219a9f427ff359461f65638981c42e60df4",
+    "src/backend/ai-service.mjs": "e4b61d426c722c2715b6eae2ba5addc6b260683cd3bed075a65ca26a0d4421d1"
+  },
+  "photoSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+  "photoBytes": 27475,
+  "derivedBlur": null,
+  "rectangle": {
+    "left": 134,
+    "top": 260,
+    "width": 222,
+    "height": 46
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "modelCallsBeforeSend": 0,
+  "backgroundCalls": 1,
+  "tenantNeverReceivesReadings": true,
+  "ownerOnlyNotificationVerified": true,
+  "quality": {
+    "version": 1,
+    "status": "pass",
+    "canSubmit": true,
+    "scope": "counter",
+    "checks": {
+      "resolution": true,
+      "exposure": true,
+      "contrast": true,
+      "sharpness": true,
+      "glare": true
+    },
+    "reasons": [],
+    "metrics": {
+      "width": 222,
+      "height": 46,
+      "meanLuma": 97.08,
+      "contrast": 37.105,
+      "edgeEnergy": 1033.998,
+      "clippedDark": 0,
+      "clippedLight": 0,
+      "glareFraction": 0
+    },
+    "source": {
+      "width": 415,
+      "height": 739
+    },
+    "rectangle": {
+      "left": 134,
+      "top": 260,
+      "width": 222,
+      "height": 46
+    }
+  },
+  "tenantReceipt": {
+    "id": "meter_sub_fa08d79724e94f67ba",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "period": "2026-11",
+    "utility": "electric",
+    "status": "processing",
+    "createdAt": "2026-10-28T10:16:53.207Z",
+    "updatedAt": "2026-10-28T10:16:53.207Z",
+    "photos": [
+      {
+        "fileId": "file_ec9d7c71365141cd9f",
+        "createdAt": "2026-10-28T10:16:53.207Z"
+      }
+    ]
+  },
+  "ownerSubmission": {
+    "id": "meter_sub_fa08d79724e94f67ba",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "submittedBy": "user_tenant",
+    "submittedByName": "Nguyễn Hoàng Nam",
+    "period": "2026-11",
+    "utility": "electric",
+    "photos": [
+      {
+        "analysisId": "meter_photo_c70d94f1264a4c86bb",
+        "fileId": "file_ec9d7c71365141cd9f",
+        "createdAt": "2026-10-28T10:16:53.207Z",
+        "rectangle": {
+          "left": 134,
+          "top": 260,
+          "width": 222,
+          "height": 46
+        },
+        "quality": {
+          "version": 1,
+          "status": "pass",
+          "canSubmit": true,
+          "scope": "counter",
+          "checks": {
+            "resolution": true,
+            "exposure": true,
+            "contrast": true,
+            "sharpness": true,
+            "glare": true
+          },
+          "reasons": [],
+          "metrics": {
+            "width": 222,
+            "height": 46,
+            "meanLuma": 97.08,
+            "contrast": 37.105,
+            "edgeEnergy": 1033.998,
+            "clippedDark": 0,
+            "clippedLight": 0,
+            "glareFraction": 0
+          },
+          "source": {
+            "width": 415,
+            "height": 739
+          },
+          "rectangle": {
+            "left": 134,
+            "top": 260,
+            "width": 222,
+            "height": 46
+          }
+        },
+        "result": {
+          "feature": "B03",
+          "engine": "hybrid",
+          "model": "PP-OCRv6 small",
+          "rawText": "[Xoay 0° · toàn vùng]\n007664kWh\n\n[Xoay 0° · kiểm tra vùng số]\n007664kWh",
+          "confidence": 99,
+          "ocrConfidence": 99,
+          "candidates": [],
+          "suggestedValue": null,
+          "registers": [
+            {
+              "digits": "007664",
+              "confidence": 98,
+              "passes": 2,
+              "stable": true,
+              "regionId": "r0-line0",
+              "unit": "kWh",
+              "decimalEvidence": "unknown",
+              "geometry": {
+                "kind": "user",
+                "angle": -3.136358368332587,
+                "rotationDegrees": 0,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 0,
+                  "top": 1,
+                  "width": 221,
+                  "height": 44
+                }
+              }
+            }
+          ],
+          "warnings": [
+            "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+            "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+            "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+            "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+            "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô.",
+            "OCR và Vision không khớp số ô; không bỏ chữ số để ép hai kết quả giống nhau.",
+            "Chưa có đối chiếu OCR ổn định cho toàn bộ từng vị trí chữ số."
+          ],
+          "requiresConfirmation": true,
+          "image": {
+            "sourceWidth": 415,
+            "sourceHeight": 739,
+            "width": 222,
+            "height": 46,
+            "rectangle": {
+              "left": 134,
+              "top": 260,
+              "width": 222,
+              "height": 46
+            },
+            "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+          },
+          "observations": [
+            {
+              "text": "007664kWh",
+              "confidence": 99,
+              "polygon": [
+                [
+                  0,
+                  13
+                ],
+                [
+                  219,
+                  1
+                ],
+                [
+                  221,
+                  33
+                ],
+                [
+                  0,
+                  45
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line0",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": true,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "007664kWh",
+              "confidence": 98,
+              "polygon": [
+                [
+                  0,
+                  12.24646924829157
+                ],
+                [
+                  220.41343963553533,
+                  0.12291571753986208
+                ],
+                [
+                  222,
+                  32.602915717539865
+                ],
+                [
+                  0,
+                  44.72646924829157
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-confirm0-line0",
+              "variant": "region-confirmation"
+            }
+          ],
+          "runtime": {
+            "backend": "onnxruntime-cpu",
+            "initMs": 3492,
+            "pythonNetworkBlocked": true
+          },
+          "preprocessing": {
+            "version": 3,
+            "attempts": 4,
+            "regions": 0,
+            "passes": []
+          },
+          "elapsedMs": 18102,
+          "ocrEngine": "paddleocr",
+          "utility": "electric",
+          "regions": [
+            {
+              "regionId": "r0-line0",
+              "role": "counter",
+              "text": "007664kWh",
+              "evidence": [
+                "unit_label"
+              ],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 134,
+                "top": 261,
+                "width": 221,
+                "height": 44
+              },
+              "geometry": {
+                "kind": "user",
+                "angle": -3.136358368332587,
+                "rotationDegrees": 0,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 0,
+                  "top": 1,
+                  "width": 221,
+                  "height": 44
+                }
+              },
+              "observationRegionIds": [
+                "r0-line0"
+              ]
+            }
+          ],
+          "regionSelection": {
+            "status": "selected",
+            "selectedRegionId": "r0-line0",
+            "source": "layout"
+          },
+          "ocrReadings": [
+            {
+              "regionId": "r0-line0",
+              "digits": "007664",
+              "integerDigits": "",
+              "fractionalDigits": "",
+              "displayText": "007664",
+              "unit": "kWh",
+              "decimalEvidence": "unknown",
+              "boundarySource": "unresolved",
+              "unitSource": "ocr",
+              "complete": false,
+              "stable": true
+            }
+          ],
+          "ocrCandidates": [],
+          "confirmedReading": null,
+          "assessment": "needs_review",
+          "vision": {
+            "available": true,
+            "model": "qwen3-vl:4b-instruct",
+            "meterType": "mechanical",
+            "unit": "kWh",
+            "regionRole": "counter",
+            "fractionalScale": "1/10",
+            "scaleLabels": [
+              "1/10"
+            ],
+            "scaleEvidence": {
+              "source": "printed_weights",
+              "fractionalDigits": 1,
+              "labels": [
+                "1/10"
+              ],
+              "verified": true
+            },
+            "cellEvidenceVersion": 1,
+            "cellCount": 5,
+            "cellsComplete": true,
+            "cells": [
+              {
+                "index": 0,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.038,
+                  "top": 0.328,
+                  "width": 0.082,
+                  "height": 0.372
+                }
+              },
+              {
+                "index": 1,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.138,
+                  "top": 0.328,
+                  "width": 0.082,
+                  "height": 0.372
+                }
+              },
+              {
+                "index": 2,
+                "state": "clear",
+                "digit": "7",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.248,
+                  "top": 0.328,
+                  "width": 0.064,
+                  "height": 0.372
+                }
+              },
+              {
+                "index": 3,
+                "state": "clear",
+                "digit": "6",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.348,
+                  "top": 0.328,
+                  "width": 0.064,
+                  "height": 0.372
+                }
+              },
+              {
+                "index": 4,
+                "state": "clear",
+                "digit": "6",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.448,
+                  "top": 0.328,
+                  "width": 0.072,
+                  "height": 0.372
+                }
+              },
+              {
+                "index": 5,
+                "state": "clear",
+                "digit": "4",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.548,
+                  "top": 0.2,
+                  "width": 0.132,
+                  "height": 0.584
+                }
+              }
+            ],
+            "integerDigits": "00766",
+            "fractionalDigits": "4",
+            "decimalEvidence": "red_digits",
+            "uncertainDigits": true,
+            "displayText": "00766.4",
+            "readable": false,
+            "issues": [
+              "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+              "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô."
+            ],
+            "cellImageIndex": 1,
+            "preparation": {
+              "rotationDegrees": 0,
+              "cropApplied": true,
+              "regionSource": "ocr",
+              "deskewDegrees": 3.136358368332587,
+              "cellImageGeometry": {
+                "sourceWidth": 415,
+                "sourceHeight": 739,
+                "baseRectangle": {
+                  "left": 134,
+                  "top": 260,
+                  "width": 222,
+                  "height": 46
+                },
+                "crop": {
+                  "left": 0,
+                  "top": 0,
+                  "width": 222,
+                  "height": 46
+                },
+                "rotationDegrees": 0,
+                "deskewDegrees": 3.136358368332587,
+                "rendered": {
+                  "width": 224,
+                  "height": 58
+                }
+              },
+              "attempts": 2,
+              "transcriptionAttempts": 1,
+              "cellAttempts": 1
+            }
+          },
+          "cellEvidence": {
+            "version": 1,
+            "status": "needs_review",
+            "displayText": "00766.4",
+            "expectedCount": 6,
+            "observedCount": 5,
+            "cellsComplete": true,
+            "coordinateSpace": "vision-input-normalized",
+            "imageIndex": 1,
+            "cells": [
+              {
+                "index": 0,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.038,
+                  "top": 0.328,
+                  "width": 0.082,
+                  "height": 0.372
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    141.12,
+                    278.7
+                  ],
+                  [
+                    159.46,
+                    277.7
+                  ],
+                  [
+                    160.64,
+                    299.24
+                  ],
+                  [
+                    142.3,
+                    300.24
+                  ]
+                ]
+              },
+              {
+                "index": 1,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.138,
+                  "top": 0.328,
+                  "width": 0.082,
+                  "height": 0.372
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    163.49,
+                    277.48
+                  ],
+                  [
+                    181.83,
+                    276.47
+                  ],
+                  [
+                    183.01,
+                    298.01
+                  ],
+                  [
+                    164.67,
+                    299.02
+                  ]
+                ]
+              },
+              {
+                "index": 2,
+                "state": "clear",
+                "digit": "7",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.248,
+                  "top": 0.328,
+                  "width": 0.064,
+                  "height": 0.372
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    188.09,
+                    276.13
+                  ],
+                  [
+                    202.41,
+                    275.34
+                  ],
+                  [
+                    203.59,
+                    296.89
+                  ],
+                  [
+                    189.27,
+                    297.67
+                  ]
+                ]
+              },
+              {
+                "index": 3,
+                "state": "clear",
+                "digit": "6",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.348,
+                  "top": 0.328,
+                  "width": 0.064,
+                  "height": 0.372
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    210.46,
+                    274.9
+                  ],
+                  [
+                    224.77,
+                    274.12
+                  ],
+                  [
+                    225.95,
+                    295.66
+                  ],
+                  [
+                    211.64,
+                    296.45
+                  ]
+                ]
+              },
+              {
+                "index": 4,
+                "state": "clear",
+                "digit": "6",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.448,
+                  "top": 0.328,
+                  "width": 0.072,
+                  "height": 0.372
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    232.82,
+                    273.68
+                  ],
+                  [
+                    248.93,
+                    272.79
+                  ],
+                  [
+                    250.11,
+                    294.34
+                  ],
+                  [
+                    234,
+                    295.22
+                  ]
+                ]
+              },
+              {
+                "index": 5,
+                "state": "clear",
+                "digit": "4",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.548,
+                  "top": 0.2,
+                  "width": 0.132,
+                  "height": 0.584
+                },
+                "ocrDigit": "",
+                "agreement": "unavailable",
+                "sourcePolygon": [
+                  [
+                    254.78,
+                    265.04
+                  ],
+                  [
+                    284.31,
+                    263.42
+                  ],
+                  [
+                    286.16,
+                    297.24
+                  ],
+                  [
+                    256.64,
+                    298.86
+                  ]
+                ]
+              }
+            ],
+            "issues": [
+              "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+              "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô.",
+              "OCR và Vision không khớp số ô; không bỏ chữ số để ép hai kết quả giống nhau.",
+              "Chưa có đối chiếu OCR ổn định cho toàn bộ từng vị trí chữ số."
+            ],
+            "alignmentSource": "sequence-position",
+            "sourceImage": {
+              "width": 415,
+              "height": 739
+            }
+          },
+          "quality": {
+            "version": 1,
+            "status": "pass",
+            "canSubmit": true,
+            "scope": "counter",
+            "checks": {
+              "resolution": true,
+              "exposure": true,
+              "contrast": true,
+              "sharpness": true,
+              "glare": true
+            },
+            "reasons": [],
+            "metrics": {
+              "width": 222,
+              "height": 46,
+              "meanLuma": 97.08,
+              "contrast": 37.105,
+              "edgeEnergy": 1033.998,
+              "clippedDark": 0,
+              "clippedLight": 0,
+              "glareFraction": 0
+            },
+            "source": {
+              "width": 415,
+              "height": 739
+            },
+            "rectangle": {
+              "left": 134,
+              "top": 260,
+              "width": 222,
+              "height": 46
+            }
+          }
+        },
+        "processingStatus": "done",
+        "processedAt": "2026-10-28T10:17:11.315Z"
+      }
+    ],
+    "selectedAnalysisId": "meter_photo_c70d94f1264a4c86bb",
+    "status": "pending",
+    "version": 2,
+    "note": "",
+    "jobAttempts": 1,
+    "updatedAt": "2026-10-28T10:17:11.316Z",
+    "createdAt": "2026-10-28T10:16:53.207Z",
+    "jobLeaseToken": null,
+    "jobLeaseUntil": null,
+    "processedAt": "2026-10-28T10:17:11.316Z",
+    "processingError": null,
+    "processingState": "complete"
+  },
+  "review": {
+    "status": "approved",
+    "value": 766,
+    "source": "manual",
+    "periodConfirmed": false,
+    "invoiceUnchanged": true
+  }
+}

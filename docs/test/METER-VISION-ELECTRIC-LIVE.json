@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-10-27T10:37:57.271Z",
+  "model": "qwen3-vl:4b-instruct",
+  "photoSha256": "588d46bc3342da934bc40042c66fd59414809954cb2d4df81bd4855574b9d13d",
+  "photoBytes": 24359,
+  "expectedDisplay": "012345",
+  "expectedValue": 12345,
+  "passed": true,
+  "businessRecordsUnchanged": true,
+  "httpHistoryAndAuthoritativePreviousVerified": true,
+  "elapsedMs": 4045,
+  "result": {
+    "feature": "B03",
+    "engine": "ollama-vision",
+    "rawText": "ELECTRIC METER                                        -",
+    "confidence": 63,
+    "ocrConfidence": 63,
+    "candidates": [
+      {
+        "value": 12345,
+        "text": "012345",
+        "displayText": "012345",
+        "fractionalDigits": "",
+        "confidence": 0,
+        "source": "vision",
+        "reason": "Vision đọc dãy 012345 kWh."
+      }
+    ],
+    "suggestedValue": 12345,
+    "warnings": [
+      "Chỉ số do vision đề xuất chưa được OCR xác nhận độc lập; cần đối chiếu ảnh."
+    ],
+    "requiresConfirmation": true,
+    "utility": "electric",
+    "elapsedMs": 4024,
+    "assessment": "vision_only",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "digital",
+      "unit": "kWh",
+      "integerDigits": "012345",
+      "fractionalDigits": "",
+      "decimalEvidence": "none",
+      "uncertainDigits": false,
+      "displayText": "012345",
+      "readable": true,
+      "issues": []
+    },
+    "fileId": "file_65e7e08d9a3e4c148c",
+    "roomId": "room_101"
+  }
+}

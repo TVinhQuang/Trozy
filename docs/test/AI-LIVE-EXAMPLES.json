@@ -1,0 +1,286 @@
+{
+  "recordedAt": "2026-10-27T09:48:39.790Z",
+  "provider": "ollama",
+  "model": "qwen3:4b-instruct",
+  "syntheticDataOnly": true,
+  "businessRecordsUnchanged": true,
+  "passed": true,
+  "checks": [
+    {
+      "name": "B01 actual model + exact debt",
+      "input": {
+        "question": "Phòng nào còn nợ tháng 10/2026?"
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 1195,
+      "result": {
+        "feature": "B01",
+        "engine": "ollama",
+        "answer": "Các phòng còn nợ tháng 10/2026 bao gồm phòng 101, 102 và 301.\n\nCông nợ còn phải thu trong kỳ 2026-10: 12.424.500 ₫, từ 3 hóa đơn.\n• Phòng 101 · Nguyễn Hoàng Nam · kỳ 2026-10: còn 2.037.500 ₫, hạn 2026-10-05.\n• Phòng 102 · Trần Thu Hà · kỳ 2026-10: còn 4.815.500 ₫, hạn 2026-10-05.\n• Phòng 301 · Phạm Ngọc Linh · kỳ 2026-10: còn 5.571.500 ₫, hạn 2026-10-05.",
+        "sources": [
+          {
+            "collection": "invoices",
+            "id": "HD-10-101",
+            "label": "Hóa đơn HD-10-101",
+            "page": "invoices"
+          },
+          {
+            "collection": "invoices",
+            "id": "HD-10-102",
+            "label": "Hóa đơn HD-10-102",
+            "page": "invoices"
+          },
+          {
+            "collection": "invoices",
+            "id": "HD-10-301",
+            "label": "Hóa đơn HD-10-301",
+            "page": "invoices"
+          }
+        ],
+        "suggestions": [
+          "Phòng nào còn nợ tiền?",
+          "Giải thích hóa đơn mới nhất",
+          "Hợp đồng nào sắp hết hạn?",
+          "Có yêu cầu sửa chữa nào chưa xong?"
+        ],
+        "warnings": [],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B01 tenant invoice explanation",
+      "input": {
+        "question": "Giải thích hóa đơn của tôi",
+        "invoiceId": "HD-10-101"
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 990,
+      "result": {
+        "feature": "B01",
+        "engine": "ollama",
+        "answer": "Hóa đơn HD-10-101 cho kỳ 2026-10 bao gồm tiền phòng, điện, nước, dịch vụ và điều chỉnh, với tổng cộng 4.037.500 ₫.\n\nHóa đơn HD-10-101 · phòng 101 · kỳ 2026-10:\n• Tiền phòng: 3.500.000 ₫.\n• Điện: 1.267 → 1.362 = 95 kWh × 3.500 ₫ = 332.500 ₫.\n• Nước: 115 → 120 = 5 m³ × 15.000 ₫ = 75.000 ₫.\n• Dịch vụ: 130.000 ₫.\n• Điều chỉnh: 0 ₫.\nTổng hóa đơn: 4.037.500 ₫. Đã phân bổ thanh toán: 2.000.000 ₫. Còn phải thu: 2.037.500 ₫.\nHạn thanh toán: 2026-10-05.",
+        "sources": [
+          {
+            "collection": "invoices",
+            "id": "HD-10-101",
+            "label": "Hóa đơn HD-10-101",
+            "page": "invoices"
+          }
+        ],
+        "suggestions": [
+          "Giải thích hóa đơn của tôi",
+          "Tôi còn nợ bao nhiêu?",
+          "Nội quy nhà trọ là gì?",
+          "Yêu cầu sửa chữa của tôi đã xong chưa?"
+        ],
+        "warnings": [],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B01 semantic document FAQ",
+      "input": {
+        "question": "Mình cần báo chủ nhà bao lâu trước khi dọn đi?"
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 1372,
+      "result": {
+        "feature": "B01",
+        "engine": "ollama",
+        "answer": "Mình cần báo chủ nhà trước 30 ngày khi có nhu cầu trả phòng.",
+        "sources": [
+          {
+            "collection": "documents",
+            "id": "document_rules",
+            "label": "Nội quy Nhà trọ An Nhiên",
+            "page": "documents",
+            "excerpt": "Nội quy Nhà trọ An Nhiên\n1. Giữ yên lặng sau 22:00.\n2. Đỗ xe đúng vị trí đã đăng ký.\n3. Không hút thuốc trong phòng.\n4. Thanh toán hóa đơn trước ngày 05 hằng tháng.\n5. Báo chủ trọ trước 30 ngày khi có nhu cầu trả phòng."
+          },
+          {
+            "collection": "contracts",
+            "id": "contract_01",
+            "label": "Bản ghi contract_01",
+            "page": "contracts",
+            "excerpt": "Tiền thuê thanh toán trước ngày 05 hằng tháng. Điện 3.500đ/kWh, nước 15.000đ/m³. Báo trước 30 ngày khi trả phòng."
+          }
+        ],
+        "suggestions": [
+          "Kiểm tra tình trạng phòng trước khi dọn đi.",
+          "Lưu ý thời hạn thuê đến 30/06/2027.",
+          "Liên hệ chủ trọ để xác nhận việc trả phòng cụ thể."
+        ],
+        "warnings": [],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B04 actual appliance classification",
+      "input": {
+        "roomId": "room_101",
+        "assetId": "asset_0",
+        "description": "Máy lạnh phòng 101 bị chảy nước và không mát, không có khói hay mùi khét."
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 3037,
+      "result": {
+        "feature": "B04",
+        "engine": "ollama",
+        "category": "Thiết bị",
+        "priority": "normal",
+        "confidence": 90,
+        "reasons": [
+          "Từ khóa trong mô tả phù hợp nhóm thiết bị.",
+          "Từ khóa 'máy lạnh' trong mô tả phù hợp nhóm thiết bị.",
+          "Triệu chứng 'chảy nước' và 'không mát' là hiện tượng thường gặp ở thiết bị điều hòa.",
+          "Không có dấu hiệu nguy hiểm như khói hoặc mùi khét, không liên quan đến điện hoặc an toàn.",
+          "Không có thông tin về lỗi cơ học hoặc kết cấu liên quan."
+        ],
+        "suggestedTitle": "Máy lạnh phòng 101 chảy nước và không mát",
+        "safetyAdvice": [],
+        "suggestedSteps": [
+          "Ghi tên thiết bị, biểu hiện và thời điểm lỗi xuất hiện.",
+          "Ngừng sử dụng nếu có dấu hiệu bất thường nguy hiểm; nhờ chủ trọ kiểm tra."
+        ],
+        "requiresConfirmation": true,
+        "warnings": [
+          "Gợi ý phân loại cần được người gửi kiểm tra trước khi áp dụng."
+        ],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B04 hazard floor preserved",
+      "input": {
+        "roomId": "room_101",
+        "description": "Ổ cắm trong phòng có tia lửa, bốc khói và mùi khét rõ rệt."
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 3289,
+      "result": {
+        "feature": "B04",
+        "engine": "ollama",
+        "category": "Điện",
+        "priority": "urgent",
+        "confidence": 100,
+        "reasons": [
+          "Mô tả có dấu hiệu khói, cháy hoặc nguy cơ điện.",
+          "Mô tả có dấu hiệu khói, cháy hoặc nguy cơ điện.",
+          "Ổ cắm bốc khói và có mùi khét rõ rệt, cho thấy hiện tượng quá nhiệt hoặc ngắn mạch.",
+          "Tia lửa xuất hiện tại ổ cắm là dấu hiệu nguy hiểm cao, có thể gây cháy hoặc điện giật.",
+          "Không thể đảm bảo an toàn nếu không kiểm tra và xử lý ngay lập tức."
+        ],
+        "suggestedTitle": "Ổ cắm trong phòng bốc khói, có tia lửa và mùi khét – cần xử lý khẩn cấp",
+        "safetyAdvice": [
+          "Tránh chạm vào thiết bị/dây điện và khu vực ẩm ướt. Chỉ ngắt nguồn khi thực hiện được an toàn; báo chủ trọ ngay."
+        ],
+        "suggestedSteps": [
+          "Báo rõ vị trí và thiết bị gặp sự cố.",
+          "Nhờ người có chuyên môn kiểm tra nguồn cấp và thiết bị; không tự tháo phần điện."
+        ],
+        "requiresConfirmation": true,
+        "warnings": [
+          "Gợi ý phân loại cần được người gửi kiểm tra trước khi áp dụng."
+        ],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B01 tenant scope denied locally",
+      "input": {
+        "question": "Phòng 102 còn nợ gì?"
+      },
+      "expectedEngine": "local",
+      "elapsedMs": 0,
+      "result": {
+        "feature": "B01",
+        "engine": "local",
+        "answer": "Mình không tìm thấy phòng này trong phạm vi dữ liệu bạn được phép xem.",
+        "sources": [],
+        "suggestions": [
+          "Phòng nào còn nợ tiền?",
+          "Giải thích hóa đơn mới nhất",
+          "Hợp đồng nào sắp hết hạn?",
+          "Có yêu cầu sửa chữa nào chưa xong?"
+        ],
+        "warnings": []
+      },
+      "passed": true
+    },
+    {
+      "name": "B01 custom announcement preserves explicit schedule",
+      "input": {
+        "question": "Soạn thông báo cắt nước ngày 29/10 từ 9h đến 11h để bảo trì đường ống."
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 1268,
+      "result": {
+        "feature": "B01",
+        "engine": "ollama",
+        "answer": "Bản nháp chưa được gửi. Hãy kiểm tra nội dung và người nhận trước khi phát hành.\n\nThông báo tạm ngưng cấp nước\nKính gửi người thuê,\n\nNội dung dự kiến: cắt nước ngày 29/10 từ 9h đến 11h để bảo trì đường ống.\n\nVui lòng kiểm tra lại lịch, phạm vi áp dụng và liên hệ chủ trọ nếu cần hỗ trợ. Cảm ơn bạn.",
+        "sources": [],
+        "suggestions": [
+          "Phòng nào còn nợ tiền?",
+          "Giải thích hóa đơn mới nhất",
+          "Hợp đồng nào sắp hết hạn?",
+          "Có yêu cầu sửa chữa nào chưa xong?"
+        ],
+        "warnings": [],
+        "draft": {
+          "title": "Thông báo tạm ngưng cấp nước",
+          "body": "Kính gửi người thuê,\n\nNội dung dự kiến: cắt nước ngày 29/10 từ 9h đến 11h để bảo trì đường ống.\n\nVui lòng kiểm tra lại lịch, phạm vi áp dụng và liên hệ chủ trọ nếu cần hỗ trợ. Cảm ơn bạn.",
+          "kind": "maintenance",
+          "roomIds": []
+        },
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    },
+    {
+      "name": "B01 authenticated HTTP round-trip + persisted history",
+      "input": {
+        "question": "Phòng nào còn nợ tháng 10/2026?"
+      },
+      "expectedEngine": "ollama",
+      "elapsedMs": 915,
+      "result": {
+        "feature": "B01",
+        "engine": "ollama",
+        "answer": "Các phòng còn nợ tháng 10/2026 bao gồm phòng 101, 102 và 301.\n\nCông nợ còn phải thu trong kỳ 2026-10: 12.424.500 ₫, từ 3 hóa đơn.\n• Phòng 101 · Nguyễn Hoàng Nam · kỳ 2026-10: còn 2.037.500 ₫, hạn 2026-10-05.\n• Phòng 102 · Trần Thu Hà · kỳ 2026-10: còn 4.815.500 ₫, hạn 2026-10-05.\n• Phòng 301 · Phạm Ngọc Linh · kỳ 2026-10: còn 5.571.500 ₫, hạn 2026-10-05.",
+        "sources": [
+          {
+            "collection": "invoices",
+            "id": "HD-10-101",
+            "label": "Hóa đơn HD-10-101",
+            "page": "invoices"
+          },
+          {
+            "collection": "invoices",
+            "id": "HD-10-102",
+            "label": "Hóa đơn HD-10-102",
+            "page": "invoices"
+          },
+          {
+            "collection": "invoices",
+            "id": "HD-10-301",
+            "label": "Hóa đơn HD-10-301",
+            "page": "invoices"
+          }
+        ],
+        "suggestions": [
+          "Phòng nào còn nợ tiền?",
+          "Giải thích hóa đơn mới nhất",
+          "Hợp đồng nào sắp hết hạn?",
+          "Có yêu cầu sửa chữa nào chưa xong?"
+        ],
+        "warnings": [],
+        "model": "qwen3:4b-instruct"
+      },
+      "passed": true
+    }
+  ]
+}

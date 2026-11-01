@@ -1,0 +1,880 @@
+{
+  "checkedAt": "2026-10-28T15:27:58.309Z",
+  "passed": true,
+  "validationScope": "Actual local OCR after explicit photo submission; no Ollama calls; tenant API privacy, owner notification/review; not general recognition accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-ocr-reader.mjs": "c285b5c5749a2db56c854bab3c48a92518f156258c1c97210039a7f58cc2c8d0",
+    "src/ai/meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "src/ai/meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "src/ai/ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "src/ai/paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "src/ai/paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "src/ai/register.mjs": "be0add9c41b48a6b79ce3f26b339a73f075eb1812233c0eb2947235d510aff98",
+    "src/backend/db.mjs": "9c231d5c1b399ab4c8d006b7cef005754060b3a883d56efb5613d997ad2032ee",
+    "src/backend/meter-submissions.mjs": "d66491501d9bae1436bc99fa6d2c9cb490e32c4dc0fe91a7ec2605f242b66915",
+    "src/backend/meter-jobs.mjs": "2c2c5fc5a55aa189bd3d98a4ff51082e025614d4881702826e078a3c3656e063",
+    "src/backend/meter-visibility.mjs": "1f6f243069bf86dc7bf139e569707d9cc8c5a507960a379577935af1a37a5d83",
+    "src/backend/domain.mjs": "53a8c8fb05f279ea1600591b28dd0067ef8a68c057a184bd5996432c8a35c7c5",
+    "src/backend/server.mjs": "3fe486a5c81748bff1e44dc5aaa2606bca0805e4150f53887b49099fc42e3735",
+    "src/backend/ai-service.mjs": "e55927c092b45f760ea7bace1991b1261d6d2cedbab6792f4ba4e29cd8228b4c"
+  },
+  "photoSha256": "b3f6eb362ad2a4440be011e62fc071edc6dc1cf13e01e409ca93299f8031a425",
+  "photoBytes": 1464196,
+  "derivedBlur": null,
+  "rectangle": null,
+  "meterProfile": {
+    "id": "meter_profile_2015f5f5152046b09b",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "utility": "water",
+    "kind": "mechanical",
+    "unit": "m3",
+    "integerDigitsCount": 4,
+    "fractionalDigitsCount": 1,
+    "configurationConfirmed": true,
+    "version": 1,
+    "confirmedBy": "owner_demo",
+    "confirmedAt": "2026-10-28T15:27:50.207Z",
+    "createdAt": "2026-10-28T15:27:50.208Z",
+    "updatedAt": "2026-10-28T15:27:50.208Z"
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "modelCallsBeforeSend": 0,
+  "backgroundCalls": 1,
+  "ollamaCalls": 0,
+  "tenantNeverReceivesReadings": true,
+  "ownerOnlyNotificationVerified": true,
+  "quality": {
+    "version": 1,
+    "status": "pass",
+    "canSubmit": false,
+    "scope": "frame",
+    "checks": {
+      "resolution": true,
+      "exposure": true,
+      "contrast": true,
+      "sharpness": true,
+      "glare": true
+    },
+    "reasons": [],
+    "metrics": {
+      "width": 639,
+      "height": 480,
+      "meanLuma": 140.222,
+      "contrast": 61.88,
+      "edgeEnergy": 1585.112,
+      "clippedDark": 0.01,
+      "clippedLight": 0.002,
+      "glareFraction": 0
+    },
+    "source": {
+      "width": 2000,
+      "height": 1502
+    }
+  },
+  "tenantReceipt": {
+    "id": "meter_sub_3e7079909ea94227b0",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "period": "2026-11",
+    "utility": "water",
+    "status": "processing",
+    "createdAt": "2026-10-28T15:27:50.490Z",
+    "updatedAt": "2026-10-28T15:27:50.490Z",
+    "photos": [
+      {
+        "fileId": "file_ba3bf73deff04d4a80",
+        "createdAt": "2026-10-28T15:27:50.490Z"
+      }
+    ]
+  },
+  "ownerSubmission": {
+    "id": "meter_sub_3e7079909ea94227b0",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "submittedBy": "user_tenant",
+    "submittedByName": "Nguyễn Hoàng Nam",
+    "period": "2026-11",
+    "utility": "water",
+    "photos": [
+      {
+        "analysisId": "meter_photo_e13630323aea422ca8",
+        "fileId": "file_ba3bf73deff04d4a80",
+        "createdAt": "2026-10-28T15:27:50.490Z",
+        "rectangle": null,
+        "quality": {
+          "version": 1,
+          "status": "pass",
+          "canSubmit": true,
+          "scope": "counter",
+          "checks": {
+            "resolution": true,
+            "exposure": true,
+            "contrast": true,
+            "sharpness": true,
+            "glare": true
+          },
+          "reasons": [],
+          "metrics": {
+            "width": 116,
+            "height": 398,
+            "meanLuma": 206.719,
+            "contrast": 36.127,
+            "edgeEnergy": 1158.859,
+            "clippedDark": 0,
+            "clippedLight": 0.069,
+            "glareFraction": 0
+          },
+          "source": {
+            "width": 2000,
+            "height": 1502
+          },
+          "rectangle": {
+            "left": 850,
+            "top": 560,
+            "width": 116,
+            "height": 398
+          }
+        },
+        "result": {
+          "feature": "B03",
+          "recognitionMode": "ocr-specialized",
+          "engine": "paddleocr",
+          "ocrEngine": "paddleocr",
+          "utility": "water",
+          "previous": 0,
+          "meterProfile": {
+            "id": "meter_profile_2015f5f5152046b09b",
+            "version": 1,
+            "kind": "mechanical",
+            "unit": "m3",
+            "integerDigitsCount": 4,
+            "fractionalDigitsCount": 1,
+            "configurationConfirmed": true
+          },
+          "meterType": "auto",
+          "rawText": "[Xoay 0° · toàn vùng]\n0.000,\n1303\n8\nX0.07\n建\n\n[Xoay 90° · toàn vùng]\nNOOOX\n000\n20.0X\n\n[Xoay 270° · toàn vùng]\n13038\n必\nXO.07\nx0001\n0.000,\n690\n\n[Xoay 270° · kiểm tra vùng số]\n13038",
+          "confidence": 95,
+          "ocrConfidence": 95,
+          "registers": [
+            {
+              "digits": "13038",
+              "confidence": 87,
+              "passes": 2,
+              "stable": true,
+              "regionId": "r270-line0",
+              "unit": "unknown",
+              "decimalEvidence": "color_groups",
+              "geometry": {
+                "kind": "auto",
+                "angle": -0.7215711634155743,
+                "rotationDegrees": 270,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 560,
+                  "top": 1034,
+                  "width": 398,
+                  "height": 116
+                }
+              },
+              "blackDigits": "1303",
+              "redDigits": "8",
+              "redStable": true,
+              "blackStable": true,
+              "redConfidence": 87,
+              "blackConfidence": 87,
+              "redPasses": 2,
+              "blackPasses": 2,
+              "colorEvidence": {
+                "method": "rgb-cell-support",
+                "colors": [
+                  "black",
+                  "black",
+                  "black",
+                  "black",
+                  "red"
+                ]
+              }
+            }
+          ],
+          "regions": [
+            {
+              "regionId": "r270-line0",
+              "role": "counter",
+              "text": "13038",
+              "evidence": [
+                "color_groups"
+              ],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 850,
+                "top": 560,
+                "width": 116,
+                "height": 398
+              },
+              "geometry": {
+                "kind": "auto",
+                "angle": -0.7215711634155743,
+                "rotationDegrees": 270,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 560,
+                  "top": 1034,
+                  "width": 398,
+                  "height": 116
+                }
+              },
+              "observationRegionIds": [
+                "r0-line1",
+                "r270-line0"
+              ]
+            },
+            {
+              "regionId": "r0-line3",
+              "role": "specification",
+              "text": "X0.07",
+              "evidence": [
+                "specification_context"
+              ],
+              "selectable": false,
+              "sourceRectangle": {
+                "left": 775,
+                "top": 938,
+                "width": 51,
+                "height": 103
+              },
+              "geometry": {
+                "kind": "auto",
+                "angle": -2.3859440303888126,
+                "rotationDegrees": 0,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 775,
+                  "top": 938,
+                  "width": 51,
+                  "height": 103
+                }
+              },
+              "observationRegionIds": [
+                "r0-line3",
+                "r90-line2"
+              ]
+            },
+            {
+              "regionId": "r270-line3",
+              "role": "unknown",
+              "text": "x0001",
+              "evidence": [],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 635,
+                "top": 772,
+                "width": 99,
+                "height": 126
+              },
+              "geometry": {
+                "kind": "auto",
+                "angle": -25.893646994228014,
+                "rotationDegrees": 270,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 772,
+                  "top": 1266,
+                  "width": 126,
+                  "height": 99
+                }
+              },
+              "observationRegionIds": [
+                "r270-line3"
+              ]
+            },
+            {
+              "regionId": "r270-line5",
+              "role": "unknown",
+              "text": "690",
+              "evidence": [],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 564,
+                "top": 605,
+                "width": 89,
+                "height": 112
+              },
+              "geometry": {
+                "kind": "auto",
+                "angle": -23.962488974578182,
+                "rotationDegrees": 270,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 605,
+                  "top": 1347,
+                  "width": 112,
+                  "height": 89
+                }
+              },
+              "observationRegionIds": [
+                "r270-line5"
+              ]
+            },
+            {
+              "regionId": "r0-line0",
+              "role": "unknown",
+              "text": "0.000,",
+              "evidence": [],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 585,
+                "top": 532,
+                "width": 134,
+                "height": 134
+              },
+              "geometry": {
+                "kind": "auto",
+                "angle": 45.299975162303916,
+                "rotationDegrees": 0,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 585,
+                  "top": 532,
+                  "width": 134,
+                  "height": 134
+                }
+              },
+              "observationRegionIds": [
+                "r0-line0",
+                "r90-line1",
+                "r270-line4"
+              ]
+            }
+          ],
+          "observations": [
+            {
+              "text": "0.000,",
+              "confidence": 88,
+              "polygon": [
+                [
+                  624,
+                  532
+                ],
+                [
+                  719,
+                  628
+                ],
+                [
+                  681,
+                  666
+                ],
+                [
+                  585,
+                  569
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line0",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": false,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "1303",
+              "confidence": 83,
+              "polygon": [
+                [
+                  842,
+                  558
+                ],
+                [
+                  959,
+                  555
+                ],
+                [
+                  968,
+                  888
+                ],
+                [
+                  851,
+                  891
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line1",
+              "variant": "full"
+            },
+            {
+              "text": "8",
+              "confidence": 74,
+              "polygon": [
+                [
+                  853,
+                  875
+                ],
+                [
+                  938,
+                  882
+                ],
+                [
+                  932,
+                  952
+                ],
+                [
+                  847,
+                  945
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line2",
+              "variant": "full"
+            },
+            {
+              "text": "X0.07",
+              "confidence": 84,
+              "polygon": [
+                [
+                  775,
+                  940
+                ],
+                [
+                  823,
+                  938
+                ],
+                [
+                  826,
+                  1040
+                ],
+                [
+                  778,
+                  1041
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line3",
+              "variant": "full"
+            },
+            {
+              "text": "建",
+              "confidence": 30,
+              "polygon": [
+                [
+                  895,
+                  938
+                ],
+                [
+                  921,
+                  938
+                ],
+                [
+                  921,
+                  972
+                ],
+                [
+                  895,
+                  972
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line4",
+              "variant": "full"
+            },
+            {
+              "text": "NOOOX",
+              "confidence": 49,
+              "polygon": [
+                [
+                  590,
+                  679
+                ],
+                [
+                  705,
+                  624
+                ],
+                [
+                  732,
+                  681
+                ],
+                [
+                  617,
+                  736
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line0",
+              "variant": "full"
+            },
+            {
+              "text": "000",
+              "confidence": 60,
+              "polygon": [
+                [
+                  821,
+                  681
+                ],
+                [
+                  931,
+                  584
+                ],
+                [
+                  970,
+                  630
+                ],
+                [
+                  860,
+                  726
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line1",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": false,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "20.0X",
+              "confidence": 62,
+              "polygon": [
+                [
+                  460,
+                  777
+                ],
+                [
+                  555,
+                  773
+                ],
+                [
+                  557,
+                  821
+                ],
+                [
+                  462,
+                  825
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line2",
+              "variant": "full"
+            },
+            {
+              "text": "13038",
+              "confidence": 80,
+              "polygon": [
+                [
+                  560,
+                  1039
+                ],
+                [
+                  957,
+                  1034
+                ],
+                [
+                  958,
+                  1145
+                ],
+                [
+                  561,
+                  1150
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line0",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": false,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": true,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "必",
+              "confidence": 48,
+              "polygon": [
+                [
+                  956,
+                  1075
+                ],
+                [
+                  970,
+                  1089
+                ],
+                [
+                  956,
+                  1103
+                ],
+                [
+                  942,
+                  1089
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line1",
+              "variant": "full"
+            },
+            {
+              "text": "XO.07",
+              "confidence": 84,
+              "polygon": [
+                [
+                  944,
+                  1173
+                ],
+                [
+                  1038,
+                  1170
+                ],
+                [
+                  1039,
+                  1219
+                ],
+                [
+                  946,
+                  1222
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line2",
+              "variant": "full"
+            },
+            {
+              "text": "x0001",
+              "confidence": 54,
+              "polygon": [
+                [
+                  772,
+                  1316
+                ],
+                [
+                  875,
+                  1266
+                ],
+                [
+                  898,
+                  1315
+                ],
+                [
+                  795,
+                  1365
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line3",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": false,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "0.000,",
+              "confidence": 85,
+              "polygon": [
+                [
+                  531,
+                  1368
+                ],
+                [
+                  635,
+                  1271
+                ],
+                [
+                  675,
+                  1315
+                ],
+                [
+                  571,
+                  1412
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line4",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": false,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "690",
+              "confidence": 92,
+              "polygon": [
+                [
+                  605,
+                  1387
+                ],
+                [
+                  695,
+                  1347
+                ],
+                [
+                  717,
+                  1397
+                ],
+                [
+                  627,
+                  1436
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-line5",
+              "variant": "full"
+            },
+            {
+              "text": "13038",
+              "confidence": 95,
+              "polygon": [
+                [
+                  550.2511711711711,
+                  1047.0236775818641
+                ],
+                [
+                  976.9409009009009,
+                  1038.2893702770782
+                ],
+                [
+                  978.3736936936937,
+                  1135.1623173803525
+                ],
+                [
+                  552.243963963964,
+                  1143.8895717884134
+                ]
+              ],
+              "rotationDegrees": 270,
+              "regionId": "r270-confirm0-line0",
+              "variant": "region-confirmation"
+            }
+          ],
+          "regionSelection": {
+            "status": "selected",
+            "selectedRegionId": "r270-line0",
+            "source": "layout"
+          },
+          "ocrReadings": [
+            {
+              "regionId": "r270-line0",
+              "digits": "13038",
+              "integerDigits": "1303",
+              "fractionalDigits": "8",
+              "displayText": "1303.8",
+              "unit": "unknown",
+              "decimalEvidence": "color_groups",
+              "boundarySource": "image-colors",
+              "unitSource": "unresolved",
+              "complete": false,
+              "stable": true
+            }
+          ],
+          "image": {
+            "sourceWidth": 2000,
+            "sourceHeight": 1502,
+            "width": 2000,
+            "height": 1502,
+            "rectangle": null,
+            "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+          },
+          "model": "PP-OCRv6 small",
+          "preprocessing": {
+            "version": 3,
+            "attempts": 4,
+            "regions": 0,
+            "passes": []
+          },
+          "quality": {
+            "version": 1,
+            "status": "pass",
+            "canSubmit": true,
+            "scope": "counter",
+            "checks": {
+              "resolution": true,
+              "exposure": true,
+              "contrast": true,
+              "sharpness": true,
+              "glare": true
+            },
+            "reasons": [],
+            "metrics": {
+              "width": 116,
+              "height": 398,
+              "meanLuma": 206.719,
+              "contrast": 36.127,
+              "edgeEnergy": 1158.859,
+              "clippedDark": 0,
+              "clippedLight": 0.069,
+              "glareFraction": 0
+            },
+            "source": {
+              "width": 2000,
+              "height": 1502
+            },
+            "rectangle": {
+              "left": 850,
+              "top": 560,
+              "width": 116,
+              "height": 398
+            }
+          },
+          "confirmedReading": null,
+          "proposedReading": null,
+          "candidates": [],
+          "suggestedValue": null,
+          "assessment": "needs_review",
+          "requiresConfirmation": true,
+          "warnings": [
+            "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+            "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+            "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+            "Các chiều ảnh đọc cùng bộ đếm thành dãy số khác nhau; chưa đề xuất chỉ số.",
+            "Chỉ số là đề xuất từ OCR; chủ nhà cần đối chiếu đủ ô số, đơn vị và phần lẻ trên ảnh trước khi xác minh.",
+            "Đọc lặp lại chỉ kiểm tra độ ổn định; điểm OCR không phải xác suất chỉ số đúng.",
+            "OCR hiện chưa tự phát hiện đáng tin cậy mọi trường hợp bánh số đang chuyển vòng."
+          ],
+          "elapsedMs": 7745
+        },
+        "processingStatus": "done",
+        "processedAt": "2026-10-28T15:27:58.244Z"
+      }
+    ],
+    "profileSnapshot": {
+      "id": "meter_profile_2015f5f5152046b09b",
+      "version": 1,
+      "kind": "mechanical",
+      "unit": "m3",
+      "integerDigitsCount": 4,
+      "fractionalDigitsCount": 1,
+      "configurationConfirmed": true
+    },
+    "selectedAnalysisId": "meter_photo_e13630323aea422ca8",
+    "status": "pending",
+    "version": 2,
+    "note": "",
+    "jobAttempts": 1,
+    "updatedAt": "2026-10-28T15:27:58.245Z",
+    "createdAt": "2026-10-28T15:27:50.490Z",
+    "jobLeaseToken": null,
+    "jobLeaseUntil": null,
+    "processedAt": "2026-10-28T15:27:58.245Z",
+    "processingError": null,
+    "processingState": "complete"
+  },
+  "review": null
+}

@@ -1,0 +1,109 @@
+{
+  "checkedAt": "2026-10-27T11:01:50.318Z",
+  "photoSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+  "photoBytes": 339681,
+  "input": {
+    "utility": "water",
+    "previous": 0
+  },
+  "expectedBlack": "00001",
+  "expectedRegister": null,
+  "passed": true,
+  "local": true,
+  "visionUsed": false,
+  "result": {
+    "feature": "B03",
+    "engine": "tesseract",
+    "rawText": "00001056\n00001",
+    "confidence": 94,
+    "ocrConfidence": 94,
+    "candidates": [],
+    "suggestedValue": null,
+    "warnings": [
+      "OCR đọc ổn định nhóm số nền đen sau khi tìm vùng và nắn thẳng; nhóm màu đỏ, đơn vị và quy ước thập phân vẫn cần đối chiếu riêng.",
+      "Các lượt OCR chưa thống nhất toàn bộ dãy số. Không dùng chuỗi ghép làm chỉ số tính tiền.",
+      "Đã nhận dạng được nhóm chữ số nhưng chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập."
+    ],
+    "registers": [
+      {
+        "digits": "00001056",
+        "confidence": 73,
+        "passes": 1,
+        "stable": false,
+        "regionId": "register-1",
+        "unit": "unknown",
+        "decimalEvidence": "color_groups",
+        "blackDigits": "00001",
+        "redDigits": "056",
+        "blackStable": true,
+        "blackConfidence": 94,
+        "blackPasses": 2,
+        "redStable": false,
+        "redConfidence": 0,
+        "redPasses": 0,
+        "geometry": {
+          "kind": "auto",
+          "angle": -9.7,
+          "rectangle": {
+            "left": 292,
+            "top": 503,
+            "width": 683,
+            "height": 189
+          }
+        }
+      }
+    ],
+    "preprocessing": {
+      "version": 2,
+      "attempts": 8,
+      "regions": 2,
+      "passes": [
+        {
+          "regionId": "register-1",
+          "variant": "threshold-120",
+          "text": "00001096",
+          "confidence": 70
+        },
+        {
+          "regionId": "register-1",
+          "variant": "threshold-110",
+          "text": "00001056",
+          "confidence": 73
+        },
+        {
+          "regionId": "register-1",
+          "variant": "threshold-100",
+          "text": "80001096",
+          "confidence": 50
+        },
+        {
+          "regionId": "register-1-black",
+          "variant": "threshold-120",
+          "text": "00001",
+          "confidence": 94
+        },
+        {
+          "regionId": "register-1-black",
+          "variant": "threshold-110",
+          "text": "00001",
+          "confidence": 93
+        },
+        {
+          "regionId": "register-1-red",
+          "variant": "threshold-120",
+          "text": "09",
+          "confidence": 56
+        },
+        {
+          "regionId": "register-1-red",
+          "variant": "threshold-110",
+          "text": "05",
+          "confidence": 30
+        }
+      ]
+    },
+    "requiresConfirmation": true,
+    "utility": "water",
+    "elapsedMs": 1385
+  }
+}

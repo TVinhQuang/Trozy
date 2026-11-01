@@ -1,0 +1,91 @@
+{
+  "createdAt": "2026-10-31T16:45:26.109Z",
+  "scope": "Automatic background jobs against isolated SQLite RAM; no original application DB opened",
+  "sourcePhotoSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+  "referencePolicy": "Locked agent visual annotation, not a user-verified or held-out accuracy benchmark",
+  "manualReadOrLocateCalls": 0,
+  "tenantSubmission": {
+    "status": 202,
+    "firstStatus": "needs_setup",
+    "automaticStates": [
+      "processing",
+      "ready"
+    ],
+    "durationMs": 5354,
+    "reading": {
+      "digits": "00001056",
+      "displayText": "00001.056",
+      "integerDigits": "00001",
+      "fractionalDigits": "056",
+      "integerValue": 1,
+      "unit": "m3"
+    },
+    "confidence": 0.9544519782476825,
+    "quality": {
+      "canRead": true,
+      "checks": {
+        "resolution": true,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true
+      },
+      "metrics": {
+        "width": 747,
+        "height": 129,
+        "cellWidth": 93.375,
+        "meanLuma": 58.73889355873105,
+        "contrast": 50.370048436842026,
+        "edgeEnergy": 672.8127912845962
+      }
+    },
+    "source": "automatic"
+  },
+  "authorization": {
+    "tenantStatus": 403,
+    "otherOwnerStatus": 404,
+    "tenantProfile": 403,
+    "tenantExportHasMachineEvidence": false
+  },
+  "review": {
+    "imageConsentRequired": true,
+    "fractionalConsentRequired": true,
+    "explicitFixtureReviewStatus": 200,
+    "waterValue": 1,
+    "periodConfirmed": false,
+    "invoicesUnchanged": true
+  },
+  "ownerSubmission": {
+    "status": 201,
+    "automaticStates": [
+      "processing",
+      "ready"
+    ],
+    "durationMs": 6225,
+    "profileReused": true,
+    "reading": {
+      "digits": "00001056",
+      "displayText": "00001.056",
+      "integerDigits": "00001",
+      "fractionalDigits": "056",
+      "integerValue": 1,
+      "unit": "m3"
+    },
+    "readingsAndInvoicesUnchanged": true
+  },
+  "sourceSha256": {
+    "src/ai/meter-reader.mjs": "9c001fefcc708d91fabda47d7cdc2e6396c4b4e5f47385afd1a180cf5235c65f",
+    "src/ai/meter_reader_worker.py": "a4236393f3983b03656b7de2cd78d81b7d6c9a981de074a522c29a739b2c1602",
+    "src/ai/meter_wheels.py": "796323311d61bdb1f142d628ba357ee2ae9b4a4c78dbf0a1213e281eb44ea922",
+    "src/ai/meter_geometry.py": "cac8cd5d6ca46b5a77223f3eac8085aee0b499bd21131ad7c3a3bd9f69c2181a",
+    "src/ai/meter_row_geometry.py": "b035af3819994a9e0d6bfd4309437960183847566254f02c4b64a7064bb42ed2",
+    "src/backend/meter-reader-service.mjs": "b43eb666fabcd6979e9267d61cb87c96874b61ee7d13bebe7f6119f3027a4fa3",
+    "src/backend/meter-automatic.mjs": "f60b7d5358d490a11726fdf4b955f53b4435c2e41a6776f76d740c90371e33df",
+    "src/backend/meter-profile.mjs": "bc4f6ffde6d08b6e73128698a2d17a36b71275b45d4820c4b3ce1241aa2c7c89",
+    "src/backend/server.mjs": "800b08c3dbe4335068b53bbed1095a90f2d5b08bc8d5b5b63f624e8053b4f1e6",
+    "src/backend/meter-submissions.mjs": "c2e8009b0ce15421c91df81187bb66e5ca2a6a2f3a77ec8d8466b758976c925c",
+    "src/frontend/meter-automatic-panel.tsx": "205f328eac5a9c5f434e8ee3369f56f0494843b43341034fac847c3e8a738982",
+    "src/frontend/meter-submissions-panel.tsx": "5fd75fd01293c73babc42fba8d5a8e90e9125677489d3039391ace2557afabe0",
+    "src/frontend/meter-reader-panel.tsx": "108af161b9210e066301dd210151284fa0a8941d0b2a7971ab96c9844bb45ce5",
+    "scripts/check-meter-automatic-live.mjs": "74310b1f49ca9cbf1eed371acf14957e2047893879721b94250a1b2b7e11e39c"
+  }
+}

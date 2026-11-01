@@ -1,0 +1,105 @@
+{
+  "checkedAt": "2026-10-29T19:08:40.271Z",
+  "scope": "Single-slot local model contract smoke only; slot index is manually selected for this test. Not an OCR-detected gap, not an end-to-end successful completion, and not a ground-truth accuracy test.",
+  "source": ".runtime/datasets/meter/electric-clear.jpg",
+  "photoSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+  "rectangle": {
+    "left": 134,
+    "top": 260,
+    "width": 222,
+    "height": 46
+  },
+  "index": 5,
+  "chatCalls": 1,
+  "elapsedMs": 6411,
+  "raw": {
+    "meterType": "digital",
+    "unit": "kWh",
+    "index": 5,
+    "cellCount": 7,
+    "integerDigitsCount": 6,
+    "fractionalDigitsCount": 1,
+    "decimalEvidence": "none",
+    "state": "clear",
+    "digit": "4",
+    "alternatives": [],
+    "readable": true,
+    "cells": [
+      {
+        "index": 0,
+        "bbox_2d": [
+          0,
+          0,
+          100,
+          100
+        ]
+      },
+      {
+        "index": 1,
+        "bbox_2d": [
+          100,
+          0,
+          200,
+          100
+        ]
+      },
+      {
+        "index": 2,
+        "bbox_2d": [
+          200,
+          0,
+          300,
+          100
+        ]
+      },
+      {
+        "index": 3,
+        "bbox_2d": [
+          300,
+          0,
+          400,
+          100
+        ]
+      },
+      {
+        "index": 4,
+        "bbox_2d": [
+          400,
+          0,
+          500,
+          100
+        ]
+      },
+      {
+        "index": 5,
+        "bbox_2d": [
+          500,
+          0,
+          600,
+          100
+        ]
+      },
+      {
+        "index": 6,
+        "bbox_2d": [
+          600,
+          0,
+          700,
+          100
+        ]
+      }
+    ],
+    "issues": []
+  },
+  "response": null,
+  "error": {
+    "status": 502,
+    "message": "Vision chưa có bằng chứng rõ cho đúng một ô cần bổ sung."
+  },
+  "sourceHashes": {
+    "src/ai/meter-slot-vision.mjs": "418e2416f4013641e5f883d465d3842f6535587a455f2b241a390ac860be8a31",
+    "src/ai/ollama.mjs": "b2874c590a24164e55be1a951a90255f5be5bd9af4b77fc56165b1ed4591d06a"
+  },
+  "noBusinessDatabaseOpened": true,
+  "noWholeNumberComparison": true
+}

@@ -1,0 +1,765 @@
+{
+  "checkedAt": "2026-10-29T17:19:56.475Z",
+  "passed": true,
+  "validationScope": "Local OCR-first frame detection with Vision frame audits and quality-gated independent digit/cell reading, reconciled into at most one reviewable proposal after photo submission; tenant privacy/owner workflow checked; not general recognition accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-frame-reader.mjs": "b668e89d332ef0d0b7b74fea00553a544b087122b57cfecba056e670ccd0ec8c",
+    "src/ai/meter-frame-check.mjs": "fb41aa6d9425b7d07732678be6957c406ef55999b163499deea9a5aafff949b0",
+    "src/ai/meter-ocr-reader.mjs": "c285b5c5749a2db56c854bab3c48a92518f156258c1c97210039a7f58cc2c8d0",
+    "src/ai/meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "src/ai/meter-regions.mjs": "10dcf5f5f4101feead74d7b4ee2963348303c602cd3a5781f39f6cbd72afab0e",
+    "src/ai/ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "src/ai/paddle-ocr.mjs": "fc08e7e1de57f8f3c088592052c0529892baf0fcadea4b4f89ebf46dcdff4cfc",
+    "src/ai/paddle-ocr-worker.py": "ff2971886931c113f4c4e581b8500c27c53b47da4691f6690a960c37904d46ff",
+    "src/ai/register.mjs": "1b0473c2b6dd70d1d53e685272f8c1d12ec0da489b3e5c48ed1428b0e0c1587b",
+    "src/backend/db.mjs": "9c231d5c1b399ab4c8d006b7cef005754060b3a883d56efb5613d997ad2032ee",
+    "src/backend/meter-submissions.mjs": "ae9ca7e4052fd435ed390a6fd964e49f721b60610a0627e8d6f81a028b73e151",
+    "src/backend/meter-jobs.mjs": "887d470c46de1a39ead91cefb9c48b259f47e6ab8ec90a5f0750fe5de30e9f75",
+    "src/backend/meter-visibility.mjs": "1f6f243069bf86dc7bf139e569707d9cc8c5a507960a379577935af1a37a5d83",
+    "src/backend/domain.mjs": "53a8c8fb05f279ea1600591b28dd0067ef8a68c057a184bd5996432c8a35c7c5",
+    "src/backend/server.mjs": "ba5d5db95c9b4a885a504dcc7f20db34dea1831919fa5677337b4038bb197ea9",
+    "src/backend/ai-service.mjs": "9b24b5a35b284da0bad7a7a657f5e16fd2a90a52de9297776e3d245f3248633a",
+    "src/ai/meter-reconciliation.mjs": "7b6e4df254b59c32c3785afde291b4a6c026683c2d607025cf36a2009d3a9e39",
+    "src/ai/meter-partial-observation.mjs": "d703c0da67d0bdebcd2459cba91dd3a4b50c66ca1d207f8fc50dec4d1e3979c2",
+    "src/ai/meter-reconciled-reader.mjs": "c3607c8308aa1335a6f361e72e6adfb897324a9460d3fa9b19c29ff77099c3a7",
+    "src/ai/meter-vision-reader.mjs": "7d75949174b4f5b4b755ac41313f32563d2ea136be09a3d9cea770d9cb6890db",
+    "src/ai/meter-cells.mjs": "0bdf93f6051b219c5c36eb047e2f1dbe26f0214434acd685e214f75ffefb4c57",
+    "src/ai/meter-cell-geometry.mjs": "d5e99ff3fae0c2bf142e1cb5f5651a10b11d2ef728511df2aa00f9b013ac4e66",
+    "src/ai/ollama.mjs": "b2874c590a24164e55be1a951a90255f5be5bd9af4b77fc56165b1ed4591d06a",
+    "scripts/check-meter-capture.mjs": "156398c8897d5f2613d42a0d91c2e2dbe5fb3294db86ce3d634c93fc458252fe"
+  },
+  "photoSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+  "photoBytes": 339681,
+  "derivedBlur": null,
+  "rectangle": null,
+  "meterProfile": {
+    "id": "meter_profile_99d05b62296f44acae",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "utility": "water",
+    "kind": "mechanical",
+    "unit": "m3",
+    "integerDigitsCount": 5,
+    "fractionalDigitsCount": 3,
+    "configurationConfirmed": true,
+    "version": 1,
+    "confirmedBy": "owner_demo",
+    "confirmedAt": "2026-10-29T17:19:21.448Z",
+    "createdAt": "2026-10-29T17:19:21.448Z",
+    "updatedAt": "2026-10-29T17:19:21.448Z"
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "modelCallsBeforeSend": 0,
+  "backgroundCalls": 1,
+  "ollamaCalls": 12,
+  "visionChatCalls": 4,
+  "frameChatCalls": 2,
+  "digitTranscriptionCalls": 1,
+  "digitCellCalls": 1,
+  "visionRequests": [
+    {
+      "task": "frame-audit",
+      "imageCount": 1
+    },
+    {
+      "task": "frame-audit",
+      "imageCount": 2
+    },
+    {
+      "task": "digit-transcription",
+      "imageCount": 2
+    },
+    {
+      "task": "cell-grounding",
+      "imageCount": 1
+    }
+  ],
+  "recognition": {
+    "mode": "ocr-vision-reconciled",
+    "originalOcrProposal": null,
+    "frameAcceptedProposal": null,
+    "originalOcrAssessment": "needs_review",
+    "frameAssessment": "needs_review",
+    "finalProposal": null,
+    "finalSource": null,
+    "resolution": {
+      "version": 1,
+      "status": "unavailable",
+      "source": null,
+      "ocrPattern": null,
+      "filledIndices": [],
+      "issues": [
+        "Vision chưa đọc rõ toàn bộ ô số để đối chiếu."
+      ]
+    },
+    "vision": {
+      "available": true,
+      "readable": false,
+      "uncertainDigits": false,
+      "displayText": "00001.056",
+      "cellCount": 8,
+      "cellsComplete": true
+    }
+  },
+  "tenantNeverReceivesReadings": true,
+  "ownerOnlyNotificationVerified": true,
+  "quality": {
+    "version": 1,
+    "status": "pass",
+    "canSubmit": false,
+    "scope": "frame",
+    "checks": {
+      "resolution": true,
+      "exposure": true,
+      "contrast": true,
+      "sharpness": true,
+      "glare": true
+    },
+    "reasons": [],
+    "metrics": {
+      "width": 360,
+      "height": 480,
+      "meanLuma": 79.149,
+      "contrast": 48.68,
+      "edgeEnergy": 252.82,
+      "clippedDark": 0.099,
+      "clippedLight": 0,
+      "glareFraction": 0
+    },
+    "source": {
+      "width": 1280,
+      "height": 1707
+    }
+  },
+  "tenantReceipt": {
+    "id": "meter_sub_f3246c5e17464a75bb",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "period": "2026-11",
+    "utility": "water",
+    "status": "processing",
+    "createdAt": "2026-10-29T17:19:21.562Z",
+    "updatedAt": "2026-10-29T17:19:21.562Z",
+    "photos": [
+      {
+        "fileId": "file_7915b8fcfbd9437ba7",
+        "createdAt": "2026-10-29T17:19:21.562Z"
+      }
+    ]
+  },
+  "ownerSubmission": {
+    "id": "meter_sub_f3246c5e17464a75bb",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "tenantId": "tenant_01",
+    "submittedBy": "user_tenant",
+    "submittedByName": "Nguyễn Hoàng Nam",
+    "period": "2026-11",
+    "utility": "water",
+    "photos": [
+      {
+        "analysisId": "meter_photo_9c6b690ea9814e20a0",
+        "fileId": "file_7915b8fcfbd9437ba7",
+        "createdAt": "2026-10-29T17:19:21.562Z",
+        "rectangle": null,
+        "quality": {
+          "version": 1,
+          "status": "pass",
+          "canSubmit": true,
+          "scope": "counter",
+          "checks": {
+            "resolution": true,
+            "exposure": true,
+            "contrast": true,
+            "sharpness": true,
+            "glare": true
+          },
+          "reasons": [],
+          "metrics": {
+            "width": 640,
+            "height": 204,
+            "meanLuma": 102.469,
+            "contrast": 55.448,
+            "edgeEnergy": 59.509,
+            "clippedDark": 0.143,
+            "clippedLight": 0,
+            "glareFraction": 0
+          },
+          "source": {
+            "width": 1280,
+            "height": 1707
+          },
+          "rectangle": {
+            "left": 248,
+            "top": 441,
+            "width": 866,
+            "height": 276
+          }
+        },
+        "result": {
+          "feature": "B03",
+          "recognitionMode": "ocr-vision-reconciled",
+          "engine": "hybrid",
+          "ocrEngine": "paddleocr",
+          "utility": "water",
+          "previous": 0,
+          "meterProfile": {
+            "id": "meter_profile_99d05b62296f44acae",
+            "version": 1,
+            "kind": "mechanical",
+            "unit": "m3",
+            "integerDigitsCount": 5,
+            "fractionalDigitsCount": 3,
+            "configurationConfirmed": true
+          },
+          "meterType": "auto",
+          "rawText": "[Xoay 0° · toàn vùng]\n000010:56m³\n\n[Xoay 0° · kiểm tra vùng số]\n000010:56m³\n\n\n[Xoay 90° · toàn vùng]\n0\n0\n3\n3",
+          "confidence": 99,
+          "ocrConfidence": 99,
+          "registers": [],
+          "regions": [
+            {
+              "regionId": "r0-line0",
+              "role": "unknown",
+              "text": "000010:56m³",
+              "evidence": [
+                "user_selected_region"
+              ],
+              "selectable": true,
+              "sourceRectangle": {
+                "left": 248,
+                "top": 441,
+                "width": 866,
+                "height": 276
+              },
+              "geometry": {
+                "kind": "user",
+                "angle": -8.252028039104397,
+                "rotationDegrees": 0,
+                "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+                "rectangle": {
+                  "left": 8,
+                  "top": 15,
+                  "width": 866,
+                  "height": 276
+                }
+              },
+              "observationRegionIds": [
+                "r0-line0"
+              ]
+            }
+          ],
+          "observations": [
+            {
+              "text": "000010:56m³",
+              "confidence": 93,
+              "polygon": [
+                [
+                  8,
+                  139
+                ],
+                [
+                  863,
+                  15
+                ],
+                [
+                  874,
+                  172
+                ],
+                [
+                  31,
+                  291
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-line0",
+              "variant": "full",
+              "layoutEvidence": {
+                "unitNearby": true,
+                "weightsNearby": false,
+                "counterWindow": false,
+                "colorGroups": false,
+                "blockedContext": false
+              }
+            },
+            {
+              "text": "000010:56m³",
+              "confidence": 93,
+              "polygon": [
+                [
+                  0,
+                  137.08319999999998
+                ],
+                [
+                  874,
+                  1.1543999999999928
+                ],
+                [
+                  874,
+                  176.8789
+                ],
+                [
+                  0,
+                  291
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-confirm0-line0",
+              "variant": "region-confirmation"
+            },
+            {
+              "text": "",
+              "confidence": 0,
+              "polygon": [
+                [
+                  873.3743222222221,
+                  47.82691944444446
+                ],
+                [
+                  874,
+                  42.32694166666666
+                ],
+                [
+                  874,
+                  122.2969833333333
+                ],
+                [
+                  874,
+                  127.69507222222224
+                ]
+              ],
+              "rotationDegrees": 0,
+              "regionId": "r0-confirm0-line1",
+              "variant": "region-confirmation"
+            },
+            {
+              "text": "0",
+              "confidence": 62,
+              "polygon": [
+                [
+                  65,
+                  246
+                ],
+                [
+                  136,
+                  246
+                ],
+                [
+                  136,
+                  294
+                ],
+                [
+                  65,
+                  294
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line0",
+              "variant": "full"
+            },
+            {
+              "text": "0",
+              "confidence": 90,
+              "polygon": [
+                [
+                  82,
+                  334
+                ],
+                [
+                  162,
+                  334
+                ],
+                [
+                  162,
+                  397
+                ],
+                [
+                  82,
+                  397
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line1",
+              "variant": "full"
+            },
+            {
+              "text": "3",
+              "confidence": 99,
+              "polygon": [
+                [
+                  130,
+                  754
+                ],
+                [
+                  214,
+                  744
+                ],
+                [
+                  227,
+                  859
+                ],
+                [
+                  143,
+                  868
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line2",
+              "variant": "full"
+            },
+            {
+              "text": "3",
+              "confidence": 51,
+              "polygon": [
+                [
+                  211,
+                  840
+                ],
+                [
+                  244,
+                  833
+                ],
+                [
+                  249,
+                  859
+                ],
+                [
+                  216,
+                  865
+                ]
+              ],
+              "rotationDegrees": 90,
+              "regionId": "r90-line3",
+              "variant": "full"
+            }
+          ],
+          "regionSelection": {
+            "status": "selected",
+            "selectedRegionId": "r0-line0",
+            "source": "user"
+          },
+          "ocrReadings": [],
+          "image": {
+            "sourceWidth": 1280,
+            "sourceHeight": 1707,
+            "width": 874,
+            "height": 291,
+            "rectangle": {
+              "left": 240,
+              "top": 426,
+              "width": 874,
+              "height": 291
+            },
+            "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+          },
+          "model": "PP-OCRv6 small",
+          "preprocessing": {
+            "version": 3,
+            "attempts": 4,
+            "regions": 0,
+            "passes": []
+          },
+          "quality": {
+            "version": 1,
+            "status": "pass",
+            "canSubmit": true,
+            "scope": "counter",
+            "checks": {
+              "resolution": true,
+              "exposure": true,
+              "contrast": true,
+              "sharpness": true,
+              "glare": true
+            },
+            "reasons": [],
+            "metrics": {
+              "width": 640,
+              "height": 204,
+              "meanLuma": 102.469,
+              "contrast": 55.448,
+              "edgeEnergy": 59.509,
+              "clippedDark": 0.143,
+              "clippedLight": 0,
+              "glareFraction": 0
+            },
+            "source": {
+              "width": 1280,
+              "height": 1707
+            },
+            "rectangle": {
+              "left": 248,
+              "top": 441,
+              "width": 866,
+              "height": 276
+            }
+          },
+          "confirmedReading": null,
+          "proposedReading": null,
+          "candidates": [],
+          "suggestedValue": null,
+          "assessment": "needs_review",
+          "requiresConfirmation": true,
+          "warnings": [
+            "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+            "OCR chưa xác định được dãy số đủ điều kiện. Chọn vùng mặt số hoặc nhập tay.",
+            "OCR có dấu “:” giữa các chữ số. Không coi đó là dấu thập phân; hãy kiểm tra trực tiếp mặt số.",
+            "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+            "Chưa xác định chắc vùng bộ đếm tích lũy; không dùng số sê-ri hoặc thông số làm chỉ số.",
+            "Chỉ số là đề xuất từ OCR; chủ nhà cần đối chiếu đủ ô số, đơn vị và phần lẻ trên ảnh trước khi xác minh.",
+            "Đọc lặp lại chỉ kiểm tra độ ổn định; điểm OCR không phải xác suất chỉ số đúng.",
+            "OCR hiện chưa tự phát hiện đáng tin cậy mọi trường hợp bánh số đang chuyển vòng.",
+            "Counter search area is identifiable",
+            "Chủ nhà vẫn phải đối chiếu ảnh gốc, đơn vị và phần lẻ trước khi xác minh.",
+            "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số.",
+            "Vision chưa đọc rõ toàn bộ ô số để đối chiếu.",
+            "Chỉ số là đề xuất để chủ nhà đối chiếu ảnh gốc; không tự ghi chỉ số hoặc lập hóa đơn."
+          ],
+          "elapsedMs": 34844,
+          "ocrProposedReading": null,
+          "ocrAssessment": "needs_review",
+          "localization": {
+            "version": 1,
+            "source": "ocr",
+            "status": "located",
+            "rectangle": {
+              "left": 248,
+              "top": 441,
+              "width": 866,
+              "height": 276
+            },
+            "sourceWidth": 1280,
+            "sourceHeight": 1707,
+            "model": "PP-OCRv6 small",
+            "issues": []
+          },
+          "frameVerification": {
+            "version": 1,
+            "status": "accepted",
+            "correctionApplied": true,
+            "attempts": [
+              {
+                "attempt": 1,
+                "status": "rejected",
+                "rectangle": null,
+                "searchRectangle": {
+                  "left": 240,
+                  "top": 426,
+                  "width": 874,
+                  "height": 291
+                },
+                "model": "qwen3-vl:4b-instruct",
+                "issues": [
+                  "Counter search area is identifiable"
+                ]
+              },
+              {
+                "attempt": 2,
+                "status": "accepted",
+                "rectangle": {
+                  "left": 248,
+                  "top": 441,
+                  "width": 866,
+                  "height": 276
+                },
+                "searchRectangle": null,
+                "model": "qwen3-vl:4b-instruct",
+                "issues": []
+              }
+            ]
+          },
+          "frameEngine": "paddleocr",
+          "frameProposedReading": null,
+          "frameAssessment": "needs_review",
+          "vision": {
+            "available": true,
+            "model": "qwen3-vl:4b-instruct",
+            "meterType": "mechanical",
+            "unit": "m3",
+            "regionRole": "counter",
+            "fractionalScale": "unknown",
+            "scaleLabels": [],
+            "cellEvidenceVersion": 1,
+            "cellCount": 8,
+            "cellsComplete": true,
+            "cells": [
+              {
+                "index": 0,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.037,
+                  "top": 0.557,
+                  "width": 0.093,
+                  "height": 0.373
+                }
+              },
+              {
+                "index": 1,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.147,
+                  "top": 0.52,
+                  "width": 0.083,
+                  "height": 0.355
+                }
+              },
+              {
+                "index": 2,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.258,
+                  "top": 0.478,
+                  "width": 0.082,
+                  "height": 0.355
+                }
+              },
+              {
+                "index": 3,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.37,
+                  "top": 0.38,
+                  "width": 0.08,
+                  "height": 0.355
+                }
+              },
+              {
+                "index": 4,
+                "state": "clear",
+                "digit": "1",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.497,
+                  "top": 0.357,
+                  "width": 0.063,
+                  "height": 0.351
+                }
+              },
+              {
+                "index": 5,
+                "state": "clear",
+                "digit": "0",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.595,
+                  "top": 0.3,
+                  "width": 0.065,
+                  "height": 0.375
+                }
+              },
+              {
+                "index": 6,
+                "state": "clear",
+                "digit": "5",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.68,
+                  "top": 0.2,
+                  "width": 0.07,
+                  "height": 0.375
+                }
+              },
+              {
+                "index": 7,
+                "state": "clear",
+                "digit": "6",
+                "alternatives": [],
+                "rectangle": {
+                  "left": 0.778,
+                  "top": 0.15,
+                  "width": 0.072,
+                  "height": 0.407
+                }
+              }
+            ],
+            "integerDigits": "00001",
+            "fractionalDigits": "056",
+            "decimalEvidence": "none",
+            "uncertainDigits": false,
+            "displayText": "00001.056",
+            "readable": false,
+            "issues": [
+              "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số."
+            ],
+            "cellImageIndex": 1,
+            "preparation": {
+              "rotationDegrees": 0,
+              "cropApplied": true,
+              "regionSource": "user",
+              "cellImageGeometry": {
+                "sourceWidth": 1280,
+                "sourceHeight": 1707,
+                "baseRectangle": {
+                  "left": 248,
+                  "top": 441,
+                  "width": 866,
+                  "height": 276
+                },
+                "crop": {
+                  "left": 0,
+                  "top": 0,
+                  "width": 866,
+                  "height": 276
+                },
+                "rotationDegrees": 0,
+                "deskewDegrees": 0,
+                "rendered": {
+                  "width": 866,
+                  "height": 276
+                }
+              },
+              "attempts": 2,
+              "transcriptionAttempts": 1,
+              "cellAttempts": 1
+            }
+          },
+          "resolution": {
+            "version": 1,
+            "status": "unavailable",
+            "source": null,
+            "ocrPattern": null,
+            "filledIndices": [],
+            "issues": [
+              "Vision chưa đọc rõ toàn bộ ô số để đối chiếu."
+            ]
+          }
+        },
+        "processingStatus": "done",
+        "processedAt": "2026-10-29T17:19:56.412Z"
+      }
+    ],
+    "profileSnapshot": {
+      "id": "meter_profile_99d05b62296f44acae",
+      "version": 1,
+      "kind": "mechanical",
+      "unit": "m3",
+      "integerDigitsCount": 5,
+      "fractionalDigitsCount": 3,
+      "configurationConfirmed": true
+    },
+    "selectedAnalysisId": "meter_photo_9c6b690ea9814e20a0",
+    "status": "pending",
+    "version": 2,
+    "note": "",
+    "jobAttempts": 1,
+    "updatedAt": "2026-10-29T17:19:56.412Z",
+    "createdAt": "2026-10-29T17:19:21.562Z",
+    "jobLeaseToken": null,
+    "jobLeaseUntil": null,
+    "processedAt": "2026-10-29T17:19:56.412Z",
+    "processingError": null,
+    "processingState": "complete"
+  },
+  "review": null
+}

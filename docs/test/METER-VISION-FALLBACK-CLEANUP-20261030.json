@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-10-30T16:57:02.511Z",
+  "project": "D:\\Trozy",
+  "scope": "Only task-owned temporary work; no user/source/model/data/report deletion",
+  "taskTemporaryCleanup": "Project launcher creates a unique process directory and removes it on child exit; no manual recursive deletion was needed in this continuation.",
+  "unidentifiedExistingTmpRetained": [
+    "node-9ecsYv",
+    "node-Iho52G",
+    "node-NQtsJM",
+    "node-SN4Rwc",
+    "node-VtugDF",
+    "node-YZc1oN",
+    "node-cWiYYL",
+    "node-jWEXWX",
+    "node-q7iXcJ",
+    "node-ufjIDA",
+    "node-w4plEB",
+    "node-wO6FH4"
+  ],
+  "paddleWorkerTmp": [],
+  "viteTmp": [],
+  "identifiedNewCTemporaryFiles": [],
+  "projectOllamaStartedForTests": true,
+  "projectOllamaStoppedAfterIdentityCheck": {
+    "pid": 22240,
+    "path": "D:\\Trozy\\.runtime\\ollama\\runtime\\ollama.exe"
+  },
+  "thirdPartyLicensesPreserved": true,
+  "businessDataChanged": false,
+  "modelDownloadOrTraining": false
+}

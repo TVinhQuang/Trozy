@@ -1,0 +1,1429 @@
+{
+  "checkedAt": "2026-10-28T07:40:32.402Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "4ef6fbbaee6824b877eedc5e579d72da185bf7d8a8dcc99c7ba6400d670ca2c9",
+  "photoBytes": 8909,
+  "expectedRegister": null,
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "paddleocr",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\n TO DIÊN 1 PHA 2 DÁY\n09610\nkWb\nGETEXEMIC\n17-2-20\nYVN\nCV140\n$65x:1866799 02.27\n450 vöngkW 27C Cáp 2 2018\n220 V\n10(40) A 50 Hx\nSé niu cia\n          \n\n[Xoay 90° · toàn vùng]\nsé nitu cia:\nI\nGELEXEMIC\nCV140$5SX 1866799\n TO DIEN 1 PHA 2 DAY\n220 V\n10|40) A 50 Hz\n1\n17020\n2\n\n[Xoay 270° · toàn vùng]\nHO753\n电\n2:20\n     PAY\nZH OG(O0O\nm sa po i  uol yo d a\n0中\n06.9981:x9.99\nGLXEIC\nL\n一\nCV140\n220\nege nye ps",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "OCR có dấu “:” giữa các chữ số. Không coi đó là dấu thập phân; hãy kiểm tra trực tiếp mặt số.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Chưa xác định chắc vùng bộ đếm; các dãy số có thể là sê-ri hoặc thông số. Chọn vùng mặt số và đọc lại.",
+      "Chọn đúng vùng bộ đếm trước khi đối chiếu chữ số. Hai dãy trùng nhau ở vùng chưa rõ vai trò chưa đủ để áp dụng."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 196,
+      "sourceHeight": 257,
+      "width": 196,
+      "height": 257,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": " TO DIÊN 1 PHA 2 DÁY",
+        "confidence": 84,
+        "polygon": [
+          [
+            42,
+            65
+          ],
+          [
+            155,
+            66
+          ],
+          [
+            155,
+            80
+          ],
+          [
+            42,
+            79
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full"
+      },
+      {
+        "text": "09610",
+        "confidence": 100,
+        "polygon": [
+          [
+            61,
+            80
+          ],
+          [
+            111,
+            80
+          ],
+          [
+            111,
+            94
+          ],
+          [
+            61,
+            94
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "kWb",
+        "confidence": 93,
+        "polygon": [
+          [
+            109,
+            80
+          ],
+          [
+            153,
+            80
+          ],
+          [
+            153,
+            95
+          ],
+          [
+            109,
+            95
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full"
+      },
+      {
+        "text": "GETEXEMIC",
+        "confidence": 91,
+        "polygon": [
+          [
+            30,
+            102
+          ],
+          [
+            82,
+            106
+          ],
+          [
+            81,
+            120
+          ],
+          [
+            29,
+            116
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line3",
+        "variant": "full"
+      },
+      {
+        "text": "17-2-20",
+        "confidence": 76,
+        "polygon": [
+          [
+            99,
+            102
+          ],
+          [
+            141,
+            102
+          ],
+          [
+            141,
+            113
+          ],
+          [
+            99,
+            113
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line4",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "YVN",
+        "confidence": 76,
+        "polygon": [
+          [
+            147,
+            112
+          ],
+          [
+            169,
+            112
+          ],
+          [
+            169,
+            123
+          ],
+          [
+            147,
+            123
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line5",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 100,
+        "polygon": [
+          [
+            47,
+            134
+          ],
+          [
+            71,
+            134
+          ],
+          [
+            71,
+            145
+          ],
+          [
+            47,
+            145
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line6",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "$65x:1866799 02.27",
+        "confidence": 77,
+        "polygon": [
+          [
+            82,
+            132
+          ],
+          [
+            179,
+            134
+          ],
+          [
+            179,
+            148
+          ],
+          [
+            82,
+            147
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line7",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "450 vöngkW 27C Cáp 2 2018",
+        "confidence": 84,
+        "polygon": [
+          [
+            34,
+            149
+          ],
+          [
+            152,
+            155
+          ],
+          [
+            152,
+            169
+          ],
+          [
+            33,
+            163
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line8",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "220 V",
+        "confidence": 93,
+        "polygon": [
+          [
+            48,
+            145
+          ],
+          [
+            74,
+            145
+          ],
+          [
+            74,
+            154
+          ],
+          [
+            48,
+            154
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line9",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "10(40) A 50 Hx",
+        "confidence": 95,
+        "polygon": [
+          [
+            86,
+            143
+          ],
+          [
+            152,
+            147
+          ],
+          [
+            152,
+            158
+          ],
+          [
+            86,
+            154
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line10",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "Sé niu cia",
+        "confidence": 70,
+        "polygon": [
+          [
+            31,
+            168
+          ],
+          [
+            70,
+            171
+          ],
+          [
+            69,
+            182
+          ],
+          [
+            30,
+            179
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line11",
+        "variant": "full"
+      },
+      {
+        "text": "          ",
+        "confidence": 63,
+        "polygon": [
+          [
+            33,
+            160
+          ],
+          [
+            153,
+            166
+          ],
+          [
+            153,
+            177
+          ],
+          [
+            32,
+            172
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line12",
+        "variant": "full"
+      },
+      {
+        "text": "sé nitu cia:",
+        "confidence": 67,
+        "polygon": [
+          [
+            74,
+            30
+          ],
+          [
+            88,
+            31
+          ],
+          [
+            84,
+            75
+          ],
+          [
+            70,
+            74
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "I",
+        "confidence": 60,
+        "polygon": [
+          [
+            124,
+            37
+          ],
+          [
+            140,
+            37
+          ],
+          [
+            140,
+            60
+          ],
+          [
+            124,
+            60
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "GELEXEMIC",
+        "confidence": 90,
+        "polygon": [
+          [
+            136,
+            30
+          ],
+          [
+            153,
+            31
+          ],
+          [
+            149,
+            84
+          ],
+          [
+            132,
+            83
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "CV140$5SX 1866799",
+        "confidence": 88,
+        "polygon": [
+          [
+            109,
+            40
+          ],
+          [
+            123,
+            40
+          ],
+          [
+            120,
+            144
+          ],
+          [
+            106,
+            144
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line3",
+        "variant": "full"
+      },
+      {
+        "text": " TO DIEN 1 PHA 2 DAY",
+        "confidence": 88,
+        "polygon": [
+          [
+            176,
+            32
+          ],
+          [
+            190,
+            32
+          ],
+          [
+            188,
+            154
+          ],
+          [
+            174,
+            154
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line4",
+        "variant": "full"
+      },
+      {
+        "text": "220 V",
+        "confidence": 95,
+        "polygon": [
+          [
+            100,
+            46
+          ],
+          [
+            110,
+            46
+          ],
+          [
+            110,
+            74
+          ],
+          [
+            100,
+            74
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line5",
+        "variant": "full"
+      },
+      {
+        "text": "10|40) A 50 Hz",
+        "confidence": 92,
+        "polygon": [
+          [
+            98,
+            88
+          ],
+          [
+            109,
+            88
+          ],
+          [
+            109,
+            152
+          ],
+          [
+            98,
+            152
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line6",
+        "variant": "full"
+      },
+      {
+        "text": "1",
+        "confidence": 68,
+        "polygon": [
+          [
+            193,
+            84
+          ],
+          [
+            200,
+            84
+          ],
+          [
+            200,
+            101
+          ],
+          [
+            193,
+            101
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line7",
+        "variant": "full"
+      },
+      {
+        "text": "17020",
+        "confidence": 73,
+        "polygon": [
+          [
+            141,
+            95
+          ],
+          [
+            156,
+            95
+          ],
+          [
+            153,
+            143
+          ],
+          [
+            138,
+            142
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line8",
+        "variant": "full"
+      },
+      {
+        "text": "2",
+        "confidence": 30,
+        "polygon": [
+          [
+            241,
+            88
+          ],
+          [
+            256,
+            88
+          ],
+          [
+            256,
+            115
+          ],
+          [
+            241,
+            115
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line9",
+        "variant": "full"
+      },
+      {
+        "text": "HO753",
+        "confidence": 73,
+        "polygon": [
+          [
+            97,
+            16
+          ],
+          [
+            112,
+            15
+          ],
+          [
+            115,
+            51
+          ],
+          [
+            100,
+            52
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "电",
+        "confidence": 75,
+        "polygon": [
+          [
+            110,
+            19
+          ],
+          [
+            136,
+            19
+          ],
+          [
+            136,
+            50
+          ],
+          [
+            110,
+            50
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "2:20",
+        "confidence": 58,
+        "polygon": [
+          [
+            136,
+            18
+          ],
+          [
+            147,
+            18
+          ],
+          [
+            147,
+            54
+          ],
+          [
+            136,
+            54
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      },
+      {
+        "text": "     PAY",
+        "confidence": 51,
+        "polygon": [
+          [
+            66,
+            41
+          ],
+          [
+            80,
+            41
+          ],
+          [
+            78,
+            162
+          ],
+          [
+            64,
+            162
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line3",
+        "variant": "full"
+      },
+      {
+        "text": "ZH OG(O0O",
+        "confidence": 52,
+        "polygon": [
+          [
+            146,
+            41
+          ],
+          [
+            160,
+            41
+          ],
+          [
+            157,
+            109
+          ],
+          [
+            143,
+            109
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line4",
+        "variant": "full"
+      },
+      {
+        "text": "m sa po i  uol yo d a",
+        "confidence": 46,
+        "polygon": [
+          [
+            166,
+            41
+          ],
+          [
+            176,
+            41
+          ],
+          [
+            174,
+            123
+          ],
+          [
+            164,
+            122
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line5",
+        "variant": "full"
+      },
+      {
+        "text": "0中",
+        "confidence": 12,
+        "polygon": [
+          [
+            102,
+            52
+          ],
+          [
+            113,
+            52
+          ],
+          [
+            113,
+            99
+          ],
+          [
+            102,
+            99
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line6",
+        "variant": "full"
+      },
+      {
+        "text": "06.9981:x9.99",
+        "confidence": 50,
+        "polygon": [
+          [
+            135,
+            51
+          ],
+          [
+            146,
+            51
+          ],
+          [
+            146,
+            113
+          ],
+          [
+            135,
+            113
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line7",
+        "variant": "full"
+      },
+      {
+        "text": "GLXEIC",
+        "confidence": 61,
+        "polygon": [
+          [
+            106,
+            109
+          ],
+          [
+            121,
+            110
+          ],
+          [
+            116,
+            164
+          ],
+          [
+            101,
+            162
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line8",
+        "variant": "full"
+      },
+      {
+        "text": "L",
+        "confidence": 38,
+        "polygon": [
+          [
+            1,
+            126
+          ],
+          [
+            9,
+            126
+          ],
+          [
+            9,
+            144
+          ],
+          [
+            1,
+            144
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line9",
+        "variant": "full"
+      },
+      {
+        "text": "一",
+        "confidence": 68,
+        "polygon": [
+          [
+            117,
+            125
+          ],
+          [
+            132,
+            125
+          ],
+          [
+            132,
+            158
+          ],
+          [
+            117,
+            158
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line10",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 82,
+        "polygon": [
+          [
+            134,
+            120
+          ],
+          [
+            145,
+            120
+          ],
+          [
+            145,
+            150
+          ],
+          [
+            134,
+            150
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line11",
+        "variant": "full"
+      },
+      {
+        "text": "220",
+        "confidence": 74,
+        "polygon": [
+          [
+            145,
+            125
+          ],
+          [
+            153,
+            125
+          ],
+          [
+            153,
+            147
+          ],
+          [
+            145,
+            147
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line12",
+        "variant": "full"
+      },
+      {
+        "text": "ege nye ps",
+        "confidence": 45,
+        "polygon": [
+          [
+            171,
+            123
+          ],
+          [
+            185,
+            125
+          ],
+          [
+            179,
+            165
+          ],
+          [
+            165,
+            163
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line13",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3079,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 3,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 8661,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "regions": [
+      {
+        "regionId": "r0-line8",
+        "role": "specification",
+        "text": "450 vöngkW 27C Cáp 2 2018",
+        "evidence": [
+          "counter_window",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 33,
+          "top": 149,
+          "width": 119,
+          "height": 20
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 2.9108378261677537,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 33,
+            "top": 149,
+            "width": 119,
+            "height": 20
+          }
+        },
+        "observationRegionIds": [
+          "r0-line8"
+        ]
+      },
+      {
+        "regionId": "r0-line6",
+        "role": "specification",
+        "text": "CV140",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 47,
+          "top": 134,
+          "width": 24,
+          "height": 11
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 47,
+            "top": 134,
+            "width": 24,
+            "height": 11
+          }
+        },
+        "observationRegionIds": [
+          "r0-line6",
+          "r270-line11"
+        ]
+      },
+      {
+        "regionId": "r0-line7",
+        "role": "specification",
+        "text": "$65x:1866799 02.27",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 82,
+          "top": 132,
+          "width": 97,
+          "height": 16
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 1.181188913326638,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 82,
+            "top": 132,
+            "width": 97,
+            "height": 16
+          }
+        },
+        "observationRegionIds": [
+          "r0-line7"
+        ]
+      },
+      {
+        "regionId": "r0-line9",
+        "role": "specification",
+        "text": "220 V",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 48,
+          "top": 145,
+          "width": 26,
+          "height": 9
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 48,
+            "top": 145,
+            "width": 26,
+            "height": 9
+          }
+        },
+        "observationRegionIds": [
+          "r0-line9",
+          "r270-line12"
+        ]
+      },
+      {
+        "regionId": "r0-line10",
+        "role": "specification",
+        "text": "10(40) A 50 Hx",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 86,
+          "top": 143,
+          "width": 66,
+          "height": 15
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 3.468229258917148,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 86,
+            "top": 143,
+            "width": 66,
+            "height": 15
+          }
+        },
+        "observationRegionIds": [
+          "r0-line10",
+          "r90-line6"
+        ]
+      },
+      {
+        "regionId": "r90-line3",
+        "role": "specification",
+        "text": "CV140$5SX 1866799",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 40,
+          "top": 134,
+          "width": 104,
+          "height": 17
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 90,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 106,
+            "top": 40,
+            "width": 17,
+            "height": 104
+          }
+        },
+        "observationRegionIds": [
+          "r90-line3"
+        ]
+      },
+      {
+        "regionId": "r90-line5",
+        "role": "specification",
+        "text": "220 V",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 46,
+          "top": 147,
+          "width": 28,
+          "height": 10
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 90,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 100,
+            "top": 46,
+            "width": 10,
+            "height": 28
+          }
+        },
+        "observationRegionIds": [
+          "r90-line5"
+        ]
+      },
+      {
+        "regionId": "r0-line1",
+        "role": "unknown",
+        "text": "09610",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 61,
+          "top": 80,
+          "width": 50,
+          "height": 14
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 61,
+            "top": 80,
+            "width": 50,
+            "height": 14
+          }
+        },
+        "observationRegionIds": [
+          "r0-line1"
+        ]
+      },
+      {
+        "regionId": "r0-line4",
+        "role": "inspection_label",
+        "text": "17-2-20",
+        "evidence": [],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 99,
+          "top": 102,
+          "width": 42,
+          "height": 11
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 99,
+            "top": 102,
+            "width": 42,
+            "height": 11
+          }
+        },
+        "observationRegionIds": [
+          "r0-line4"
+        ]
+      },
+      {
+        "regionId": "r90-line8",
+        "role": "unknown",
+        "text": "17020",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 95,
+          "top": 101,
+          "width": 48,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 90,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 138,
+            "top": 95,
+            "width": 18,
+            "height": 48
+          }
+        },
+        "observationRegionIds": [
+          "r90-line8"
+        ]
+      },
+      {
+        "regionId": "r270-line0",
+        "role": "unknown",
+        "text": "HO753",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 144,
+          "top": 97,
+          "width": 37,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -3.8140748342903548,
+          "rotationDegrees": 270,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 97,
+            "top": 15,
+            "width": 18,
+            "height": 37
+          }
+        },
+        "observationRegionIds": [
+          "r270-line0"
+        ]
+      },
+      {
+        "regionId": "r270-line2",
+        "role": "unknown",
+        "text": "2:20",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 142,
+          "top": 136,
+          "width": 36,
+          "height": 11
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 270,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 136,
+            "top": 18,
+            "width": 11,
+            "height": 36
+          }
+        },
+        "observationRegionIds": [
+          "r270-line2"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "unresolved"
+    },
+    "ocrReadings": [],
+    "ocrCandidates": [],
+    "confirmedReading": null,
+    "assessment": "needs_review",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "kWh",
+      "regionRole": "counter",
+      "fractionalScale": "unknown",
+      "scaleLabels": [],
+      "integerDigits": "09610",
+      "fractionalDigits": "0",
+      "decimalEvidence": "none",
+      "uncertainDigits": false,
+      "displayText": "09610.0",
+      "readable": false,
+      "issues": [
+        "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số."
+      ],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": false,
+        "regionSource": "full",
+        "attempts": 2
+      }
+    },
+    "fileId": "file_9fb178e3e346422590",
+    "roomId": "room_101"
+  }
+}

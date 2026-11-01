@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Exploratory offline YOLO window plus VisionState WheelReader feasibility trial; never production meter or invoice input.",
+  "referencePolicy": {
+    "createdAtLocalDate": "2026-10-31",
+    "author": "Codex independent visual-review agent",
+    "labelsLockedBeforeTrialPredictions": true,
+    "userVerified": false,
+    "source": "Visual inspection of original project-local images only; no prior OCR/Vision predictions or previous readings used for labels.",
+    "limitations": [
+      "Five reused exploratory photographs are not a held-out accuracy benchmark or representative sample.",
+      "Visible references are agent annotations, not independently verified meter readings or billing truth.",
+      "A question mark denotes an unresolved wheel. Exact full-row scoring must exclude samples with exactDigits=null.",
+      "Manual crop geometry and digit/decimal counts are baseline configuration, not detector predictions; automatic and manual paths must be reported separately.",
+      "Decimals and units are configured from visible markings/colour groups for this trial; WheelReader does not infer them.",
+      "Preserve original photo hashes and do not revise a label or crop after seeing trial predictions without declaring a new exploratory variant."
+    ]
+  },
+  "geometry": {
+    "space": "Original image pixels after EXIF transpose; all five source files have EXIF orientation 1.",
+    "box": "[left, top, right, bottom] axis-aligned bounding box containing the manual row quadrilateral.",
+    "corners": "Four manually chosen source points mapping to rectified [top-left, top-right, bottom-right, bottom-left] in reading order. The weathered source row is vertical and the corner order rectifies it counter-clockwise.",
+    "provenance": "Approximate original-image visual annotation, locked before model predictions; not finely optimized crops."
+  },
+  "samples": [
+    {
+      "id": "electric-clear",
+      "file": ".runtime/datasets/meter/electric-clear.jpg",
+      "sha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+      "sourceSize": {"width": 415, "height": 739},
+      "exifOrientation": 1,
+      "display": "counter",
+      "utility": "electric",
+      "digits": 6,
+      "decimals": 1,
+      "unit": "kWh",
+      "manualRegion": {
+        "box": [132, 266, 284, 312],
+        "corners": [[133, 276], [280, 266], [283, 301], [136, 311]]
+      },
+      "reference": {
+        "visibleDigits": "007664",
+        "exactDigits": "007664",
+        "integerDigits": "00766",
+        "fractionalDigits": "4",
+        "displayText": "00766.4",
+        "uncertainIndices": [],
+        "boundaryEvidence": "Five black wheels followed by one red wheel; printed weights end at 1 and 1/10; kWh is printed beside the register.",
+        "quality": "Readable row, mild tilt; original photo rather than a calibrated camera frame.",
+        "userVerified": false
+      }
+    },
+    {
+      "id": "electric-26762",
+      "file": ".runtime/datasets/meter/electric-26762.jpg",
+      "sha256": "5e8b308031f2e98ec578acc9af3c8285248b7386820aebc49b8a9d503089e67d",
+      "sourceSize": {"width": 453, "height": 676},
+      "exifOrientation": 1,
+      "display": "counter",
+      "utility": "electric",
+      "digits": 6,
+      "decimals": 1,
+      "unit": "kWh",
+      "manualRegion": {
+        "box": [208, 241, 347, 280],
+        "corners": [[208, 247], [345, 241], [346, 274], [209, 280]]
+      },
+      "reference": {
+        "visibleDigits": "26762?",
+        "exactDigits": null,
+        "integerDigits": "26762",
+        "fractionalDigits": null,
+        "displayText": "26762.?",
+        "uncertainIndices": [5],
+        "boundaryEvidence": "Printed weights show five black integer places and a red 1/10 place. The small red wheel is unresolved in the original image.",
+        "quality": "Very small native row; no exact label assigned to the red wheel. Score integer prefix only, never treat model output as the missing reference.",
+        "userVerified": false
+      }
+    },
+    {
+      "id": "electric-screenshot",
+      "file": ".runtime/datasets/meter/electric-screenshot.jpg",
+      "sha256": "db1a436b661c58c9414717f03d5133592366592cca63157b8bb631cd83a45fc7",
+      "sourceSize": {"width": 800, "height": 538},
+      "exifOrientation": 1,
+      "display": "counter",
+      "utility": "electric",
+      "digits": 6,
+      "decimals": 1,
+      "unit": "kWh",
+      "sourceKind": "Existing sample named screenshot; visually an opened mechanical electric meter photograph.",
+      "manualRegion": {
+        "box": [483, 115, 611, 150],
+        "corners": [[484, 121], [607, 115], [610, 144], [485, 150]]
+      },
+      "reference": {
+        "visibleDigits": "13624?",
+        "exactDigits": null,
+        "integerDigits": "13624",
+        "fractionalDigits": null,
+        "displayText": "13624.?",
+        "uncertainIndices": [5],
+        "boundaryEvidence": "The printed place weights run from 10000 to 1 then 1/10; kWh is visible. Last wheel shows split/transition-like strokes and is left unresolved.",
+        "quality": "Small counter row and ambiguous rightmost wheel; full-row accuracy cannot be assessed from this annotation.",
+        "userVerified": false
+      }
+    },
+    {
+      "id": "water-blue",
+      "file": ".runtime/datasets/meter/water-blue.jpg",
+      "sha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+      "sourceSize": {"width": 1280, "height": 1707},
+      "exifOrientation": 1,
+      "display": "counter",
+      "utility": "water",
+      "digits": 8,
+      "decimals": 3,
+      "unit": "m3",
+      "manualRegion": {
+        "box": [269, 452, 1005, 729],
+        "corners": [[269, 579], [981, 452], [1004, 610], [292, 728]]
+      },
+      "reference": {
+        "visibleDigits": "00001056",
+        "exactDigits": "00001056",
+        "integerDigits": "00001",
+        "fractionalDigits": "056",
+        "displayText": "00001.056",
+        "uncertainIndices": [],
+        "boundaryEvidence": "Five black wheels followed by three red wheels beside m3; downstream dial is marked x0.0001. Decimal placement is an explicit trial configuration.",
+        "quality": "Readable black and red wheels with noticeable diagonal row and perspective. Intermediate wheel geometry must remain observable.",
+        "userVerified": false
+      }
+    },
+    {
+      "id": "water-weathered",
+      "file": ".runtime/datasets/meter/water-weathered.webp",
+      "sha256": "b3f6eb362ad2a4440be011e62fc071edc6dc1cf13e01e409ca93299f8031a425",
+      "sourceSize": {"width": 2000, "height": 1502},
+      "exifOrientation": 1,
+      "display": "counter",
+      "utility": "water",
+      "digits": 5,
+      "decimals": 1,
+      "unit": "m3",
+      "manualRegion": {
+        "box": [858, 570, 951, 954],
+        "corners": [[941, 572], [950, 949], [862, 953], [858, 573]]
+      },
+      "reference": {
+        "visibleDigits": "13038",
+        "exactDigits": "13038",
+        "integerDigits": "1303",
+        "fractionalDigits": "8",
+        "displayText": "1303.8",
+        "uncertainIndices": [],
+        "boundaryEvidence": "Four dark integer wheels followed by one red wheel; lower-place pointer dials carry x0.01/x0.001/x0.0001 markings. m3 unit is beside the register.",
+        "quality": "Worn/dirty glass and source rotated roughly 90 degrees. Reference is a provisional visual annotation; user has not confirmed the observed reading.",
+        "userVerified": false
+      }
+    }
+  ]
+}

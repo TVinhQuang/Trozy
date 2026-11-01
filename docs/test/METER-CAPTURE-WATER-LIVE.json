@@ -1,0 +1,871 @@
+{
+  "checkedAt": "2026-10-28T09:58:47.781Z",
+  "passed": true,
+  "validationScope": "Actual local models and tenant HTTP evidence workflow; passing means integration/safe handling, not correct transcription or general accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-cells.mjs": "0bdf93f6051b219c5c36eb047e2f1dbe26f0214434acd685e214f75ffefb4c57",
+    "src/ai/meter-cell-geometry.mjs": "d5e99ff3fae0c2bf142e1cb5f5651a10b11d2ef728511df2aa00f9b013ac4e66",
+    "src/ai/meter-vision.mjs": "03d96478920c7c28de89fed5dda7b06fb560f71cd08a589be99ebc3b2830c221",
+    "src/ai/meter-vision-reader.mjs": "7d75949174b4f5b4b755ac41313f32563d2ea136be09a3d9cea770d9cb6890db",
+    "src/ai/meter-consensus.mjs": "6e54336ff1c8852babade4345cf0e0c76a8ba7170c22cb4e2d5a042f8b12be1a",
+    "src/ai/ollama.mjs": "b2874c590a24164e55be1a951a90255f5be5bd9af4b77fc56165b1ed4591d06a",
+    "src/backend/meter-submissions.mjs": "88555e373cc0e6c7d2df029dc7bc81e827b44472bdb570624891b03675cc73ea",
+    "src/backend/server.mjs": "48ec8fc281fa6aa3bfe27748cd409d85ce00039522ca4073337c5a4b04744cab",
+    "src/backend/ai-service.mjs": "80bf02f69ed4a74e1768aa0a7aae1806b800d1c543394995b1ec48ee32cd8adf"
+  },
+  "photoSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+  "photoBytes": 339681,
+  "derivedBlur": null,
+  "rectangle": {
+    "left": 220,
+    "top": 440,
+    "width": 850,
+    "height": 300
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "analysis": {
+    "id": "meter_ai_1b8b698d0e794c14a9",
+    "result": {
+      "feature": "B03",
+      "engine": "ollama-vision",
+      "model": "PP-OCRv6 small",
+      "rawText": "[Xoay 0° · toàn vùng]\n00001056m\n\n[Xoay 90° · toàn vùng]\n0\n0\n0\n0\n10:5\n3\n\n[Xoay 270° · toàn vùng]\n0056m",
+      "confidence": 100,
+      "ocrConfidence": 100,
+      "candidates": [],
+      "suggestedValue": null,
+      "registers": [],
+      "warnings": [
+        "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+        "OCR chưa xác định được dãy số đủ điều kiện. Chọn vùng mặt số hoặc nhập tay.",
+        "OCR có dấu “:” giữa các chữ số. Không coi đó là dấu thập phân; hãy kiểm tra trực tiếp mặt số.",
+        "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+        "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+        "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô.",
+        "Chưa có đối chiếu OCR ổn định cho toàn bộ từng vị trí chữ số.",
+        "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số."
+      ],
+      "requiresConfirmation": true,
+      "image": {
+        "sourceWidth": 1280,
+        "sourceHeight": 1707,
+        "width": 850,
+        "height": 300,
+        "rectangle": {
+          "left": 220,
+          "top": 440,
+          "width": 850,
+          "height": 300
+        },
+        "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+      },
+      "observations": [
+        {
+          "text": "00001056m",
+          "confidence": 100,
+          "polygon": [
+            [
+              29,
+              134
+            ],
+            [
+              846,
+              0
+            ],
+            [
+              850,
+              164
+            ],
+            [
+              53,
+              299
+            ]
+          ],
+          "rotationDegrees": 0,
+          "regionId": "r0-line0",
+          "variant": "full",
+          "layoutEvidence": {
+            "unitNearby": false,
+            "weightsNearby": false,
+            "counterWindow": false,
+            "colorGroups": false,
+            "blockedContext": false
+          }
+        },
+        {
+          "text": "0",
+          "confidence": 91,
+          "polygon": [
+            [
+              41,
+              74
+            ],
+            [
+              132,
+              68
+            ],
+            [
+              137,
+              132
+            ],
+            [
+              46,
+              138
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line0",
+          "variant": "full"
+        },
+        {
+          "text": "0",
+          "confidence": 92,
+          "polygon": [
+            [
+              68,
+              164
+            ],
+            [
+              146,
+              164
+            ],
+            [
+              146,
+              231
+            ],
+            [
+              68,
+              231
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line1",
+          "variant": "full"
+        },
+        {
+          "text": "0",
+          "confidence": 91,
+          "polygon": [
+            [
+              83,
+              254
+            ],
+            [
+              166,
+              254
+            ],
+            [
+              166,
+              325
+            ],
+            [
+              83,
+              325
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line2",
+          "variant": "full"
+        },
+        {
+          "text": "0",
+          "confidence": 87,
+          "polygon": [
+            [
+              102,
+              345
+            ],
+            [
+              186,
+              345
+            ],
+            [
+              186,
+              422
+            ],
+            [
+              102,
+              422
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line3",
+          "variant": "full"
+        },
+        {
+          "text": "10:5",
+          "confidence": 91,
+          "polygon": [
+            [
+              70,
+              433
+            ],
+            [
+              200,
+              410
+            ],
+            [
+              258,
+              704
+            ],
+            [
+              129,
+              726
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line4",
+          "variant": "full"
+        },
+        {
+          "text": "3",
+          "confidence": 96,
+          "polygon": [
+            [
+              158,
+              771
+            ],
+            [
+              242,
+              771
+            ],
+            [
+              242,
+              849
+            ],
+            [
+              158,
+              849
+            ]
+          ],
+          "rotationDegrees": 90,
+          "regionId": "r90-line5",
+          "variant": "full"
+        },
+        {
+          "text": "0056m",
+          "confidence": 55,
+          "polygon": [
+            [
+              7,
+              0
+            ],
+            [
+              172,
+              0
+            ],
+            [
+              296,
+              802
+            ],
+            [
+              131,
+              824
+            ]
+          ],
+          "rotationDegrees": 270,
+          "regionId": "r270-line0",
+          "variant": "full"
+        }
+      ],
+      "runtime": {
+        "backend": "onnxruntime-cpu",
+        "initMs": 4029,
+        "pythonNetworkBlocked": true
+      },
+      "preprocessing": {
+        "version": 3,
+        "attempts": 3,
+        "regions": 0,
+        "passes": []
+      },
+      "elapsedMs": 16626,
+      "ocrEngine": "paddleocr",
+      "utility": "water",
+      "regions": [
+        {
+          "regionId": "r0-line0",
+          "role": "unknown",
+          "text": "00001056m",
+          "evidence": [
+            "user_selected_region"
+          ],
+          "selectable": true,
+          "sourceRectangle": {
+            "left": 249,
+            "top": 440,
+            "width": 821,
+            "height": 299
+          },
+          "geometry": {
+            "kind": "user",
+            "angle": -9.314418419462767,
+            "rotationDegrees": 0,
+            "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+            "rectangle": {
+              "left": 29,
+              "top": 0,
+              "width": 821,
+              "height": 299
+            }
+          },
+          "observationRegionIds": [
+            "r0-line0",
+            "r270-line0"
+          ]
+        },
+        {
+          "regionId": "r90-line4",
+          "role": "unknown",
+          "text": "10:5",
+          "evidence": [],
+          "selectable": true,
+          "sourceRectangle": {
+            "left": 630,
+            "top": 482,
+            "width": 316,
+            "height": 188
+          },
+          "geometry": {
+            "kind": "user",
+            "angle": -10.033120554331168,
+            "rotationDegrees": 90,
+            "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+            "rectangle": {
+              "left": 70,
+              "top": 410,
+              "width": 188,
+              "height": 316
+            }
+          },
+          "observationRegionIds": [
+            "r90-line4"
+          ]
+        }
+      ],
+      "regionSelection": {
+        "status": "selected",
+        "selectedRegionId": "r0-line0",
+        "source": "user"
+      },
+      "ocrReadings": [],
+      "ocrCandidates": [],
+      "confirmedReading": null,
+      "assessment": "needs_review",
+      "vision": {
+        "available": true,
+        "model": "qwen3-vl:4b-instruct",
+        "meterType": "mechanical",
+        "unit": "m3",
+        "regionRole": "counter",
+        "fractionalScale": "unknown",
+        "scaleLabels": [],
+        "cellEvidenceVersion": 1,
+        "cellCount": 7,
+        "cellsComplete": true,
+        "cells": [
+          {
+            "index": 0,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.087,
+              "top": 0.398,
+              "width": 0.076,
+              "height": 0.232
+            }
+          },
+          {
+            "index": 1,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.194,
+              "top": 0.41,
+              "width": 0.076,
+              "height": 0.234
+            }
+          },
+          {
+            "index": 2,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.299,
+              "top": 0.41,
+              "width": 0.078,
+              "height": 0.234
+            }
+          },
+          {
+            "index": 3,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.41,
+              "top": 0.398,
+              "width": 0.077,
+              "height": 0.232
+            }
+          },
+          {
+            "index": 4,
+            "state": "clear",
+            "digit": "1",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.537,
+              "top": 0.423,
+              "width": 0.06,
+              "height": 0.221
+            }
+          },
+          {
+            "index": 5,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.634,
+              "top": 0.43,
+              "width": 0.058,
+              "height": 0.225
+            }
+          },
+          {
+            "index": 6,
+            "state": "clear",
+            "digit": "5",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.73,
+              "top": 0.38,
+              "width": 0.057,
+              "height": 0.23
+            }
+          },
+          {
+            "index": 7,
+            "state": "clear",
+            "digit": "6",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.827,
+              "top": 0.38,
+              "width": 0.06,
+              "height": 0.275
+            }
+          }
+        ],
+        "integerDigits": "00000",
+        "fractionalDigits": "1056",
+        "decimalEvidence": "none",
+        "uncertainDigits": true,
+        "displayText": "00000.1056",
+        "readable": false,
+        "issues": [
+          "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số.",
+          "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+          "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô."
+        ],
+        "cellImageIndex": 1,
+        "preparation": {
+          "rotationDegrees": 0,
+          "cropApplied": true,
+          "regionSource": "ocr",
+          "deskewDegrees": 9.314418419462767,
+          "cellImageGeometry": {
+            "sourceWidth": 1280,
+            "sourceHeight": 1707,
+            "baseRectangle": {
+              "left": 220,
+              "top": 440,
+              "width": 850,
+              "height": 300
+            },
+            "crop": {
+              "left": 0,
+              "top": 0,
+              "width": 850,
+              "height": 300
+            },
+            "rotationDegrees": 0,
+            "deskewDegrees": 9.314418419462767,
+            "rendered": {
+              "width": 887,
+              "height": 434
+            }
+          },
+          "attempts": 2,
+          "transcriptionAttempts": 1,
+          "cellAttempts": 1
+        }
+      },
+      "cellEvidence": {
+        "version": 1,
+        "status": "needs_review",
+        "displayText": "00001056",
+        "expectedCount": 9,
+        "observedCount": 7,
+        "cellsComplete": true,
+        "coordinateSpace": "vision-input-normalized",
+        "imageIndex": 1,
+        "cells": [
+          {
+            "index": 0,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.087,
+              "top": 0.398,
+              "width": 0.076,
+              "height": 0.232
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                276.33,
+                605.61
+              ],
+              [
+                342.86,
+                594.7
+              ],
+              [
+                359.15,
+                694.06
+              ],
+              [
+                292.63,
+                704.97
+              ]
+            ]
+          },
+          {
+            "index": 1,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.194,
+              "top": 0.41,
+              "width": 0.076,
+              "height": 0.234
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                370.83,
+                595.39
+              ],
+              [
+                437.36,
+                584.47
+              ],
+              [
+                453.79,
+                684.69
+              ],
+              [
+                387.27,
+                695.6
+              ]
+            ]
+          },
+          {
+            "index": 2,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.299,
+              "top": 0.41,
+              "width": 0.078,
+              "height": 0.234
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                462.74,
+                580.31
+              ],
+              [
+                531.02,
+                569.11
+              ],
+              [
+                547.45,
+                669.33
+              ],
+              [
+                479.18,
+                680.53
+              ]
+            ]
+          },
+          {
+            "index": 3,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.41,
+              "top": 0.398,
+              "width": 0.077,
+              "height": 0.232
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                559.06,
+                559.24
+              ],
+              [
+                626.46,
+                548.18
+              ],
+              [
+                642.75,
+                647.54
+              ],
+              [
+                575.35,
+                658.6
+              ]
+            ]
+          },
+          {
+            "index": 4,
+            "state": "clear",
+            "digit": "1",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.537,
+              "top": 0.423,
+              "width": 0.06,
+              "height": 0.221
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                671.98,
+                551.71
+              ],
+              [
+                724.5,
+                543.1
+              ],
+              [
+                740.02,
+                637.75
+              ],
+              [
+                687.5,
+                646.36
+              ]
+            ]
+          },
+          {
+            "index": 5,
+            "state": "clear",
+            "digit": "0",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.634,
+              "top": 0.43,
+              "width": 0.058,
+              "height": 0.225
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                757.37,
+                540.78
+              ],
+              [
+                808.14,
+                532.46
+              ],
+              [
+                823.95,
+                628.82
+              ],
+              [
+                773.18,
+                637.15
+              ]
+            ]
+          },
+          {
+            "index": 6,
+            "state": "clear",
+            "digit": "5",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.73,
+              "top": 0.38,
+              "width": 0.057,
+              "height": 0.23
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                837.89,
+                505.59
+              ],
+              [
+                887.78,
+                497.4
+              ],
+              [
+                903.94,
+                595.91
+              ],
+              [
+                854.05,
+                604.09
+              ]
+            ]
+          },
+          {
+            "index": 7,
+            "state": "clear",
+            "digit": "6",
+            "alternatives": [],
+            "rectangle": {
+              "left": 0.827,
+              "top": 0.38,
+              "width": 0.06,
+              "height": 0.275
+            },
+            "ocrDigit": "",
+            "agreement": "unavailable",
+            "sourcePolygon": [
+              [
+                922.8,
+                491.66
+              ],
+              [
+                975.31,
+                483.05
+              ],
+              [
+                994.63,
+                600.82
+              ],
+              [
+                942.11,
+                609.44
+              ]
+            ]
+          }
+        ],
+        "issues": [
+          "Chưa quan sát đủ số ô của bộ đếm; không ghép các ô còn lại thành một chỉ số.",
+          "Số ô quan sát không khớp độ dài dãy chữ số; có thể đã bỏ sót hoặc ghép nhầm ô.",
+          "Chưa có đối chiếu OCR ổn định cho toàn bộ từng vị trí chữ số."
+        ],
+        "alignmentSource": "sequence-position",
+        "sourceImage": {
+          "width": 1280,
+          "height": 1707
+        }
+      },
+      "quality": {
+        "version": 1,
+        "status": "pass",
+        "canSubmit": true,
+        "scope": "counter",
+        "checks": {
+          "resolution": true,
+          "exposure": true,
+          "contrast": true,
+          "sharpness": true,
+          "glare": true
+        },
+        "reasons": [],
+        "metrics": {
+          "width": 640,
+          "height": 226,
+          "meanLuma": 106.401,
+          "contrast": 55.8,
+          "edgeEnergy": 53.795,
+          "clippedDark": 0.134,
+          "clippedLight": 0,
+          "glareFraction": 0
+        },
+        "source": {
+          "width": 1280,
+          "height": 1707
+        },
+        "rectangle": {
+          "left": 220,
+          "top": 440,
+          "width": 850,
+          "height": 300
+        }
+      }
+    },
+    "quality": {
+      "version": 1,
+      "status": "pass",
+      "canSubmit": true,
+      "scope": "counter",
+      "checks": {
+        "resolution": true,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true,
+        "glare": true
+      },
+      "reasons": [],
+      "metrics": {
+        "width": 640,
+        "height": 226,
+        "meanLuma": 106.401,
+        "contrast": 55.8,
+        "edgeEnergy": 53.795,
+        "clippedDark": 0.134,
+        "clippedLight": 0,
+        "glareFraction": 0
+      },
+      "source": {
+        "width": 1280,
+        "height": 1707
+      },
+      "rectangle": {
+        "left": 220,
+        "top": 440,
+        "width": 850,
+        "height": 300
+      }
+    }
+  },
+  "submission": {
+    "id": "meter_sub_7ee8b88ce90846bdae",
+    "status": "pending",
+    "photoCount": 1
+  },
+  "review": {
+    "status": "approved",
+    "value": 1,
+    "source": "manual",
+    "periodConfirmed": false,
+    "invoiceUnchanged": true
+  }
+}

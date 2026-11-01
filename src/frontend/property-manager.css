@@ -1,0 +1,29 @@
+/* Property management keeps the selected workspace and consequential actions clear. */
+.property-manager { min-width: 0; }
+.property-manager-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.property-manager-toolbar>p { font-size: .8125rem; }
+.property-manager-list { display: flex; flex-direction: column; gap: 12px; }
+.property-manager-row { display: flex; align-items: flex-start; gap: 15px; padding: 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.property-manager-row.is-selected { border-color: var(--primary-border); background: var(--primary-light); }
+.property-manager-icon { display: grid; place-items: center; flex-shrink: 0; width: 42px; height: 42px; border-radius: 10px; color: var(--accent-text); background: var(--primary-light); }
+.is-selected .property-manager-icon { background: var(--surface); }
+.property-manager-information { flex: 1; min-width: 0; }
+.property-manager-information h3 { font-size: 1rem; overflow-wrap: anywhere; }
+.property-manager-information>p { color: var(--muted); font-size: .8125rem; margin-top: 5px; overflow-wrap: anywhere; }
+.property-manager-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 12px; color: var(--muted); font-size: .75rem; }
+.property-manager-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 5px; flex-shrink: 0; }
+.property-manager-actions .icon-button { background: var(--surface); border: 1px solid var(--control-border); }
+.property-manager-actions .icon-button.danger-text { border-color: var(--danger); color: var(--danger); }
+.property-manager-target { display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: 10px; background: var(--secondary); min-width: 0; }
+.property-manager-target>svg { color: var(--accent-text); margin-top: 3px; }
+.property-manager-target>div { min-width: 0; overflow-wrap: anywhere; }
+.property-manager-target p { font-size: .8125rem; margin-top: 4px; }
+.property-manager-alternatives { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+@media (max-width: 640px) {
+  .property-manager-row { flex-wrap: wrap; gap: 12px; padding: 15px; }
+  .property-manager-information { flex-basis: calc(100% - 54px); }
+  .property-manager-actions { width: 100%; justify-content: flex-start; gap: 8px; }
+  .property-manager-actions .icon-button { width: 44px; height: 44px; }
+  .property-manager-actions .btn { min-height: 44px; }
+  .property-manager-toolbar>.btn { min-height: 44px; }
+}

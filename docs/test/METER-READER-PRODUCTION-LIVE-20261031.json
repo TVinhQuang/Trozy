@@ -1,0 +1,217 @@
+{
+  "scope": "Real CPU model through HTTP against isolated SQLite RAM; no original app DB opened",
+  "createdAt": "2026-10-31T14:40:40.767Z",
+  "sourcePhotoSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+  "read": {
+    "status": "ready",
+    "reading": {
+      "digits": "007664",
+      "displayText": "00766.4",
+      "integerDigits": "00766",
+      "fractionalDigits": "4",
+      "integerValue": 766,
+      "unit": "kWh"
+    },
+    "confidence": 0.9515423777038178,
+    "cells": [
+      {
+        "index": 0,
+        "position": 0.1,
+        "confidence": 0.9515423777038178,
+        "alternatives": [
+          {
+            "position": 0.2,
+            "confidence": 0.46815056497116414
+          },
+          {
+            "position": 0.1,
+            "confidence": 0.38814320802675123
+          },
+          {
+            "position": 0,
+            "confidence": 0.054784135054518644
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "position": 0.1,
+        "confidence": 0.9539018633393478,
+        "alternatives": [
+          {
+            "position": 0.1,
+            "confidence": 0.7145676456675123
+          },
+          {
+            "position": 0.2,
+            "confidence": 0.13906836597251732
+          },
+          {
+            "position": 0,
+            "confidence": 0.09484524978881724
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "position": 7.1,
+        "confidence": 0.9704089274439878,
+        "alternatives": [
+          {
+            "position": 7,
+            "confidence": 0.8240829755553839
+          },
+          {
+            "position": 7.1,
+            "confidence": 0.07848433657186028
+          },
+          {
+            "position": 6.9,
+            "confidence": 0.06666902255601229
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "position": 6.1,
+        "confidence": 0.9774707963438478,
+        "alternatives": [
+          {
+            "position": 6.1,
+            "confidence": 0.7598027417883689
+          },
+          {
+            "position": 6,
+            "confidence": 0.16727242714590349
+          },
+          {
+            "position": 6.2,
+            "confidence": 0.049083847760261944
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "position": 6.1,
+        "confidence": 0.9747783888627743,
+        "alternatives": [
+          {
+            "position": 6,
+            "confidence": 0.6278916152588853
+          },
+          {
+            "position": 6.1,
+            "confidence": 0.3364058099428066
+          },
+          {
+            "position": 5.9,
+            "confidence": 0.007924265785126674
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "position": 4,
+        "confidence": 0.983816100146227,
+        "alternatives": [
+          {
+            "position": 4,
+            "confidence": 0.927215118865042
+          },
+          {
+            "position": 4.1,
+            "confidence": 0.04916099371129488
+          },
+          {
+            "position": 3.9,
+            "confidence": 0.007329690201463993
+          }
+        ]
+      }
+    ],
+    "quality": {
+      "canRead": true,
+      "checks": {
+        "resolution": true,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true
+      },
+      "metrics": {
+        "width": 147,
+        "height": 35,
+        "cellWidth": 24.5,
+        "meanLuma": 86.75063168124393,
+        "contrast": 31.561417012210743,
+        "edgeEnergy": 467.21498395477846
+      }
+    }
+  },
+  "authorization": {
+    "tenantReader": 403,
+    "tenantPreview": 403,
+    "otherOwnerRead": 404,
+    "tenantExportHasProposal": false
+  },
+  "review": {
+    "withoutFractionalConsent": 400,
+    "withExplicitImageAndFractionalConsent": 200,
+    "electricValue": 766,
+    "periodConfirmed": false,
+    "invoicesUnchanged": true
+  },
+  "locate": {
+    "status": "selected",
+    "candidates": 1,
+    "noReadingProduced": true
+  },
+  "ownerEvidence": {
+    "status": 201,
+    "source": "owner",
+    "pending": true
+  },
+  "finalSourceSha256": {
+    "src/ai/meter-reader.mjs": "25227d8ef4af7eb159e2959bdf3d072dab921e87211264705a0c9301f9ce3645",
+    "src/ai/meter_reader_worker.py": "72f62504af4e2392a77955e061fbcad9fa769c0293f16b51f1e05f366202bd45",
+    "src/ai/meter_wheels.py": "796323311d61bdb1f142d628ba357ee2ae9b4a4c78dbf0a1213e281eb44ea922",
+    "src/ai/meter_geometry.py": "cac8cd5d6ca46b5a77223f3eac8085aee0b499bd21131ad7c3a3bd9f69c2181a",
+    "src/backend/meter-reader-service.mjs": "1cdb5c742db4460f8fdd1be06da8ba037d444c8640a31d03bd11d917e8232296",
+    "src/backend/meter-submissions.mjs": "010c8205c2548608a94bea7c0e16969c68b4a65db94a3e1123dca8dfad139a46",
+    "src/backend/meter-visibility.mjs": "4067441e09345dab69c6075c365d4af668c162c549c4dfb4cdc4bccad2251ea2",
+    "src/backend/server.mjs": "0c6a908295ef1c167c1c04e2a2a588505f388b6e76ba8b52aa6519bb2679f004",
+    "src/frontend/meter-reader-panel.tsx": "1d74cde733a76c120c7100dbb29a0cca0d6661e3a6144a5534a7b525f168cbc3",
+    "src/frontend/meter-reader.css": "bf885568916de4123b7cca9608ba213dc265107681f231c346ab1a23682f28f6",
+    "src/frontend/meter-submissions-panel.tsx": "1df5f1cd2ef6671017a930323b0773eb8567ffdcbe21ea1738e61d29755b22cf",
+    "src/frontend/meter-evidence-capture.tsx": "de9088db3fa761c721a6ce6433c9be2158a041f6cf7ac091199af9bd7b17e7be",
+    "scripts/check-meter-reader-live.mjs": "24abfbc44c18a55a09b2066620821dad4052807a4cbcbe9d98edf72d5043deb2",
+    "scripts/check-ai-ui.mjs": "4370963b7eb0a51b61ec0ac12ffbb50aa3fa4927f1a4f342bf4418391854d5b3",
+    "tests/meter-reader-api.test.mjs": "3afc9021256b46218cc423f826d043264a284c955af6de832a9c369632c94a60",
+    "tests/meter-reader-bridge.test.mjs": "c713465386d6734138e85b7ef8f7ddcfd14a9d15e241d1caf23d4808cef4318d",
+    "tests/meter-reader-production.test.py": "eb91965c8186be6e63134f985e7dc7b2be27a0855d87e848891090551d74ab1a"
+  },
+  "verification": {
+    "node": {
+      "passed": 94,
+      "failed": 0,
+      "skipped": 0
+    },
+    "pythonProduction": {
+      "passed": 4,
+      "failed": 0
+    },
+    "uiDom": {
+      "passed": 29
+    },
+    "roleRouteRenders": {
+      "passed": 132
+    },
+    "typecheck": true,
+    "viteBuild": true,
+    "realBrowser": false,
+    "realBrowserLimitation": "Browser host unavailable; no real phone/camera verification claimed.",
+    "localApp": {
+      "url": "http://127.0.0.1:3001",
+      "httpStatus": 200
+    }
+  }
+}

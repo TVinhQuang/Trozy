@@ -1,0 +1,167 @@
+{
+  "checkedAt": "2026-10-30T15:15:25.756Z",
+  "scope": "Independent full Vision on user-provided counter crop; no business DB or OCR answers.",
+  "result": {
+    "regionRole": "counter",
+    "meterType": "mechanical",
+    "unit": "kWh",
+    "decimalIndex": 5,
+    "decimalEvidence": "printed_weights",
+    "scaleLabels": [
+      "1/10"
+    ],
+    "cells": [
+      {
+        "index": 0,
+        "digit": "2",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 1,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.1,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 2,
+        "digit": "7",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.2,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 3,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.3,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 4,
+        "digit": "2",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.4,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 5,
+        "digit": "9",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.5,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      },
+      {
+        "index": 6,
+        "digit": "0",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0.6,
+          "top": 0,
+          "width": 0.1,
+          "height": 0.1
+        }
+      }
+    ],
+    "readable": false,
+    "issues": [],
+    "available": true,
+    "model": "qwen3-vl:4b-instruct",
+    "sourceRectangle": {
+      "left": 209,
+      "top": 237,
+      "width": 141,
+      "height": 44
+    },
+    "sourceWidth": 453,
+    "sourceHeight": 676,
+    "rotationDegrees": 0,
+    "imageQuality": {
+      "version": 1,
+      "status": "retake",
+      "canSubmit": false,
+      "scope": "counter",
+      "checks": {
+        "resolution": false,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true,
+        "glare": true
+      },
+      "reasons": [
+        "Vùng bộ đếm quá nhỏ. Đưa camera gần hơn, giữ đủ cả dãy số và đơn vị."
+      ],
+      "metrics": {
+        "width": 141,
+        "height": 44,
+        "meanLuma": 95.754,
+        "contrast": 63.345,
+        "edgeEnergy": 3871.431,
+        "clippedDark": 0.021,
+        "clippedLight": 0.001,
+        "glareFraction": 0.001
+      },
+      "source": {
+        "width": 453,
+        "height": 676
+      },
+      "rectangle": {
+        "left": 209,
+        "top": 237,
+        "width": 141,
+        "height": 44
+      }
+    },
+    "quality": {
+      "version": 1,
+      "status": "retake",
+      "minCellWidth": 14.1,
+      "minCellHeight": 4.4,
+      "checks": {
+        "nativeResolution": false,
+        "clearCells": true,
+        "geometry": true,
+        "photometric": true
+      },
+      "issues": [
+        "Một số ô quá nhỏ ở ảnh gốc; phóng ảnh không tạo thêm chi tiết."
+      ]
+    },
+    "integerDigits": "26762",
+    "fractionalDigits": "90",
+    "displayText": "26762.90"
+  }
+}

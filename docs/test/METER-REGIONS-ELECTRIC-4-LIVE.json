@@ -1,0 +1,2037 @@
+{
+  "checkedAt": "2026-10-28T07:40:23.381Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "5e8b308031f2e98ec578acc9af3c8285248b7386820aebc49b8a9d503089e67d",
+  "photoBytes": 29964,
+  "expectedRegister": null,
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "ollama-vision",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\nPDM 023-2007\nCONG TC DIÈN 1 PHA 25099\n26762回\nVN\nN52\n10000 100 00 10 1 1/10\nGEL'EX EMIC\nlido loe\nCV140\nSSX:17180433\n220 V\n5(20) A\n50H2\n900 vòng/kWh\nCáp 2\n2017\nSan xuāt tai Tong cong ty co\nThict bi dien Viet Nam\nSo hùu cua\n\n[Xoay 0° · kiểm tra vùng số]\n26762回\n\n[Xoay 90° · toàn vùng]\nSo hùu cua\nSan xuat tai Tong cong ly co\n900 vòng/kWh2\n一\nGEL'EX EMIC\nCONG TC DIÈN 1 PHA 25099\n220 V\nCV140\n10000 1000 100 10\n26762回\n5(20) A\nThict hi dien Viet Nam\nCap 22017\n1/10\nPDM 023-2007\n502\nVN\nN52\n\n[Xoay 270° · toàn vùng]\n哈鸭甲鸡\nCON   G 50\n510\nCa2 2017\nniet  e am\nNA\nN52\nPDM 07\n2)4)\n222\n11/0\nS:XT1\n0\n01 001 0001 00001\nSa a g g  n \nGELLX EMIC\n0o 06\nCV140\n20V\nSo h uu ua\n一",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Vision chưa được OCR xác nhận toàn bộ dãy số. Chưa có kết quả để áp dụng."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 453,
+      "sourceHeight": 676,
+      "width": 453,
+      "height": 676,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "PDM 023-2007",
+        "confidence": 94,
+        "polygon": [
+          [
+            310,
+            194
+          ],
+          [
+            381,
+            192
+          ],
+          [
+            381,
+            206
+          ],
+          [
+            311,
+            208
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "CONG TC DIÈN 1 PHA 25099",
+        "confidence": 91,
+        "polygon": [
+          [
+            152,
+            224
+          ],
+          [
+            421,
+            211
+          ],
+          [
+            422,
+            235
+          ],
+          [
+            153,
+            248
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "26762回",
+        "confidence": 89,
+        "polygon": [
+          [
+            209,
+            242
+          ],
+          [
+            349,
+            237
+          ],
+          [
+            350,
+            276
+          ],
+          [
+            210,
+            281
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": true,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "VN",
+        "confidence": 100,
+        "polygon": [
+          [
+            378,
+            247
+          ],
+          [
+            401,
+            247
+          ],
+          [
+            401,
+            264
+          ],
+          [
+            378,
+            264
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line3",
+        "variant": "full"
+      },
+      {
+        "text": "N52",
+        "confidence": 100,
+        "polygon": [
+          [
+            374,
+            263
+          ],
+          [
+            403,
+            260
+          ],
+          [
+            405,
+            275
+          ],
+          [
+            375,
+            278
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line4",
+        "variant": "full"
+      },
+      {
+        "text": "10000 100 00 10 1 1/10",
+        "confidence": 91,
+        "polygon": [
+          [
+            200,
+            274
+          ],
+          [
+            347,
+            274
+          ],
+          [
+            347,
+            294
+          ],
+          [
+            200,
+            294
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line5",
+        "variant": "full"
+      },
+      {
+        "text": "GEL'EX EMIC",
+        "confidence": 96,
+        "polygon": [
+          [
+            149,
+            301
+          ],
+          [
+            248,
+            301
+          ],
+          [
+            248,
+            325
+          ],
+          [
+            149,
+            325
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line6",
+        "variant": "full"
+      },
+      {
+        "text": "lido loe",
+        "confidence": 59,
+        "polygon": [
+          [
+            360,
+            297
+          ],
+          [
+            387,
+            297
+          ],
+          [
+            387,
+            304
+          ],
+          [
+            360,
+            304
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line7",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 100,
+        "polygon": [
+          [
+            179,
+            367
+          ],
+          [
+            228,
+            367
+          ],
+          [
+            228,
+            385
+          ],
+          [
+            179,
+            385
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line8",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "SSX:17180433",
+        "confidence": 92,
+        "polygon": [
+          [
+            257,
+            361
+          ],
+          [
+            402,
+            359
+          ],
+          [
+            403,
+            383
+          ],
+          [
+            257,
+            385
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line9",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "220 V",
+        "confidence": 100,
+        "polygon": [
+          [
+            181,
+            389
+          ],
+          [
+            224,
+            389
+          ],
+          [
+            224,
+            407
+          ],
+          [
+            181,
+            407
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line10",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "5(20) A",
+        "confidence": 97,
+        "polygon": [
+          [
+            281,
+            390
+          ],
+          [
+            336,
+            389
+          ],
+          [
+            337,
+            408
+          ],
+          [
+            281,
+            410
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line11",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "50H2",
+        "confidence": 80,
+        "polygon": [
+          [
+            363,
+            390
+          ],
+          [
+            407,
+            390
+          ],
+          [
+            407,
+            408
+          ],
+          [
+            363,
+            408
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line12",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "900 vòng/kWh",
+        "confidence": 94,
+        "polygon": [
+          [
+            152,
+            408
+          ],
+          [
+            256,
+            412
+          ],
+          [
+            255,
+            430
+          ],
+          [
+            151,
+            426
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line13",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "Cáp 2",
+        "confidence": 88,
+        "polygon": [
+          [
+            309,
+            411
+          ],
+          [
+            359,
+            411
+          ],
+          [
+            359,
+            430
+          ],
+          [
+            309,
+            430
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line14",
+        "variant": "full"
+      },
+      {
+        "text": "2017",
+        "confidence": 100,
+        "polygon": [
+          [
+            366,
+            411
+          ],
+          [
+            407,
+            411
+          ],
+          [
+            407,
+            430
+          ],
+          [
+            366,
+            430
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line15",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "San xuāt tai Tong cong ty co",
+        "confidence": 92,
+        "polygon": [
+          [
+            143,
+            429
+          ],
+          [
+            278,
+            432
+          ],
+          [
+            278,
+            449
+          ],
+          [
+            142,
+            447
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line16",
+        "variant": "full"
+      },
+      {
+        "text": "Thict bi dien Viet Nam",
+        "confidence": 89,
+        "polygon": [
+          [
+            304,
+            433
+          ],
+          [
+            416,
+            436
+          ],
+          [
+            415,
+            450
+          ],
+          [
+            303,
+            448
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line17",
+        "variant": "full"
+      },
+      {
+        "text": "So hùu cua",
+        "confidence": 90,
+        "polygon": [
+          [
+            143,
+            448
+          ],
+          [
+            209,
+            452
+          ],
+          [
+            208,
+            470
+          ],
+          [
+            142,
+            466
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line18",
+        "variant": "full"
+      },
+      {
+        "text": "26762回",
+        "confidence": 91,
+        "polygon": [
+          [
+            200.66923076923075,
+            245
+          ],
+          [
+            355.7892307692308,
+            239.46000000000004
+          ],
+          [
+            356.69384615384627,
+            274.74
+          ],
+          [
+            201.57384615384615,
+            280.28
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-confirm0-line0",
+        "variant": "region-confirmation"
+      },
+      {
+        "text": "So hùu cua",
+        "confidence": 93,
+        "polygon": [
+          [
+            205,
+            141
+          ],
+          [
+            226,
+            143
+          ],
+          [
+            221,
+            211
+          ],
+          [
+            200,
+            209
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "San xuat tai Tong cong ly co",
+        "confidence": 95,
+        "polygon": [
+          [
+            226,
+            141
+          ],
+          [
+            246,
+            142
+          ],
+          [
+            240,
+            279
+          ],
+          [
+            220,
+            279
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "900 vòng/kWh2",
+        "confidence": 97,
+        "polygon": [
+          [
+            245,
+            149
+          ],
+          [
+            266,
+            149
+          ],
+          [
+            263,
+            278
+          ],
+          [
+            242,
+            278
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "一",
+        "confidence": 99,
+        "polygon": [
+          [
+            317,
+            155
+          ],
+          [
+            343,
+            155
+          ],
+          [
+            343,
+            201
+          ],
+          [
+            317,
+            201
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line3",
+        "variant": "full"
+      },
+      {
+        "text": "GEL'EX EMIC",
+        "confidence": 96,
+        "polygon": [
+          [
+            345,
+            149
+          ],
+          [
+            373,
+            149
+          ],
+          [
+            373,
+            250
+          ],
+          [
+            345,
+            250
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line4",
+        "variant": "full"
+      },
+      {
+        "text": "CONG TC DIÈN 1 PHA 25099",
+        "confidence": 94,
+        "polygon": [
+          [
+            423,
+            153
+          ],
+          [
+            450,
+            151
+          ],
+          [
+            463,
+            420
+          ],
+          [
+            436,
+            421
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line5",
+        "variant": "full"
+      },
+      {
+        "text": "220 V",
+        "confidence": 94,
+        "polygon": [
+          [
+            266,
+            180
+          ],
+          [
+            285,
+            180
+          ],
+          [
+            285,
+            224
+          ],
+          [
+            266,
+            224
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line6",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 100,
+        "polygon": [
+          [
+            288,
+            177
+          ],
+          [
+            310,
+            177
+          ],
+          [
+            310,
+            229
+          ],
+          [
+            288,
+            229
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line7",
+        "variant": "full"
+      },
+      {
+        "text": "10000 1000 100 10",
+        "confidence": 93,
+        "polygon": [
+          [
+            380,
+            204
+          ],
+          [
+            397,
+            204
+          ],
+          [
+            397,
+            299
+          ],
+          [
+            380,
+            299
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line8",
+        "variant": "full"
+      },
+      {
+        "text": "26762回",
+        "confidence": 94,
+        "polygon": [
+          [
+            391,
+            209
+          ],
+          [
+            426,
+            207
+          ],
+          [
+            434,
+            347
+          ],
+          [
+            399,
+            349
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line9",
+        "variant": "full"
+      },
+      {
+        "text": "5(20) A",
+        "confidence": 96,
+        "polygon": [
+          [
+            264,
+            280
+          ],
+          [
+            285,
+            280
+          ],
+          [
+            285,
+            345
+          ],
+          [
+            264,
+            345
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line10",
+        "variant": "full"
+      },
+      {
+        "text": "Thict hi dien Viet Nam",
+        "confidence": 93,
+        "polygon": [
+          [
+            223,
+            302
+          ],
+          [
+            240,
+            302
+          ],
+          [
+            240,
+            413
+          ],
+          [
+            223,
+            413
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line11",
+        "variant": "full"
+      },
+      {
+        "text": "Cap 22017",
+        "confidence": 95,
+        "polygon": [
+          [
+            244,
+            306
+          ],
+          [
+            265,
+            307
+          ],
+          [
+            262,
+            409
+          ],
+          [
+            241,
+            408
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line12",
+        "variant": "full"
+      },
+      {
+        "text": "1/10",
+        "confidence": 99,
+        "polygon": [
+          [
+            386,
+            316
+          ],
+          [
+            399,
+            316
+          ],
+          [
+            399,
+            345
+          ],
+          [
+            386,
+            345
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line13",
+        "variant": "full"
+      },
+      {
+        "text": "PDM 023-2007",
+        "confidence": 90,
+        "polygon": [
+          [
+            464,
+            308
+          ],
+          [
+            481,
+            307
+          ],
+          [
+            483,
+            381
+          ],
+          [
+            466,
+            381
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line14",
+        "variant": "full"
+      },
+      {
+        "text": "502",
+        "confidence": 89,
+        "polygon": [
+          [
+            264,
+            356
+          ],
+          [
+            286,
+            357
+          ],
+          [
+            283,
+            408
+          ],
+          [
+            261,
+            407
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line15",
+        "variant": "full"
+      },
+      {
+        "text": "VN",
+        "confidence": 99,
+        "polygon": [
+          [
+            411,
+            363
+          ],
+          [
+            430,
+            363
+          ],
+          [
+            430,
+            405
+          ],
+          [
+            411,
+            405
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line16",
+        "variant": "full"
+      },
+      {
+        "text": "N52",
+        "confidence": 100,
+        "polygon": [
+          [
+            393,
+            374
+          ],
+          [
+            412,
+            374
+          ],
+          [
+            412,
+            406
+          ],
+          [
+            393,
+            406
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line17",
+        "variant": "full"
+      },
+      {
+        "text": "哈鸭甲鸡",
+        "confidence": 59,
+        "polygon": [
+          [
+            288,
+            26
+          ],
+          [
+            302,
+            25
+          ],
+          [
+            307,
+            92
+          ],
+          [
+            293,
+            93
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "CON   G 50",
+        "confidence": 56,
+        "polygon": [
+          [
+            210,
+            41
+          ],
+          [
+            238,
+            39
+          ],
+          [
+            252,
+            297
+          ],
+          [
+            224,
+            299
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "510",
+        "confidence": 56,
+        "polygon": [
+          [
+            388,
+            43
+          ],
+          [
+            410,
+            43
+          ],
+          [
+            410,
+            94
+          ],
+          [
+            388,
+            94
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      },
+      {
+        "text": "Ca2 2017",
+        "confidence": 69,
+        "polygon": [
+          [
+            409,
+            42
+          ],
+          [
+            431,
+            42
+          ],
+          [
+            431,
+            143
+          ],
+          [
+            409,
+            143
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line3",
+        "variant": "full"
+      },
+      {
+        "text": "niet  e am",
+        "confidence": 46,
+        "polygon": [
+          [
+            435,
+            34
+          ],
+          [
+            452,
+            35
+          ],
+          [
+            449,
+            150
+          ],
+          [
+            431,
+            149
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line4",
+        "variant": "full"
+      },
+      {
+        "text": "NA",
+        "confidence": 96,
+        "polygon": [
+          [
+            247,
+            49
+          ],
+          [
+            263,
+            49
+          ],
+          [
+            263,
+            78
+          ],
+          [
+            247,
+            78
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line5",
+        "variant": "full"
+      },
+      {
+        "text": "N52",
+        "confidence": 85,
+        "polygon": [
+          [
+            262,
+            44
+          ],
+          [
+            280,
+            44
+          ],
+          [
+            280,
+            81
+          ],
+          [
+            262,
+            81
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line6",
+        "variant": "full"
+      },
+      {
+        "text": "PDM 07",
+        "confidence": 76,
+        "polygon": [
+          [
+            191,
+            70
+          ],
+          [
+            208,
+            70
+          ],
+          [
+            210,
+            141
+          ],
+          [
+            193,
+            142
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line7",
+        "variant": "full"
+      },
+      {
+        "text": "2)4)",
+        "confidence": 57,
+        "polygon": [
+          [
+            391,
+            91
+          ],
+          [
+            409,
+            91
+          ],
+          [
+            409,
+            170
+          ],
+          [
+            391,
+            170
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line8",
+        "variant": "full"
+      },
+      {
+        "text": "222",
+        "confidence": 41,
+        "polygon": [
+          [
+            242,
+            104
+          ],
+          [
+            274,
+            103
+          ],
+          [
+            279,
+            240
+          ],
+          [
+            247,
+            241
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line9",
+        "variant": "full"
+      },
+      {
+        "text": "11/0",
+        "confidence": 78,
+        "polygon": [
+          [
+            277,
+            106
+          ],
+          [
+            288,
+            106
+          ],
+          [
+            288,
+            131
+          ],
+          [
+            277,
+            131
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line10",
+        "variant": "full"
+      },
+      {
+        "text": "S:XT1",
+        "confidence": 51,
+        "polygon": [
+          [
+            360,
+            104
+          ],
+          [
+            388,
+            104
+          ],
+          [
+            388,
+            194
+          ],
+          [
+            360,
+            194
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line11",
+        "variant": "full"
+      },
+      {
+        "text": "0",
+        "confidence": 19,
+        "polygon": [
+          [
+            195,
+            160
+          ],
+          [
+            207,
+            160
+          ],
+          [
+            207,
+            180
+          ],
+          [
+            195,
+            180
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line12",
+        "variant": "full"
+      },
+      {
+        "text": "01 001 0001 00001",
+        "confidence": 82,
+        "polygon": [
+          [
+            276,
+            151
+          ],
+          [
+            293,
+            151
+          ],
+          [
+            293,
+            244
+          ],
+          [
+            276,
+            244
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line13",
+        "variant": "full"
+      },
+      {
+        "text": "Sa a g g  n ",
+        "confidence": 48,
+        "polygon": [
+          [
+            433,
+            172
+          ],
+          [
+            451,
+            172
+          ],
+          [
+            448,
+            309
+          ],
+          [
+            429,
+            308
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line14",
+        "variant": "full"
+      },
+      {
+        "text": "GELLX EMIC",
+        "confidence": 65,
+        "polygon": [
+          [
+            301,
+            199
+          ],
+          [
+            329,
+            200
+          ],
+          [
+            327,
+            304
+          ],
+          [
+            299,
+            303
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line15",
+        "variant": "full"
+      },
+      {
+        "text": "0o 06",
+        "confidence": 52,
+        "polygon": [
+          [
+            411,
+            193
+          ],
+          [
+            432,
+            194
+          ],
+          [
+            428,
+            303
+          ],
+          [
+            407,
+            302
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line16",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 75,
+        "polygon": [
+          [
+            366,
+            223
+          ],
+          [
+            385,
+            223
+          ],
+          [
+            385,
+            273
+          ],
+          [
+            366,
+            273
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line17",
+        "variant": "full"
+      },
+      {
+        "text": "20V",
+        "confidence": 78,
+        "polygon": [
+          [
+            389,
+            224
+          ],
+          [
+            408,
+            224
+          ],
+          [
+            408,
+            272
+          ],
+          [
+            389,
+            272
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line18",
+        "variant": "full"
+      },
+      {
+        "text": "So h uu ua",
+        "confidence": 66,
+        "polygon": [
+          [
+            450,
+            238
+          ],
+          [
+            473,
+            240
+          ],
+          [
+            468,
+            310
+          ],
+          [
+            445,
+            308
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line19",
+        "variant": "full"
+      },
+      {
+        "text": "一",
+        "confidence": 96,
+        "polygon": [
+          [
+            333,
+            253
+          ],
+          [
+            356,
+            253
+          ],
+          [
+            356,
+            292
+          ],
+          [
+            333,
+            292
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line20",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3245,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 4,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 8553,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "regions": [
+      {
+        "regionId": "r0-line2",
+        "role": "counter",
+        "text": "26762回",
+        "evidence": [
+          "printed_weights"
+        ],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 209,
+          "top": 237,
+          "width": 141,
+          "height": 44
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.0454084888872277,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 209,
+            "top": 237,
+            "width": 141,
+            "height": 44
+          }
+        },
+        "observationRegionIds": [
+          "r0-line2",
+          "r90-line9",
+          "r270-line9"
+        ]
+      },
+      {
+        "regionId": "r0-line8",
+        "role": "serial",
+        "text": "CV140",
+        "evidence": [
+          "counter_window",
+          "serial_context",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 179,
+          "top": 367,
+          "width": 49,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 179,
+            "top": 367,
+            "width": 49,
+            "height": 18
+          }
+        },
+        "observationRegionIds": [
+          "r0-line8",
+          "r90-line7",
+          "r270-line17"
+        ]
+      },
+      {
+        "regionId": "r0-line9",
+        "role": "serial",
+        "text": "SSX:17180433",
+        "evidence": [
+          "counter_window",
+          "serial_context",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 257,
+          "top": 359,
+          "width": 146,
+          "height": 26
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -0.7902365024291874,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 257,
+            "top": 359,
+            "width": 146,
+            "height": 26
+          }
+        },
+        "observationRegionIds": [
+          "r0-line9"
+        ]
+      },
+      {
+        "regionId": "r0-line1",
+        "role": "specification",
+        "text": "CONG TC DIÈN 1 PHA 25099",
+        "evidence": [
+          "printed_weights",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 152,
+          "top": 211,
+          "width": 270,
+          "height": 37
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.766788401169521,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 152,
+            "top": 211,
+            "width": 270,
+            "height": 37
+          }
+        },
+        "observationRegionIds": [
+          "r0-line1",
+          "r90-line5"
+        ]
+      },
+      {
+        "regionId": "r0-line10",
+        "role": "specification",
+        "text": "220 V",
+        "evidence": [
+          "counter_window",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 181,
+          "top": 389,
+          "width": 43,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 181,
+            "top": 389,
+            "width": 43,
+            "height": 18
+          }
+        },
+        "observationRegionIds": [
+          "r0-line10",
+          "r90-line6"
+        ]
+      },
+      {
+        "regionId": "r0-line13",
+        "role": "specification",
+        "text": "900 vòng/kWh",
+        "evidence": [
+          "counter_window",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 151,
+          "top": 408,
+          "width": 105,
+          "height": 22
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 2.2025981617658057,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 151,
+            "top": 408,
+            "width": 105,
+            "height": 22
+          }
+        },
+        "observationRegionIds": [
+          "r0-line13",
+          "r90-line2",
+          "r270-line16"
+        ]
+      },
+      {
+        "regionId": "r0-line15",
+        "role": "specification",
+        "text": "2017",
+        "evidence": [
+          "specification_context",
+          "year_like"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 366,
+          "top": 411,
+          "width": 41,
+          "height": 19
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 366,
+            "top": 411,
+            "width": 41,
+            "height": 19
+          }
+        },
+        "observationRegionIds": [
+          "r0-line15"
+        ]
+      },
+      {
+        "regionId": "r90-line8",
+        "role": "specification",
+        "text": "10000 1000 100 10",
+        "evidence": [
+          "printed_weights",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 204,
+          "top": 279,
+          "width": 95,
+          "height": 17
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 90,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 380,
+            "top": 204,
+            "width": 17,
+            "height": 95
+          }
+        },
+        "observationRegionIds": [
+          "r90-line8",
+          "r270-line13"
+        ]
+      },
+      {
+        "regionId": "r0-line0",
+        "role": "specification",
+        "text": "PDM 023-2007",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 310,
+          "top": 192,
+          "width": 71,
+          "height": 16
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -1.6135389328811822,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 310,
+            "top": 192,
+            "width": 71,
+            "height": 16
+          }
+        },
+        "observationRegionIds": [
+          "r0-line0",
+          "r90-line14"
+        ]
+      },
+      {
+        "regionId": "r0-line5",
+        "role": "specification",
+        "text": "10000 100 00 10 1 1/10",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 200,
+          "top": 274,
+          "width": 147,
+          "height": 20
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 200,
+            "top": 274,
+            "width": 147,
+            "height": 20
+          }
+        },
+        "observationRegionIds": [
+          "r0-line5"
+        ]
+      },
+      {
+        "regionId": "r0-line11",
+        "role": "specification",
+        "text": "5(20) A",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 281,
+          "top": 389,
+          "width": 56,
+          "height": 21
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -1.041626676009974,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 281,
+            "top": 389,
+            "width": 56,
+            "height": 21
+          }
+        },
+        "observationRegionIds": [
+          "r0-line11",
+          "r90-line10"
+        ]
+      },
+      {
+        "regionId": "r0-line12",
+        "role": "specification",
+        "text": "50H2",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 363,
+          "top": 390,
+          "width": 44,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 363,
+            "top": 390,
+            "width": 44,
+            "height": 18
+          }
+        },
+        "observationRegionIds": [
+          "r0-line12",
+          "r90-line15",
+          "r270-line2"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "selected",
+      "selectedRegionId": "r0-line2",
+      "source": "layout"
+    },
+    "ocrReadings": [],
+    "ocrCandidates": [],
+    "confirmedReading": null,
+    "assessment": "vision_only",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "kWh",
+      "regionRole": "counter",
+      "fractionalScale": "1/10",
+      "scaleLabels": [
+        "1/10"
+      ],
+      "scaleEvidence": {
+        "source": "printed_weights",
+        "fractionalDigits": 1,
+        "labels": [
+          "1/10"
+        ],
+        "verified": true
+      },
+      "integerDigits": "26762",
+      "fractionalDigits": "9",
+      "decimalEvidence": "red_digits",
+      "uncertainDigits": false,
+      "displayText": "26762.9",
+      "readable": true,
+      "issues": [],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": true,
+        "regionSource": "ocr",
+        "deskewDegrees": 2.0454084888872277,
+        "attempts": 1
+      }
+    },
+    "fileId": "file_57428be99d5e4753b3",
+    "roomId": "room_101"
+  }
+}

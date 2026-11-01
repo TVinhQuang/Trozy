@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-27T10:39:28.769Z",
+  "model": "qwen3-vl:4b-instruct",
+  "modelDigest": "84f7ed8042fa7cdbd902f7dcb7d0370e032095047cc3244179f263b77b5bc318",
+  "photoSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+  "photoBytes": 339681,
+  "expectedDisplay": "00001.056",
+  "expectedValue": 1,
+  "passed": true,
+  "businessRecordsUnchanged": true,
+  "httpHistoryAndAuthoritativePreviousVerified": true,
+  "elapsedMs": 2296,
+  "result": {
+    "feature": "B03",
+    "engine": "ollama-vision",
+    "rawText": "",
+    "confidence": 0,
+    "ocrConfidence": 0,
+    "candidates": [
+      {
+        "value": 1,
+        "text": "00001",
+        "displayText": "00001.056",
+        "fractionalDigits": "056",
+        "confidence": 0,
+        "source": "vision",
+        "reason": "Vision đọc dãy 00001.056 m³. Biểu mẫu ghi phần nguyên; phần thập phân được giữ để đối chiếu."
+      }
+    ],
+    "suggestedValue": 1,
+    "warnings": [
+      "Chỉ số do vision đề xuất chưa được OCR xác nhận độc lập; cần đối chiếu ảnh.",
+      "Dãy đầy đủ là 00001.056 m³. Biểu mẫu hiện ghi phần nguyên 1; xác nhận quy ước tính tiền trước khi áp dụng."
+    ],
+    "requiresConfirmation": true,
+    "utility": "water",
+    "elapsedMs": 2273,
+    "assessment": "vision_only",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "m3",
+      "integerDigits": "00001",
+      "fractionalDigits": "056",
+      "decimalEvidence": "red_digits",
+      "uncertainDigits": false,
+      "displayText": "00001.056",
+      "readable": true,
+      "issues": []
+    },
+    "fileId": "file_de223f2922af49e790",
+    "roomId": "room_101"
+  }
+}

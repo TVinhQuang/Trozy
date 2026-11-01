@@ -1,0 +1,166 @@
+{
+  "checkedAt": "2026-10-30T15:27:48.160Z",
+  "scope": "Independent Vision smoke on existing clear counter; no answer hint or business write.",
+  "result": {
+    "regionRole": "counter",
+    "meterType": "mechanical",
+    "unit": "kWh",
+    "decimalIndex": 6,
+    "decimalEvidence": "printed_weights",
+    "scaleLabels": [
+      "1/10"
+    ],
+    "cells": [
+      {
+        "index": 0,
+        "digit": "0",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 1,
+        "digit": "0",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 2,
+        "digit": "7",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 3,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 4,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 5,
+        "digit": "4",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 6,
+        "digit": "0",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      }
+    ],
+    "readable": false,
+    "issues": [],
+    "available": true,
+    "model": "qwen3-vl:4b-instruct",
+    "sourceRectangle": {
+      "left": 134,
+      "top": 260,
+      "width": 222,
+      "height": 46
+    },
+    "sourceWidth": 415,
+    "sourceHeight": 739,
+    "rotationDegrees": 0,
+    "imageQuality": {
+      "version": 1,
+      "status": "pass",
+      "canSubmit": true,
+      "scope": "counter",
+      "checks": {
+        "resolution": true,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true,
+        "glare": true
+      },
+      "reasons": [],
+      "metrics": {
+        "width": 222,
+        "height": 46,
+        "meanLuma": 97.08,
+        "contrast": 37.105,
+        "edgeEnergy": 1033.998,
+        "clippedDark": 0,
+        "clippedLight": 0,
+        "glareFraction": 0
+      },
+      "source": {
+        "width": 415,
+        "height": 739
+      },
+      "rectangle": {
+        "left": 134,
+        "top": 260,
+        "width": 222,
+        "height": 46
+      }
+    },
+    "quality": {
+      "version": 1,
+      "status": "retake",
+      "minCellWidth": 222,
+      "minCellHeight": 46,
+      "checks": {
+        "nativeResolution": true,
+        "clearCells": true,
+        "geometry": false,
+        "photometric": true
+      },
+      "issues": [
+        "Chưa xác định rõ vị trí và thứ tự toàn bộ ô số."
+      ]
+    },
+    "integerDigits": "007664",
+    "fractionalDigits": "0",
+    "displayText": "007664.0",
+    "attempts": 2
+  }
+}

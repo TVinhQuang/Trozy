@@ -1,0 +1,1763 @@
+{
+  "checkedAt": "2026-10-28T07:40:14.444Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+  "photoBytes": 27475,
+  "expectedRegister": null,
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "hybrid",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\nPDM 023-2007\nCÔNG TO DIÊN 1 PHA 2 DÃY\n00766kWh\n100001000100 101 1/10\nGELEX EMIC\nssx:23204079\nCV140\n220 V\n5(20) A\n50 Hz\n2023\n1CC1V\n900 vòng/kWh\n27C Cp 2\nSàn xuat tai Tng cóng ty c phn Thit bi din Vit Nam\nSo hūu cua:\n\n[Xoay 0° · kiểm tra vùng số]\n00766kWh\n\n[Xoay 90° · toàn vùng]\nSo huu cua:\nSn xuat tai Tng cng ty c phn Thiét bi din Vit Nam\n900 vòng/kWh 27°C Cäp 2 2023\nGELEX EMIC\nCÔNG TO DIÊN 1 PHA 2 DÅY\n一\n220 V\nCV140\n100001000 100 10 1 1/10\n00766kWh\nS6SX:23204079\n5(20) A\nPDM 023-2007\n50 Hz\n1C1V\n\n[Xoay 270° · toàn vùng]\n1C1V\nan          am\nZH  2\n90 2  2 2 2023\nCON    G  DAY\n0077W\n5604234079\nP 07\n11010010001\n5(2)04\n园\nGELLX ELEMIC\nCV140\n20V\nS ohu  ua:\n一",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [
+      {
+        "digits": "00766",
+        "confidence": 100,
+        "passes": 2,
+        "stable": true,
+        "regionId": "r0-line2",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.6025622024998065,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 134,
+            "top": 260,
+            "width": 222,
+            "height": 46
+          }
+        }
+      }
+    ],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Vision và OCR khác chữ số, vị trí thập phân hoặc đơn vị. Không có kết quả để áp dụng; đối chiếu ảnh hoặc nhập tay."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 415,
+      "sourceHeight": 739,
+      "width": 415,
+      "height": 739,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "PDM 023-2007",
+        "confidence": 100,
+        "polygon": [
+          [
+            240,
+            214
+          ],
+          [
+            316,
+            210
+          ],
+          [
+            317,
+            224
+          ],
+          [
+            241,
+            228
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "CÔNG TO DIÊN 1 PHA 2 DÃY",
+        "confidence": 93,
+        "polygon": [
+          [
+            68,
+            250
+          ],
+          [
+            351,
+            234
+          ],
+          [
+            353,
+            255
+          ],
+          [
+            70,
+            271
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full"
+      },
+      {
+        "text": "00766kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            134,
+            270
+          ],
+          [
+            354,
+            260
+          ],
+          [
+            356,
+            295
+          ],
+          [
+            136,
+            306
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": true,
+          "weightsNearby": true,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "100001000100 101 1/10",
+        "confidence": 93,
+        "polygon": [
+          [
+            124,
+            303
+          ],
+          [
+            284,
+            297
+          ],
+          [
+            285,
+            318
+          ],
+          [
+            125,
+            325
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line3",
+        "variant": "full"
+      },
+      {
+        "text": "GELEX EMIC",
+        "confidence": 98,
+        "polygon": [
+          [
+            66,
+            335
+          ],
+          [
+            184,
+            330
+          ],
+          [
+            185,
+            358
+          ],
+          [
+            68,
+            363
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line4",
+        "variant": "full"
+      },
+      {
+        "text": "ssx:23204079",
+        "confidence": 92,
+        "polygon": [
+          [
+            195,
+            394
+          ],
+          [
+            355,
+            387
+          ],
+          [
+            357,
+            415
+          ],
+          [
+            196,
+            422
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line5",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "CV140",
+        "confidence": 100,
+        "polygon": [
+          [
+            105,
+            405
+          ],
+          [
+            162,
+            401
+          ],
+          [
+            163,
+            423
+          ],
+          [
+            107,
+            427
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line6",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "220 V",
+        "confidence": 95,
+        "polygon": [
+          [
+            108,
+            431
+          ],
+          [
+            159,
+            427
+          ],
+          [
+            161,
+            449
+          ],
+          [
+            110,
+            453
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line7",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "5(20) A",
+        "confidence": 97,
+        "polygon": [
+          [
+            224,
+            426
+          ],
+          [
+            286,
+            422
+          ],
+          [
+            288,
+            445
+          ],
+          [
+            225,
+            449
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line8",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "50 Hz",
+        "confidence": 100,
+        "polygon": [
+          [
+            313,
+            422
+          ],
+          [
+            365,
+            419
+          ],
+          [
+            366,
+            441
+          ],
+          [
+            314,
+            444
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line9",
+        "variant": "full"
+      },
+      {
+        "text": "2023",
+        "confidence": 100,
+        "polygon": [
+          [
+            317,
+            445
+          ],
+          [
+            364,
+            442
+          ],
+          [
+            365,
+            465
+          ],
+          [
+            318,
+            467
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line10",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "1CC1V",
+        "confidence": 63,
+        "polygon": [
+          [
+            373,
+            440
+          ],
+          [
+            388,
+            440
+          ],
+          [
+            388,
+            466
+          ],
+          [
+            373,
+            466
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line11",
+        "variant": "full"
+      },
+      {
+        "text": "900 vòng/kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            74,
+            456
+          ],
+          [
+            196,
+            451
+          ],
+          [
+            197,
+            473
+          ],
+          [
+            75,
+            478
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line12",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "27C Cp 2",
+        "confidence": 90,
+        "polygon": [
+          [
+            202,
+            450
+          ],
+          [
+            312,
+            446
+          ],
+          [
+            313,
+            467
+          ],
+          [
+            203,
+            471
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line13",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "Sàn xuat tai Tng cóng ty c phn Thit bi din Vit Nam",
+        "confidence": 94,
+        "polygon": [
+          [
+            67,
+            482
+          ],
+          [
+            377,
+            469
+          ],
+          [
+            377,
+            488
+          ],
+          [
+            67,
+            501
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line14",
+        "variant": "full"
+      },
+      {
+        "text": "So hūu cua:",
+        "confidence": 94,
+        "polygon": [
+          [
+            68,
+            506
+          ],
+          [
+            151,
+            504
+          ],
+          [
+            152,
+            524
+          ],
+          [
+            68,
+            526
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line15",
+        "variant": "full"
+      },
+      {
+        "text": "00766kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            120.93239436619719,
+            273.01309859154935
+          ],
+          [
+            352.0861971830986,
+            260.16959539052493
+          ],
+          [
+            354.41295774647887,
+            291.11450704225354
+          ],
+          [
+            122.66760563380281,
+            304.2469014084507
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-confirm0-line0",
+        "variant": "region-confirmation"
+      },
+      {
+        "text": "So huu cua:",
+        "confidence": 91,
+        "polygon": [
+          [
+            211,
+            69
+          ],
+          [
+            232,
+            69
+          ],
+          [
+            232,
+            151
+          ],
+          [
+            211,
+            151
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "Sn xuat tai Tng cng ty c phn Thiét bi din Vit Nam",
+        "confidence": 89,
+        "polygon": [
+          [
+            232,
+            68
+          ],
+          [
+            256,
+            67
+          ],
+          [
+            269,
+            377
+          ],
+          [
+            245,
+            378
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "900 vòng/kWh 27°C Cäp 2 2023",
+        "confidence": 95,
+        "polygon": [
+          [
+            256,
+            74
+          ],
+          [
+            283,
+            72
+          ],
+          [
+            297,
+            368
+          ],
+          [
+            269,
+            370
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "GELEX EMIC",
+        "confidence": 100,
+        "polygon": [
+          [
+            371,
+            66
+          ],
+          [
+            402,
+            66
+          ],
+          [
+            406,
+            185
+          ],
+          [
+            375,
+            186
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line3",
+        "variant": "full"
+      },
+      {
+        "text": "CÔNG TO DIÊN 1 PHA 2 DÅY",
+        "confidence": 93,
+        "polygon": [
+          [
+            460,
+            67
+          ],
+          [
+            488,
+            65
+          ],
+          [
+            506,
+            352
+          ],
+          [
+            478,
+            354
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line4",
+        "variant": "full"
+      },
+      {
+        "text": "一",
+        "confidence": 78,
+        "polygon": [
+          [
+            345,
+            82
+          ],
+          [
+            368,
+            82
+          ],
+          [
+            368,
+            134
+          ],
+          [
+            345,
+            134
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line5",
+        "variant": "full"
+      },
+      {
+        "text": "220 V",
+        "confidence": 98,
+        "polygon": [
+          [
+            284,
+            110
+          ],
+          [
+            306,
+            110
+          ],
+          [
+            306,
+            160
+          ],
+          [
+            284,
+            160
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line6",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 100,
+        "polygon": [
+          [
+            308,
+            106
+          ],
+          [
+            333,
+            104
+          ],
+          [
+            336,
+            163
+          ],
+          [
+            311,
+            164
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line7",
+        "variant": "full"
+      },
+      {
+        "text": "100001000 100 10 1 1/10",
+        "confidence": 82,
+        "polygon": [
+          [
+            410,
+            122
+          ],
+          [
+            435,
+            121
+          ],
+          [
+            440,
+            289
+          ],
+          [
+            416,
+            290
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line8",
+        "variant": "full"
+      },
+      {
+        "text": "00766kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            432,
+            133
+          ],
+          [
+            471,
+            131
+          ],
+          [
+            478,
+            356
+          ],
+          [
+            440,
+            358
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line9",
+        "variant": "full"
+      },
+      {
+        "text": "S6SX:23204079",
+        "confidence": 89,
+        "polygon": [
+          [
+            312,
+            196
+          ],
+          [
+            343,
+            194
+          ],
+          [
+            351,
+            357
+          ],
+          [
+            320,
+            359
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line10",
+        "variant": "full"
+      },
+      {
+        "text": "5(20) A",
+        "confidence": 94,
+        "polygon": [
+          [
+            289,
+            221
+          ],
+          [
+            310,
+            220
+          ],
+          [
+            313,
+            289
+          ],
+          [
+            291,
+            290
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line11",
+        "variant": "full"
+      },
+      {
+        "text": "PDM 023-2007",
+        "confidence": 96,
+        "polygon": [
+          [
+            506,
+            237
+          ],
+          [
+            523,
+            236
+          ],
+          [
+            527,
+            316
+          ],
+          [
+            510,
+            317
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line12",
+        "variant": "full"
+      },
+      {
+        "text": "50 Hz",
+        "confidence": 98,
+        "polygon": [
+          [
+            294,
+            311
+          ],
+          [
+            316,
+            311
+          ],
+          [
+            316,
+            365
+          ],
+          [
+            294,
+            365
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line13",
+        "variant": "full"
+      },
+      {
+        "text": "1C1V",
+        "confidence": 99,
+        "polygon": [
+          [
+            268,
+            375
+          ],
+          [
+            297,
+            372
+          ],
+          [
+            299,
+            387
+          ],
+          [
+            269,
+            389
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line14",
+        "variant": "full"
+      },
+      {
+        "text": "1C1V",
+        "confidence": 76,
+        "polygon": [
+          [
+            438,
+            27
+          ],
+          [
+            467,
+            22
+          ],
+          [
+            470,
+            37
+          ],
+          [
+            440,
+            42
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "an          am",
+        "confidence": 49,
+        "polygon": [
+          [
+            468,
+            35
+          ],
+          [
+            491,
+            34
+          ],
+          [
+            504,
+            345
+          ],
+          [
+            481,
+            347
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "ZH  2",
+        "confidence": 61,
+        "polygon": [
+          [
+            421,
+            48
+          ],
+          [
+            443,
+            48
+          ],
+          [
+            443,
+            101
+          ],
+          [
+            421,
+            101
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      },
+      {
+        "text": "90 2  2 2 2023",
+        "confidence": 66,
+        "polygon": [
+          [
+            440,
+            45
+          ],
+          [
+            468,
+            43
+          ],
+          [
+            481,
+            340
+          ],
+          [
+            454,
+            342
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line3",
+        "variant": "full"
+      },
+      {
+        "text": "CON    G  DAY",
+        "confidence": 69,
+        "polygon": [
+          [
+            230,
+            61
+          ],
+          [
+            259,
+            59
+          ],
+          [
+            277,
+            345
+          ],
+          [
+            248,
+            347
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line4",
+        "variant": "full"
+      },
+      {
+        "text": "0077W",
+        "confidence": 56,
+        "polygon": [
+          [
+            258,
+            56
+          ],
+          [
+            296,
+            54
+          ],
+          [
+            304,
+            266
+          ],
+          [
+            265,
+            268
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line5",
+        "variant": "full"
+      },
+      {
+        "text": "5604234079",
+        "confidence": 65,
+        "polygon": [
+          [
+            387,
+            55
+          ],
+          [
+            417,
+            53
+          ],
+          [
+            425,
+            216
+          ],
+          [
+            395,
+            218
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line6",
+        "variant": "full"
+      },
+      {
+        "text": "P 07",
+        "confidence": 70,
+        "polygon": [
+          [
+            209,
+            94
+          ],
+          [
+            227,
+            93
+          ],
+          [
+            230,
+            174
+          ],
+          [
+            212,
+            175
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line7",
+        "variant": "full"
+      },
+      {
+        "text": "11010010001",
+        "confidence": 60,
+        "polygon": [
+          [
+            295,
+            121
+          ],
+          [
+            320,
+            120
+          ],
+          [
+            327,
+            290
+          ],
+          [
+            302,
+            291
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line8",
+        "variant": "full"
+      },
+      {
+        "text": "5(2)04",
+        "confidence": 64,
+        "polygon": [
+          [
+            426,
+            123
+          ],
+          [
+            447,
+            123
+          ],
+          [
+            447,
+            191
+          ],
+          [
+            426,
+            191
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line9",
+        "variant": "full"
+      },
+      {
+        "text": "园",
+        "confidence": 17,
+        "polygon": [
+          [
+            213,
+            192
+          ],
+          [
+            229,
+            192
+          ],
+          [
+            229,
+            218
+          ],
+          [
+            213,
+            218
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line10",
+        "variant": "full"
+      },
+      {
+        "text": "GELLX ELEMIC",
+        "confidence": 66,
+        "polygon": [
+          [
+            332,
+            227
+          ],
+          [
+            363,
+            227
+          ],
+          [
+            363,
+            345
+          ],
+          [
+            332,
+            345
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line11",
+        "variant": "full"
+      },
+      {
+        "text": "CV140",
+        "confidence": 80,
+        "polygon": [
+          [
+            403,
+            249
+          ],
+          [
+            428,
+            249
+          ],
+          [
+            428,
+            307
+          ],
+          [
+            403,
+            307
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line12",
+        "variant": "full"
+      },
+      {
+        "text": "20V",
+        "confidence": 92,
+        "polygon": [
+          [
+            428,
+            252
+          ],
+          [
+            452,
+            251
+          ],
+          [
+            454,
+            304
+          ],
+          [
+            431,
+            305
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line13",
+        "variant": "full"
+      },
+      {
+        "text": "S ohu  ua:",
+        "confidence": 54,
+        "polygon": [
+          [
+            504,
+            262
+          ],
+          [
+            528,
+            262
+          ],
+          [
+            528,
+            345
+          ],
+          [
+            504,
+            345
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line14",
+        "variant": "full"
+      },
+      {
+        "text": "一",
+        "confidence": 68,
+        "polygon": [
+          [
+            371,
+            285
+          ],
+          [
+            393,
+            285
+          ],
+          [
+            393,
+            330
+          ],
+          [
+            371,
+            330
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line15",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 7309,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 4,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 14587,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "regions": [
+      {
+        "regionId": "r0-line2",
+        "role": "counter",
+        "text": "00766kWh",
+        "evidence": [
+          "unit_label",
+          "printed_weights"
+        ],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 134,
+          "top": 260,
+          "width": 222,
+          "height": 46
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.6025622024998065,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 134,
+            "top": 260,
+            "width": 222,
+            "height": 46
+          }
+        },
+        "observationRegionIds": [
+          "r0-line2",
+          "r90-line9",
+          "r270-line5"
+        ]
+      },
+      {
+        "regionId": "r0-line0",
+        "role": "specification",
+        "text": "PDM 023-2007",
+        "evidence": [
+          "counter_window",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 240,
+          "top": 210,
+          "width": 77,
+          "height": 18
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -3.01278750418334,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 240,
+            "top": 210,
+            "width": 77,
+            "height": 18
+          }
+        },
+        "observationRegionIds": [
+          "r0-line0",
+          "r90-line12"
+        ]
+      },
+      {
+        "regionId": "r0-line5",
+        "role": "serial",
+        "text": "ssx:23204079",
+        "evidence": [
+          "serial_context",
+          "specification_context",
+          "unit_label"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 195,
+          "top": 387,
+          "width": 162,
+          "height": 35
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.505092867241399,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 195,
+            "top": 387,
+            "width": 162,
+            "height": 35
+          }
+        },
+        "observationRegionIds": [
+          "r0-line5",
+          "r90-line10",
+          "r270-line6"
+        ]
+      },
+      {
+        "regionId": "r0-line6",
+        "role": "serial",
+        "text": "CV140",
+        "evidence": [
+          "serial_context",
+          "specification_context",
+          "unit_label"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 105,
+          "top": 401,
+          "width": 58,
+          "height": 26
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -4.0141756954110255,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 105,
+            "top": 401,
+            "width": 58,
+            "height": 26
+          }
+        },
+        "observationRegionIds": [
+          "r0-line6",
+          "r90-line7",
+          "r270-line12"
+        ]
+      },
+      {
+        "regionId": "r0-line10",
+        "role": "specification",
+        "text": "2023",
+        "evidence": [
+          "specification_context",
+          "year_like"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 317,
+          "top": 442,
+          "width": 48,
+          "height": 25
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -3.6522227803063356,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 317,
+            "top": 442,
+            "width": 48,
+            "height": 25
+          }
+        },
+        "observationRegionIds": [
+          "r0-line10"
+        ]
+      },
+      {
+        "regionId": "r90-line2",
+        "role": "specification",
+        "text": "900 vòng/kWh 27°C Cäp 2 2023",
+        "evidence": [
+          "unit_label",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 72,
+          "top": 442,
+          "width": 298,
+          "height": 41
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -4.236394799058841,
+          "rotationDegrees": 90,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 256,
+            "top": 72,
+            "width": 41,
+            "height": 298
+          }
+        },
+        "observationRegionIds": [
+          "r90-line2",
+          "r270-line3"
+        ]
+      },
+      {
+        "regionId": "r0-line3",
+        "role": "specification",
+        "text": "100001000100 101 1/10",
+        "evidence": [
+          "specification_context",
+          "unit_label"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 124,
+          "top": 297,
+          "width": 161,
+          "height": 28
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.147585428298503,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 124,
+            "top": 297,
+            "width": 161,
+            "height": 28
+          }
+        },
+        "observationRegionIds": [
+          "r0-line3",
+          "r90-line8",
+          "r270-line8"
+        ]
+      },
+      {
+        "regionId": "r0-line7",
+        "role": "specification",
+        "text": "220 V",
+        "evidence": [
+          "specification_context",
+          "unit_label"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 108,
+          "top": 427,
+          "width": 53,
+          "height": 26
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -4.484606009544625,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 108,
+            "top": 427,
+            "width": 53,
+            "height": 26
+          }
+        },
+        "observationRegionIds": [
+          "r0-line7",
+          "r90-line6"
+        ]
+      },
+      {
+        "regionId": "r0-line8",
+        "role": "specification",
+        "text": "5(20) A",
+        "evidence": [
+          "specification_context",
+          "unit_label"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 224,
+          "top": 422,
+          "width": 64,
+          "height": 27
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -3.6913859864512752,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 224,
+            "top": 422,
+            "width": 64,
+            "height": 27
+          }
+        },
+        "observationRegionIds": [
+          "r0-line8",
+          "r90-line11",
+          "r270-line9"
+        ]
+      },
+      {
+        "regionId": "r0-line12",
+        "role": "specification",
+        "text": "900 vòng/kWh",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 74,
+          "top": 451,
+          "width": 123,
+          "height": 27
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.3468742924872865,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 74,
+            "top": 451,
+            "width": 123,
+            "height": 27
+          }
+        },
+        "observationRegionIds": [
+          "r0-line12"
+        ]
+      },
+      {
+        "regionId": "r0-line13",
+        "role": "specification",
+        "text": "27C Cp 2",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 202,
+          "top": 446,
+          "width": 111,
+          "height": 25
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": -2.0825652797308845,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 202,
+            "top": 446,
+            "width": 111,
+            "height": 25
+          }
+        },
+        "observationRegionIds": [
+          "r0-line13"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "selected",
+      "selectedRegionId": "r0-line2",
+      "source": "layout"
+    },
+    "ocrReadings": [
+      {
+        "regionId": "r0-line2",
+        "digits": "00766",
+        "integerDigits": "",
+        "fractionalDigits": "",
+        "displayText": "00766",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "boundarySource": "unresolved",
+        "unitSource": "ocr",
+        "complete": false,
+        "stable": true
+      }
+    ],
+    "ocrCandidates": [],
+    "confirmedReading": null,
+    "assessment": "conflict",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "kWh",
+      "regionRole": "counter",
+      "fractionalScale": "1/10",
+      "scaleLabels": [
+        "1/10"
+      ],
+      "scaleEvidence": {
+        "source": "printed_weights",
+        "fractionalDigits": 1,
+        "labels": [
+          "1/10"
+        ],
+        "verified": true
+      },
+      "integerDigits": "00766",
+      "fractionalDigits": "4",
+      "decimalEvidence": "red_digits",
+      "uncertainDigits": false,
+      "displayText": "00766.4",
+      "readable": true,
+      "issues": [],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": true,
+        "regionSource": "ocr",
+        "deskewDegrees": 2.6025622024998065,
+        "attempts": 1
+      }
+    },
+    "fileId": "file_7373f2521d7f448096",
+    "roomId": "room_101"
+  }
+}

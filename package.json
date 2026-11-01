@@ -1,0 +1,59 @@
+{
+  "name": "trozy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "node scripts/run-project.mjs scripts/dev.mjs",
+    "dev:api": "node scripts/run-project.mjs --watch src/backend/server.mjs",
+    "dev:web": "node scripts/run-project.mjs node_modules/vite/bin/vite.js --host 127.0.0.1",
+    "build": "node scripts/run-project.mjs scripts/build.mjs",
+    "start": "node scripts/run-project.mjs src/backend/server.mjs",
+    "test": "node scripts/run-project.mjs --test tests/*.test.mjs",
+    "check:pages": "node scripts/run-project.mjs scripts/check-pages.mjs",
+    "check:rooms-ui": "node scripts/run-project.mjs scripts/check-rooms-ui.mjs",
+    "check:ui-colors": "node scripts/run-project.mjs scripts/check-ui-colors.mjs",
+    "check:readings-entry": "node scripts/run-project.mjs scripts/check-readings-entry.mjs",
+    "check:property-management-ui": "node scripts/run-project.mjs scripts/check-property-management-ui.mjs",
+    "check:room-summary": "node scripts/run-project.mjs scripts/check-room-summary.mjs",
+    "check:shell-ui": "node scripts/run-project.mjs scripts/check-shell-ui.mjs",
+    "check:scroll-navigation": "node scripts/run-project.mjs scripts/check-scroll-navigation.mjs",
+    "check:ai-ui": "node scripts/run-project.mjs scripts/check-ai-ui.mjs",
+    "backup": "node scripts/run-project.mjs src/backend/backup.mjs",
+    "ai:check": "node scripts/run-project.mjs scripts/ai-status.mjs",
+    "ai:live-check": "node scripts/run-project.mjs scripts/check-ai-live.mjs",
+    "ai:setup": "node scripts/run-project.mjs --powershell scripts/setup-ollama.ps1",
+    "ai:start": "node scripts/run-project.mjs --powershell scripts/setup-ollama.ps1 -SkipPull",
+    "ai:stop": "node scripts/run-project.mjs --powershell scripts/stop-ollama.ps1",
+    "ai:setup-meter-reader": "node scripts/run-project.mjs --powershell scripts/setup-meter-reader.ps1",
+    "ai:setup-paddle-meter": "node scripts/run-project.mjs --powershell scripts/setup-paddle-meter.ps1",
+    "ai:meter-reader-check": "node scripts/run-project.mjs scripts/check-meter-reader-live.mjs",
+    "ai:meter-auto-check": "node scripts/run-project.mjs scripts/check-meter-automatic-live.mjs",
+    "ai:meter-split-check": "node scripts/run-project.mjs scripts/check-meter-utility-split-live.mjs"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "lucide-react": "^0.468.0",
+    "nodemailer": "^10.2.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.35.5"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "^11.1.1"
+    }
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "^30.1.3",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  }
+}

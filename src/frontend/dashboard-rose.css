@@ -1,0 +1,108 @@
+/* Dashboard: useful data first, with a quiet rose accent and room to breathe. */
+.rose-dashboard { gap: 24px; }
+.rose-dashboard-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; min-width: 0; }
+.rose-date-label { display: flex; align-items: center; gap: 9px; color: var(--muted); }
+.rose-dashboard-date { color: var(--muted); font-size: .8125rem; }
+.rose-overview { min-width: 0; background: var(--surface, #fff); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.rose-overview-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+.rose-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0; }
+.rose-metric { min-width: 0; padding: 24px; }
+.rose-metric + .rose-metric { border-left: 1px solid var(--border); }
+.rose-metric dt { display: flex; align-items: center; gap: 8px; font-size: .8125rem; line-height: 1.55; color: var(--muted); }
+.rose-metric dt svg { color: var(--info); }
+.rose-metric:nth-child(2) dt svg { color: var(--success); }
+.rose-metric:nth-child(3) dt svg { color: var(--danger); }
+.rose-metric:nth-child(4) dt svg { color: var(--warning); }
+.rose-metric dd { margin: 11px 0 0; font-size: 1.4375rem; line-height: 1.4; font-weight: 650; letter-spacing: -.025em; font-variant-numeric: tabular-nums; color: var(--foreground); overflow-wrap: anywhere; }
+.rose-metric p { color: var(--muted); font-size: .75rem; line-height: 1.7; margin-top: 5px; }
+.rose-dashboard-panels { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 24px; align-items: stretch; min-width: 0; }
+.rose-dashboard-panels > section { min-width: 0; }
+.rose-dashboard .card-header { gap: 16px; align-items: flex-start; }
+.rose-dashboard .card-header h2 { font-size: 1rem; color: var(--foreground); line-height: 1.5; }
+.rose-dashboard .card-header p { font-size: .8125rem; color: var(--muted); line-height: 1.65; margin-top: 3px; }
+.rose-dashboard .card-header > .text-button { font-size: .8125rem; white-space: nowrap; }
+.rose-cashflow-summary { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 24px; }
+.rose-cashflow-summary > span { font-size: .8125rem; color: var(--muted); }
+.rose-cashflow-summary > strong { font-size: 1.5rem; font-weight: 650; letter-spacing: -.025em; line-height: 1.4; color: var(--foreground); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.rose-cashflow-chart { list-style: none; margin: 0; padding: 0; display: grid; gap: 15px; }
+.rose-cashflow-chart li { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(82px, auto); align-items: center; gap: 14px; min-width: 0; min-height: 27px; }
+.rose-cashflow-month { color: var(--muted); font-size: .75rem; line-height: 1.5; }
+.rose-cashflow-month small { display: block; color: var(--accent-text); font-size: .75rem; line-height: 1.5; }
+.rose-cashflow-chart li > strong { text-align: right; color: var(--foreground); font-size: .8125rem; font-weight: 550; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rose-cashflow-track { height: 10px; background: var(--chart-track); border-radius: 4px; overflow: hidden; }
+.rose-cashflow-track > span { display: block; height: 100%; background: var(--chart-cash); border-radius: 4px; }
+.is-current .rose-cashflow-track > span { background: var(--chart-cash-current); }
+.rose-chart-note { color: var(--muted); font-size: .75rem; margin-top: 18px; }
+.rose-occupancy-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.rose-occupancy-title > span { font-size: .875rem; color: var(--muted); }
+.rose-occupancy-title > strong { color: var(--foreground); font-size: 2rem; font-weight: 650; letter-spacing: -.03em; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.rose-occupancy-title small { font-size: 1rem; margin-left: 2px; }
+.rose-occupancy-track { display: flex; height: 14px; border-radius: 5px; overflow: hidden; background: var(--chart-track); }
+.rose-occupancy-track > span { height: 100%; }
+.rose-occupancy-track > span:not(:last-child) { border-right: 1px solid var(--surface); }
+.rose-room-states { display: grid; gap: 0; margin: 20px 0 7px; }
+.rose-room-states > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.rose-room-states > div:last-child { border-bottom: 0; }
+.rose-room-states dt { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: .8125rem; }
+.rose-room-states dt i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.rose-room-states dd { color: var(--foreground); font-size: .9375rem; margin: 0; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rose-room-states dd > span { color: var(--muted); font-size: .75rem; font-weight: 400; }
+.rose-room-overview .occupied { background: var(--chart-occupied); }
+.rose-room-overview .vacant { background: var(--chart-vacant); }
+.rose-room-overview .other { background: var(--chart-other); }
+.rose-room-link { font-size: .8125rem; margin-top: 9px; min-height: 36px; }
+.rose-quick-links { display: grid; gap: 0; }
+.rose-quick-link { display: flex; align-items: center; gap: 12px; min-height: 59px; padding: 12px 0; width: 100%; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--foreground); font-size: .875rem; text-align: left; }
+.rose-quick-link:last-child { border-bottom: 0; }
+.rose-quick-link > svg:first-child { color: #b3337b; }
+.rose-quick-link > span { flex: 1; min-width: 0; }
+.rose-quick-link > svg:last-child { color: var(--muted); }
+.rose-quick-link:hover { color: var(--accent-text); }
+.rose-notice-list { padding: 0 24px 7px; }
+.rose-notice { display: flex; gap: 12px; align-items: flex-start; width: 100%; padding: 19px 0; border: 0; border-bottom: 1px solid var(--border); background: transparent; text-align: left; }
+.rose-notice:last-child { border-bottom: 0; }
+.rose-notice > svg:first-child { color: #b3337b; margin-top: 3px; }
+.rose-notice > svg:last-child { color: var(--muted); margin-top: 3px; }
+.rose-notice > span { flex: 1; min-width: 0; }
+.rose-notice b { display: block; color: var(--foreground); font-size: .875rem; line-height: 1.6; font-weight: 550; overflow-wrap: anywhere; }
+.rose-notice small { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--muted); font-size: .75rem; line-height: 1.7; margin-top: 3px; overflow-wrap: anywhere; }
+.rose-notice time { display: block; color: var(--muted); font-size: .75rem; margin-top: 7px; }
+.rose-notice:hover b { color: var(--accent-text); }
+@media (max-width: 1280px) {
+ .rose-metric { padding: 21px 18px; }
+ .rose-metric dd { font-size: 1.3125rem; }
+ .rose-dashboard-panels { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; }
+ .rose-cashflow-chart li { gap: 10px; grid-template-columns: 58px minmax(0, 1fr) auto; }
+}
+@media (max-width: 1100px) {
+ .rose-dashboard-panels { grid-template-columns: minmax(0, 1fr); }
+ .rose-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .rose-metric:nth-child(3) { border-left: 0; }
+ .rose-metric:nth-child(n+3) { border-top: 1px solid var(--border); }
+ .rose-notice-list { padding-inline: 22px; }
+}
+@media (max-width: 600px) {
+ .rose-dashboard { gap: 20px; }
+ .rose-overview-actions { width: 100%; align-items: stretch; }
+ .rose-overview-actions > .btn { flex: 1 1 175px; }
+ .rose-metric { padding: 18px 14px; }
+ .rose-metric dt { font-size: .75rem; gap: 6px; }
+ .rose-metric dt svg { width: 15px; height: 15px; }
+ .rose-metric dd { font-size: 1.25rem; }
+ .rose-metric p { font-size: .75rem; }
+ .rose-dashboard .card-header { flex-wrap: wrap; }
+ .rose-cashflow-summary > strong { font-size: 1.375rem; }
+ .rose-cashflow-chart { gap: 18px; }
+ .rose-cashflow-chart li { grid-template-columns: minmax(0, 1fr) auto; gap: 7px 12px; }
+ .rose-cashflow-month { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+ .rose-cashflow-month small { display: inline; font-size: .75rem; }
+ .rose-cashflow-track { grid-row: 2; grid-column: 1 / -1; height: 8px; }
+ .rose-cashflow-chart li > strong { grid-row: 1; grid-column: 2; }
+ .rose-notice-list { padding-inline: 16px; }
+}
+@media (max-width: 360px) {
+ .rose-metrics { grid-template-columns: minmax(0, 1fr); }
+ .rose-metric + .rose-metric { border-left: 0; border-top: 1px solid var(--border); }
+ .rose-metric { padding: 17px 16px; }
+ .rose-metric dd { margin-top: 6px; }
+}

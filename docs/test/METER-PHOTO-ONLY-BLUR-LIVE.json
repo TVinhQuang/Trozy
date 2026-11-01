@@ -1,0 +1,76 @@
+{
+  "checkedAt": "2026-10-28T10:17:12.066Z",
+  "passed": true,
+  "validationScope": "Actual local background models after explicit photo submission; tenant API privacy, owner notification/review; not general recognition accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-cells.mjs": "0bdf93f6051b219c5c36eb047e2f1dbe26f0214434acd685e214f75ffefb4c57",
+    "src/ai/meter-cell-geometry.mjs": "d5e99ff3fae0c2bf142e1cb5f5651a10b11d2ef728511df2aa00f9b013ac4e66",
+    "src/ai/meter-vision.mjs": "03d96478920c7c28de89fed5dda7b06fb560f71cd08a589be99ebc3b2830c221",
+    "src/ai/meter-vision-reader.mjs": "7d75949174b4f5b4b755ac41313f32563d2ea136be09a3d9cea770d9cb6890db",
+    "src/ai/meter-consensus.mjs": "6e54336ff1c8852babade4345cf0e0c76a8ba7170c22cb4e2d5a042f8b12be1a",
+    "src/ai/ollama.mjs": "b2874c590a24164e55be1a951a90255f5be5bd9af4b77fc56165b1ed4591d06a",
+    "src/backend/meter-submissions.mjs": "56ee5721209698fdc888e6a65a041ee730df70ff870d80f14df26596acb855b6",
+    "src/backend/meter-jobs.mjs": "8094ecaba2ae4f1d4908010926f92190f99b3dca49777daabb1ccbcc31ee0139",
+    "src/backend/meter-visibility.mjs": "1f6f243069bf86dc7bf139e569707d9cc8c5a507960a379577935af1a37a5d83",
+    "src/backend/domain.mjs": "ed46690b642f8830fcdae8dcfbdfee0e47fc174332ac81493a353de5b1892c6c",
+    "src/backend/server.mjs": "b8647334d7e0fbeeafb80500c1e4a219a9f427ff359461f65638981c42e60df4",
+    "src/backend/ai-service.mjs": "e4b61d426c722c2715b6eae2ba5addc6b260683cd3bed075a65ca26a0d4421d1"
+  },
+  "photoSha256": "980ec096062345d500a2d0b0ff0530771c63651a4a1174fd6e354dbf941e72ba",
+  "photoBytes": 15861,
+  "derivedBlur": 8,
+  "rectangle": {
+    "left": 134,
+    "top": 260,
+    "width": 222,
+    "height": 46
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "modelCallsBeforeSend": 0,
+  "backgroundCalls": 0,
+  "tenantNeverReceivesReadings": true,
+  "ownerOnlyNotificationVerified": false,
+  "quality": {
+    "version": 1,
+    "status": "retake",
+    "canSubmit": false,
+    "scope": "counter",
+    "checks": {
+      "resolution": true,
+      "exposure": true,
+      "contrast": false,
+      "sharpness": false,
+      "glare": true
+    },
+    "reasons": [
+      "Các nét số chưa tách rõ khỏi nền. Chọn vùng bộ đếm và điều chỉnh ánh sáng.",
+      "Vùng ảnh chưa đủ nét. Giữ máy yên và chạm lấy nét vào dãy số."
+    ],
+    "metrics": {
+      "width": 222,
+      "height": 46,
+      "meanLuma": 100.648,
+      "contrast": 18.249,
+      "edgeEnergy": 2.83,
+      "clippedDark": 0,
+      "clippedLight": 0,
+      "glareFraction": 0
+    },
+    "source": {
+      "width": 415,
+      "height": 739
+    },
+    "rectangle": {
+      "left": 134,
+      "top": 260,
+      "width": 222,
+      "height": 46
+    }
+  },
+  "tenantReceipt": null,
+  "ownerSubmission": null,
+  "review": null
+}

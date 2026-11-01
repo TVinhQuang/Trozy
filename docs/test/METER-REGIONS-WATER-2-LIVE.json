@@ -1,0 +1,854 @@
+{
+  "checkedAt": "2026-10-28T07:40:52.478Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "bc91f72f9a652eca3b55b9c965341e2624b4595833499050f48f0893ca40e675",
+  "photoBytes": 59902,
+  "expectedRegister": null,
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "paddleocr",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\nP-MAX\n100000158\nMDB-B20\n水\nClass B\n0C PN16\n2.5m3/h\n/504064\nCcsd sed\n\n[Xoay 90° · toàn vùng]\nMDB-B20\n5m3/h\n大\n3\nMAX\ncsd sed\n\n[Xoay 270° · toàn vùng]\nQC Passed\n00000\nS0406\n08-8-20\n8 99\nPNNd",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Chưa xác định chắc vùng bộ đếm; các dãy số có thể là sê-ri hoặc thông số. Chọn vùng mặt số và đọc lại.",
+      "Chọn đúng vùng bộ đếm trước khi đối chiếu chữ số. Hai dãy trùng nhau ở vùng chưa rõ vai trò chưa đủ để áp dụng."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 504,
+      "sourceHeight": 522,
+      "width": 504,
+      "height": 522,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "P-MAX",
+        "confidence": 91,
+        "polygon": [
+          [
+            167,
+            162
+          ],
+          [
+            208,
+            162
+          ],
+          [
+            208,
+            176
+          ],
+          [
+            167,
+            176
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full"
+      },
+      {
+        "text": "100000158",
+        "confidence": 91,
+        "polygon": [
+          [
+            126,
+            189
+          ],
+          [
+            240,
+            195
+          ],
+          [
+            238,
+            221
+          ],
+          [
+            125,
+            215
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "MDB-B20",
+        "confidence": 99,
+        "polygon": [
+          [
+            124,
+            224
+          ],
+          [
+            161,
+            224
+          ],
+          [
+            161,
+            239
+          ],
+          [
+            124,
+            239
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full"
+      },
+      {
+        "text": "水",
+        "confidence": 87,
+        "polygon": [
+          [
+            173,
+            219
+          ],
+          [
+            204,
+            219
+          ],
+          [
+            204,
+            253
+          ],
+          [
+            173,
+            253
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line3",
+        "variant": "full"
+      },
+      {
+        "text": "Class B",
+        "confidence": 100,
+        "polygon": [
+          [
+            124,
+            237
+          ],
+          [
+            154,
+            237
+          ],
+          [
+            154,
+            248
+          ],
+          [
+            124,
+            248
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line4",
+        "variant": "full"
+      },
+      {
+        "text": "0C PN16",
+        "confidence": 92,
+        "polygon": [
+          [
+            126,
+            246
+          ],
+          [
+            166,
+            246
+          ],
+          [
+            166,
+            260
+          ],
+          [
+            126,
+            260
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line5",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "2.5m3/h",
+        "confidence": 83,
+        "polygon": [
+          [
+            132,
+            256
+          ],
+          [
+            167,
+            256
+          ],
+          [
+            167,
+            270
+          ],
+          [
+            132,
+            270
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line6",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": true
+        }
+      },
+      {
+        "text": "/504064",
+        "confidence": 94,
+        "polygon": [
+          [
+            170,
+            286
+          ],
+          [
+            207,
+            286
+          ],
+          [
+            207,
+            301
+          ],
+          [
+            170,
+            301
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line7",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": false,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "Ccsd sed",
+        "confidence": 73,
+        "polygon": [
+          [
+            271,
+            430
+          ],
+          [
+            338,
+            379
+          ],
+          [
+            353,
+            400
+          ],
+          [
+            285,
+            450
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line8",
+        "variant": "full"
+      },
+      {
+        "text": "MDB-B20",
+        "confidence": 96,
+        "polygon": [
+          [
+            283,
+            124
+          ],
+          [
+            298,
+            125
+          ],
+          [
+            295,
+            162
+          ],
+          [
+            280,
+            161
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "5m3/h",
+        "confidence": 86,
+        "polygon": [
+          [
+            253,
+            139
+          ],
+          [
+            263,
+            139
+          ],
+          [
+            263,
+            165
+          ],
+          [
+            253,
+            165
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "大",
+        "confidence": 25,
+        "polygon": [
+          [
+            268,
+            167
+          ],
+          [
+            301,
+            167
+          ],
+          [
+            301,
+            203
+          ],
+          [
+            268,
+            203
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "3",
+        "confidence": 100,
+        "polygon": [
+          [
+            330,
+            185
+          ],
+          [
+            344,
+            185
+          ],
+          [
+            344,
+            200
+          ],
+          [
+            330,
+            200
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line3",
+        "variant": "full"
+      },
+      {
+        "text": "MAX",
+        "confidence": 99,
+        "polygon": [
+          [
+            345,
+            180
+          ],
+          [
+            360,
+            181
+          ],
+          [
+            357,
+            206
+          ],
+          [
+            342,
+            205
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line4",
+        "variant": "full"
+      },
+      {
+        "text": "csd sed",
+        "confidence": 64,
+        "polygon": [
+          [
+            88,
+            269
+          ],
+          [
+            145,
+            339
+          ],
+          [
+            123,
+            356
+          ],
+          [
+            66,
+            286
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line5",
+        "variant": "full"
+      },
+      {
+        "text": "QC Passed",
+        "confidence": 99,
+        "polygon": [
+          [
+            397,
+            146
+          ],
+          [
+            456,
+            212
+          ],
+          [
+            434,
+            231
+          ],
+          [
+            375,
+            165
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "00000",
+        "confidence": 97,
+        "polygon": [
+          [
+            197,
+            312
+          ],
+          [
+            214,
+            312
+          ],
+          [
+            214,
+            369
+          ],
+          [
+            197,
+            369
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "S0406",
+        "confidence": 72,
+        "polygon": [
+          [
+            292,
+            303
+          ],
+          [
+            299,
+            303
+          ],
+          [
+            299,
+            328
+          ],
+          [
+            292,
+            328
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      },
+      {
+        "text": "08-8-20",
+        "confidence": 62,
+        "polygon": [
+          [
+            224,
+            341
+          ],
+          [
+            243,
+            341
+          ],
+          [
+            243,
+            375
+          ],
+          [
+            224,
+            375
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line3",
+        "variant": "full"
+      },
+      {
+        "text": "8 99",
+        "confidence": 59,
+        "polygon": [
+          [
+            238,
+            349
+          ],
+          [
+            249,
+            349
+          ],
+          [
+            249,
+            371
+          ],
+          [
+            238,
+            371
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line4",
+        "variant": "full"
+      },
+      {
+        "text": "PNNd",
+        "confidence": 65,
+        "polygon": [
+          [
+            245,
+            340
+          ],
+          [
+            257,
+            340
+          ],
+          [
+            257,
+            360
+          ],
+          [
+            245,
+            360
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line5",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3350,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 3,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 9103,
+    "ocrEngine": "paddleocr",
+    "utility": "water",
+    "regions": [
+      {
+        "regionId": "r0-line5",
+        "role": "specification",
+        "text": "0C PN16",
+        "evidence": [
+          "counter_window",
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 126,
+          "top": 246,
+          "width": 40,
+          "height": 14
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 126,
+            "top": 246,
+            "width": 40,
+            "height": 14
+          }
+        },
+        "observationRegionIds": [
+          "r0-line5"
+        ]
+      },
+      {
+        "regionId": "r0-line6",
+        "role": "specification",
+        "text": "2.5m3/h",
+        "evidence": [
+          "specification_context"
+        ],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 132,
+          "top": 256,
+          "width": 35,
+          "height": 14
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 132,
+            "top": 256,
+            "width": 35,
+            "height": 14
+          }
+        },
+        "observationRegionIds": [
+          "r0-line6"
+        ]
+      },
+      {
+        "regionId": "r0-line1",
+        "role": "unknown",
+        "text": "100000158",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 125,
+          "top": 189,
+          "width": 115,
+          "height": 32
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 3.01278750418334,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 125,
+            "top": 189,
+            "width": 115,
+            "height": 32
+          }
+        },
+        "observationRegionIds": [
+          "r0-line1"
+        ]
+      },
+      {
+        "regionId": "r0-line7",
+        "role": "unknown",
+        "text": "/504064",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 170,
+          "top": 286,
+          "width": 37,
+          "height": 15
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 170,
+            "top": 286,
+            "width": 37,
+            "height": 15
+          }
+        },
+        "observationRegionIds": [
+          "r0-line7"
+        ]
+      },
+      {
+        "regionId": "r270-line1",
+        "role": "unknown",
+        "text": "00000",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 135,
+          "top": 197,
+          "width": 57,
+          "height": 17
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 270,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 197,
+            "top": 312,
+            "width": 17,
+            "height": 57
+          }
+        },
+        "observationRegionIds": [
+          "r270-line1"
+        ]
+      },
+      {
+        "regionId": "r270-line3",
+        "role": "inspection_label",
+        "text": "08-8-20",
+        "evidence": [],
+        "selectable": false,
+        "sourceRectangle": {
+          "left": 129,
+          "top": 224,
+          "width": 34,
+          "height": 19
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 270,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 224,
+            "top": 341,
+            "width": 19,
+            "height": 34
+          }
+        },
+        "observationRegionIds": [
+          "r270-line3"
+        ]
+      },
+      {
+        "regionId": "r270-line4",
+        "role": "unknown",
+        "text": "8 99",
+        "evidence": [],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 133,
+          "top": 238,
+          "width": 22,
+          "height": 11
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0,
+          "rotationDegrees": 270,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 238,
+            "top": 349,
+            "width": 11,
+            "height": 22
+          }
+        },
+        "observationRegionIds": [
+          "r270-line4"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "unresolved"
+    },
+    "ocrReadings": [],
+    "ocrCandidates": [],
+    "confirmedReading": null,
+    "assessment": "needs_review",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "m3",
+      "regionRole": "counter",
+      "fractionalScale": "unknown",
+      "scaleLabels": [],
+      "integerDigits": "00000",
+      "fractionalDigits": "159",
+      "decimalEvidence": "none",
+      "uncertainDigits": false,
+      "displayText": "00000.159",
+      "readable": false,
+      "issues": [
+        "Chưa đủ bằng chứng xác định vị trí phần thập phân; cần đối chiếu mặt số."
+      ],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": false,
+        "regionSource": "full",
+        "attempts": 2
+      }
+    },
+    "fileId": "file_5547adeb98c0451ca8",
+    "roomId": "room_101"
+  }
+}

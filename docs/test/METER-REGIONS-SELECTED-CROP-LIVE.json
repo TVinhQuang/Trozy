@@ -1,0 +1,261 @@
+{
+  "checkedAt": "2026-10-28T07:41:13.730Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+  "photoBytes": 27475,
+  "expectedRegister": null,
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "hybrid",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\n007664kWh\n\n[Xoay 0° · kiểm tra vùng số]\n007664kWh",
+    "confidence": 99,
+    "ocrConfidence": 99,
+    "candidates": [
+      {
+        "value": 766,
+        "text": "00766",
+        "displayText": "00766.4",
+        "fractionalDigits": "4",
+        "confidence": 98,
+        "source": "both",
+        "reason": "Vision và OCR khớp toàn bộ chuỗi 007664. Hiển thị 00766.4 kWh. Biểu mẫu ghi phần nguyên; cần xác nhận quy ước trước khi áp dụng."
+      }
+    ],
+    "suggestedValue": 766,
+    "registers": [
+      {
+        "digits": "007664",
+        "confidence": 98,
+        "passes": 2,
+        "stable": true,
+        "regionId": "r0-line0",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "geometry": {
+          "kind": "user",
+          "angle": -3.136358368332587,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 0,
+            "top": 1,
+            "width": 221,
+            "height": 44
+          }
+        }
+      }
+    ],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Hai bên khớp chữ số. Cách chia phần nguyên/phần lẻ do Vision nhận dạng, OCR chưa xác nhận độc lập.",
+      "Chỉ số đầy đủ 00766.4 kWh; biểu mẫu hiện ghi phần nguyên 766. Giữ phần lẻ để đối chiếu, không ghép thành số nguyên lớn hơn."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 415,
+      "sourceHeight": 739,
+      "width": 222,
+      "height": 46,
+      "rectangle": {
+        "left": 134,
+        "top": 260,
+        "width": 222,
+        "height": 46
+      },
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "007664kWh",
+        "confidence": 99,
+        "polygon": [
+          [
+            0,
+            13
+          ],
+          [
+            219,
+            1
+          ],
+          [
+            221,
+            33
+          ],
+          [
+            0,
+            45
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": true,
+          "weightsNearby": false,
+          "counterWindow": false,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "007664kWh",
+        "confidence": 98,
+        "polygon": [
+          [
+            0,
+            12.24646924829157
+          ],
+          [
+            220.41343963553533,
+            0.12291571753986208
+          ],
+          [
+            222,
+            32.602915717539865
+          ],
+          [
+            0,
+            44.72646924829157
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-confirm0-line0",
+        "variant": "region-confirmation"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3530,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 4,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 10241,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "regions": [
+      {
+        "regionId": "r0-line0",
+        "role": "counter",
+        "text": "007664kWh",
+        "evidence": [
+          "unit_label"
+        ],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 134,
+          "top": 261,
+          "width": 221,
+          "height": 44
+        },
+        "geometry": {
+          "kind": "user",
+          "angle": -3.136358368332587,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 0,
+            "top": 1,
+            "width": 221,
+            "height": 44
+          }
+        },
+        "observationRegionIds": [
+          "r0-line0"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "selected",
+      "selectedRegionId": "r0-line0",
+      "source": "layout"
+    },
+    "ocrReadings": [
+      {
+        "regionId": "r0-line0",
+        "digits": "007664",
+        "integerDigits": "",
+        "fractionalDigits": "",
+        "displayText": "007664",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "boundarySource": "unresolved",
+        "unitSource": "ocr",
+        "complete": false,
+        "stable": true
+      }
+    ],
+    "ocrCandidates": [],
+    "confirmedReading": {
+      "digits": "007664",
+      "displayText": "00766.4",
+      "integerDigits": "00766",
+      "fractionalDigits": "4",
+      "unit": "kWh",
+      "agreementScope": "digits",
+      "value": 766,
+      "numericValue": 766.4,
+      "unitSource": "both",
+      "boundarySource": "vision"
+    },
+    "assessment": "agreed",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "mechanical",
+      "unit": "kWh",
+      "regionRole": "counter",
+      "fractionalScale": "1/10",
+      "scaleLabels": [
+        "1/10"
+      ],
+      "scaleEvidence": {
+        "source": "printed_weights",
+        "fractionalDigits": 1,
+        "labels": [
+          "1/10"
+        ],
+        "verified": true
+      },
+      "integerDigits": "00766",
+      "fractionalDigits": "4",
+      "decimalEvidence": "red_digits",
+      "uncertainDigits": false,
+      "displayText": "00766.4",
+      "readable": true,
+      "issues": [],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": true,
+        "regionSource": "ocr",
+        "deskewDegrees": 3.136358368332587,
+        "attempts": 1
+      }
+    },
+    "agreementScope": "digits",
+    "fileId": "file_ad92f5313a004a8fbc",
+    "roomId": "room_101"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "checkedAt": "2026-10-28T15:27:46.097Z",
+  "passed": true,
+  "validationScope": "Actual local OCR after explicit photo submission; no Ollama calls; tenant API privacy, owner notification/review; not general recognition accuracy.",
+  "sourceHashes": {
+    "src/shared/meter-image-quality.mjs": "f7d6e4f88954131cdc21332ada4e78c3c22ffdabe143d00d9355df49572ff789",
+    "src/ai/meter-image-quality.mjs": "2561e59e4d162060594c127674c53b3710cc99ad10bcc7c0ca7294a4993a2dad",
+    "src/ai/meter-ocr-reader.mjs": "c285b5c5749a2db56c854bab3c48a92518f156258c1c97210039a7f58cc2c8d0",
+    "src/ai/meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "src/ai/meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "src/ai/ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "src/ai/paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "src/ai/paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "src/ai/register.mjs": "be0add9c41b48a6b79ce3f26b339a73f075eb1812233c0eb2947235d510aff98",
+    "src/backend/db.mjs": "9c231d5c1b399ab4c8d006b7cef005754060b3a883d56efb5613d997ad2032ee",
+    "src/backend/meter-submissions.mjs": "d66491501d9bae1436bc99fa6d2c9cb490e32c4dc0fe91a7ec2605f242b66915",
+    "src/backend/meter-jobs.mjs": "2c2c5fc5a55aa189bd3d98a4ff51082e025614d4881702826e078a3c3656e063",
+    "src/backend/meter-visibility.mjs": "1f6f243069bf86dc7bf139e569707d9cc8c5a507960a379577935af1a37a5d83",
+    "src/backend/domain.mjs": "53a8c8fb05f279ea1600591b28dd0067ef8a68c057a184bd5996432c8a35c7c5",
+    "src/backend/server.mjs": "3fe486a5c81748bff1e44dc5aaa2606bca0805e4150f53887b49099fc42e3735",
+    "src/backend/ai-service.mjs": "e55927c092b45f760ea7bace1991b1261d6d2cedbab6792f4ba4e29cd8228b4c"
+  },
+  "photoSha256": "980ec096062345d500a2d0b0ff0530771c63651a4a1174fd6e354dbf941e72ba",
+  "photoBytes": 15861,
+  "derivedBlur": 8,
+  "rectangle": {
+    "left": 134,
+    "top": 260,
+    "width": 222,
+    "height": 46
+  },
+  "meterProfile": {
+    "id": "meter_profile_f393499f0782481d98",
+    "propertyId": "property_01",
+    "roomId": "room_101",
+    "utility": "electric",
+    "kind": "mechanical",
+    "unit": "kWh",
+    "integerDigitsCount": 5,
+    "fractionalDigitsCount": 1,
+    "configurationConfirmed": true,
+    "version": 1,
+    "confirmedBy": "owner_demo",
+    "confirmedAt": "2026-10-28T15:27:46.014Z",
+    "createdAt": "2026-10-28T15:27:46.014Z",
+    "updatedAt": "2026-10-28T15:27:46.014Z"
+  },
+  "scanAndSubmissionDoNotChangeBusinessRecords": true,
+  "originalPhotosNotCopied": true,
+  "modelCallsBeforeSend": 0,
+  "backgroundCalls": 0,
+  "ollamaCalls": 0,
+  "tenantNeverReceivesReadings": true,
+  "ownerOnlyNotificationVerified": false,
+  "quality": {
+    "version": 1,
+    "status": "retake",
+    "canSubmit": false,
+    "scope": "counter",
+    "checks": {
+      "resolution": true,
+      "exposure": true,
+      "contrast": false,
+      "sharpness": false,
+      "glare": true
+    },
+    "reasons": [
+      "Các nét số chưa tách rõ khỏi nền. Chọn vùng bộ đếm và điều chỉnh ánh sáng.",
+      "Vùng ảnh chưa đủ nét. Giữ máy yên và chạm lấy nét vào dãy số."
+    ],
+    "metrics": {
+      "width": 222,
+      "height": 46,
+      "meanLuma": 100.648,
+      "contrast": 18.249,
+      "edgeEnergy": 2.83,
+      "clippedDark": 0,
+      "clippedLight": 0,
+      "glareFraction": 0
+    },
+    "source": {
+      "width": 415,
+      "height": 739
+    },
+    "rectangle": {
+      "left": 134,
+      "top": 260,
+      "width": 222,
+      "height": 46
+    }
+  },
+  "tenantReceipt": null,
+  "ownerSubmission": null,
+  "review": null
+}

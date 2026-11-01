@@ -1,0 +1,52 @@
+/* Meter review keeps originals visible and proposals distinct from confirmation. */
+.meter-reader-panel{min-width:0;padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.meter-reader-panel h3{font-size:15px;color:var(--foreground)}
+.meter-reader-panel>.btn{align-self:flex-start}
+.meter-reader-stage{position:relative;max-width:680px;margin:0 auto;overflow:hidden;border-radius:12px;background:var(--secondary);line-height:0}
+.meter-reader-stage>img{display:block;width:100%;height:auto;user-select:none}
+.meter-reader-stage>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.meter-reader-stage polygon{fill:#ffb3d540;stroke:var(--focus);stroke-width:2;vector-effect:non-scaling-stroke}
+.meter-reader-stage polygon.invalid{fill:#c44d4d20;stroke:var(--danger);stroke-width:2}
+.meter-reader-stage line{stroke:#2d805d;stroke-width:4;vector-effect:non-scaling-stroke}
+.meter-reader-stage circle{fill:#fff;stroke:var(--focus);stroke-width:2;vector-effect:non-scaling-stroke;cursor:grab;touch-action:none}
+.meter-reader-stage circle:focus{stroke:#237550;stroke-width:4;outline:none}
+.meter-reader-stage circle[aria-disabled=true]{cursor:default;opacity:.6}
+.meter-reader-stage text{fill:var(--accent-text);font-size:16px;font-weight:700;pointer-events:none}
+.meter-region-editor>p{margin:14px 0;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
+.meter-reader-directions{flex-wrap:wrap;gap:10px}
+.meter-region-editor details{margin-top:14px;font-size:13px;line-height:1.8}
+.meter-region-editor summary{min-height:36px;cursor:pointer;color:var(--foreground)}
+.meter-reader-coordinates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.meter-reader-coordinates>.inline{flex-wrap:wrap;align-items:flex-end;gap:8px;min-width:0}
+.meter-reader-coordinates>.inline>.field{flex:1 1 90px;min-width:0}
+.meter-reader-proposal{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #aacbbb;border-radius:12px;background:var(--success-bg)}
+.meter-reader-proposal>strong{overflow-wrap:anywhere;font-size:26px;line-height:1.5;font-variant-numeric:tabular-nums;color:#265b40}
+.meter-reader-proposal>p,.meter-reader-proposal>ul{margin:0;font-size:14px;line-height:1.8;color:#265b40}
+.meter-reader-proposal>ul{padding-left:20px}
+.meter-reader-proposal>.btn{align-self:flex-start}
+.meter-reader-applied{padding:14px 16px;border:1px solid #aacbbb;border-radius:12px;background:var(--success-bg);font-size:14px;line-height:1.8;color:#265b40}
+.meter-reader-stage .meter-reader-handle-hit{fill:transparent;stroke:none;cursor:grab;touch-action:none}
+.meter-reader-stage .meter-reader-handle{pointer-events:none}
+.meter-reader-stage .meter-reader-handle-hit:focus+.meter-reader-handle{stroke:#237550;stroke-width:4}
+.meter-reader-stage .meter-reader-handle-hit[aria-disabled=true]{cursor:default}
+.meter-reader-stage .meter-reader-handle-hit[aria-disabled=true]+.meter-reader-handle{opacity:.6}
+.meter-profile-summary{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;min-width:0}
+.meter-profile-setup{padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface);min-width:0}
+.meter-profile-setup h4{margin:0 0 8px;font-size:15px}
+.meter-profile-setup>.inline{flex-wrap:wrap}
+.meter-manual-fallback>.meter-reader-panel{margin-top:14px}
+.meter-profile-setup label.inline,.meter-reader-applied label.inline{align-items:flex-start;font-size:14px;line-height:1.8}
+.meter-profile-setup input[type=checkbox],.meter-reader-applied input[type=checkbox]{flex-shrink:0;margin-top:5px;accent-color:var(--focus)}
+@media(max-width:760px){
+ .meter-reader-panel{padding:16px}
+ .meter-reader-coordinates{grid-template-columns:minmax(0,1fr)}
+ .meter-reader-panel button,.meter-profile-summary>.btn{min-height:44px}
+ .meter-profile-setup{padding:14px}
+}
+@media(max-width:600px){
+ .meter-reader-stage circle{r:23}
+ .meter-reader-stage text{font-size:20px}
+ .meter-reader-stage .meter-reader-handle-hit{r:65}
+ .meter-reader-directions .btn{flex:1 1 110px;white-space:normal}
+ .meter-profile-summary{align-items:flex-start}
+}

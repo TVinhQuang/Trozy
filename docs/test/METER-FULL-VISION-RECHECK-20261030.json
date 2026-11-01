@@ -1,0 +1,156 @@
+{
+  "checkedAt": "2026-10-30T15:25:32.169Z",
+  "scope": "Independent full Vision on the same authorized original crop after prompt/coordinate correction. No expected digits or DB writes.",
+  "result": {
+    "regionRole": "counter",
+    "meterType": "mechanical",
+    "unit": "kWh",
+    "decimalIndex": 5,
+    "decimalEvidence": "printed_weights",
+    "scaleLabels": [
+      "1/10"
+    ],
+    "cells": [
+      {
+        "index": 0,
+        "digit": "2",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 1,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 2,
+        "digit": "7",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 3,
+        "digit": "6",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 4,
+        "digit": "2",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      },
+      {
+        "index": 5,
+        "digit": "9",
+        "state": "clear",
+        "alternatives": [],
+        "rectangle": {
+          "left": 0,
+          "top": 0,
+          "width": 1,
+          "height": 1
+        }
+      }
+    ],
+    "readable": false,
+    "issues": [],
+    "available": true,
+    "model": "qwen3-vl:4b-instruct",
+    "sourceRectangle": {
+      "left": 209,
+      "top": 237,
+      "width": 141,
+      "height": 44
+    },
+    "sourceWidth": 453,
+    "sourceHeight": 676,
+    "rotationDegrees": 0,
+    "imageQuality": {
+      "version": 1,
+      "status": "retake",
+      "canSubmit": false,
+      "scope": "counter",
+      "checks": {
+        "resolution": false,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true,
+        "glare": true
+      },
+      "reasons": [
+        "Vùng bộ đếm quá nhỏ. Đưa camera gần hơn, giữ đủ cả dãy số và đơn vị."
+      ],
+      "metrics": {
+        "width": 141,
+        "height": 44,
+        "meanLuma": 95.754,
+        "contrast": 63.345,
+        "edgeEnergy": 3871.431,
+        "clippedDark": 0.021,
+        "clippedLight": 0.001,
+        "glareFraction": 0.001
+      },
+      "source": {
+        "width": 453,
+        "height": 676
+      },
+      "rectangle": {
+        "left": 209,
+        "top": 237,
+        "width": 141,
+        "height": 44
+      }
+    },
+    "quality": {
+      "version": 1,
+      "status": "retake",
+      "minCellWidth": 141,
+      "minCellHeight": 44,
+      "checks": {
+        "nativeResolution": true,
+        "clearCells": true,
+        "geometry": false,
+        "photometric": true
+      },
+      "issues": [
+        "Chưa xác định rõ vị trí và thứ tự toàn bộ ô số."
+      ]
+    },
+    "integerDigits": "26762",
+    "fractionalDigits": "9",
+    "displayText": "26762.9",
+    "attempts": 2
+  }
+}

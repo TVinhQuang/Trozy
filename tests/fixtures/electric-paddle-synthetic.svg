@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="500">
+  <rect width="1000" height="500" fill="#ddd"/>
+  <text x="100" y="100" font-size="42" font-family="Arial">ELECTRIC METER</text>
+  <rect x="90" y="150" width="470" height="150" fill="#111"/>
+  <text x="110" y="260" fill="white" font-size="110" font-family="Consolas,monospace" letter-spacing="8">012345</text>
+  <text x="650" y="260" font-size="66" font-family="Arial">kWh</text>
+  <text x="100" y="420" font-size="30" font-family="Arial">Serial 99887766 - 220 V - 50 Hz</text>
+</svg>

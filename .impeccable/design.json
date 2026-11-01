@@ -1,0 +1,707 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-01T05:06:45.986Z",
+  "title": "Design System: Trozy Rose",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Fresh Light Pink",
+        "tonalRamp": [
+          "oklch(15% 0.0117 350.92)",
+          "oklch(27% 0.0117 350.92)",
+          "oklch(39% 0.0976 350.92)",
+          "oklch(51% 0.0976 350.92)",
+          "oklch(63% 0.0976 350.92)",
+          "oklch(75% 0.0976 350.92)",
+          "oklch(87% 0.0117 350.92)",
+          "oklch(95% 0.0117 350.92)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Fresh Pink Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0152 351.00)",
+          "oklch(27% 0.0152 351.00)",
+          "oklch(39% 0.1267 351.00)",
+          "oklch(51% 0.1267 351.00)",
+          "oklch(63% 0.1267 351.00)",
+          "oklch(75% 0.1267 351.00)",
+          "oklch(87% 0.0152 351.00)",
+          "oklch(95% 0.0152 351.00)"
+        ]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Pale Fresh Pink",
+        "tonalRamp": [
+          "oklch(15% 0.0022 347.42)",
+          "oklch(27% 0.0022 347.42)",
+          "oklch(39% 0.0185 347.42)",
+          "oklch(51% 0.0185 347.42)",
+          "oklch(63% 0.0185 347.42)",
+          "oklch(75% 0.0185 347.42)",
+          "oklch(87% 0.0022 347.42)",
+          "oklch(95% 0.0022 347.42)"
+        ]
+      },
+      "primary-foreground": {
+        "role": "primary",
+        "displayName": "Dark Pink on Light Pink",
+        "tonalRamp": [
+          "oklch(15% 0.0163 357.64)",
+          "oklch(27% 0.0163 357.64)",
+          "oklch(39% 0.1357 357.64)",
+          "oklch(51% 0.1357 357.64)",
+          "oklch(63% 0.1357 357.64)",
+          "oklch(75% 0.1357 357.64)",
+          "oklch(87% 0.0163 357.64)",
+          "oklch(95% 0.0163 357.64)"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Neutral Work Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0003 264.54)",
+          "oklch(27% 0.0003 264.54)",
+          "oklch(39% 0.0029 264.54)",
+          "oklch(51% 0.0029 264.54)",
+          "oklch(63% 0.0029 264.54)",
+          "oklch(75% 0.0029 264.54)",
+          "oklch(87% 0.0003 264.54)",
+          "oklch(95% 0.0003 264.54)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "White Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(27% 0.0000 89.88)",
+          "oklch(39% 0.0000 89.88)",
+          "oklch(51% 0.0000 89.88)",
+          "oklch(63% 0.0000 89.88)",
+          "oklch(75% 0.0000 89.88)",
+          "oklch(87% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Interface Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0040 260.87)",
+          "oklch(27% 0.0040 260.87)",
+          "oklch(39% 0.0337 260.87)",
+          "oklch(51% 0.0337 260.87)",
+          "oklch(63% 0.0337 260.87)",
+          "oklch(75% 0.0337 260.87)",
+          "oklch(87% 0.0040 260.87)",
+          "oklch(95% 0.0040 260.87)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Secondary Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0034 259.79)",
+          "oklch(27% 0.0034 259.79)",
+          "oklch(39% 0.0282 259.79)",
+          "oklch(51% 0.0282 259.79)",
+          "oklch(63% 0.0282 259.79)",
+          "oklch(75% 0.0282 259.79)",
+          "oklch(87% 0.0034 259.79)",
+          "oklch(95% 0.0034 259.79)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Surface Separator",
+        "tonalRamp": [
+          "oklch(15% 0.0013 256.70)",
+          "oklch(27% 0.0013 256.70)",
+          "oklch(39% 0.0110 256.70)",
+          "oklch(51% 0.0110 256.70)",
+          "oklch(63% 0.0110 256.70)",
+          "oklch(75% 0.0110 256.70)",
+          "oklch(87% 0.0013 256.70)",
+          "oklch(95% 0.0013 256.70)"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Emphasized Separator",
+        "tonalRamp": [
+          "oklch(15% 0.0025 257.48)",
+          "oklch(27% 0.0025 257.48)",
+          "oklch(39% 0.0209 257.48)",
+          "oklch(51% 0.0209 257.48)",
+          "oklch(63% 0.0209 257.48)",
+          "oklch(75% 0.0209 257.48)",
+          "oklch(87% 0.0025 257.48)",
+          "oklch(95% 0.0025 257.48)"
+        ]
+      },
+      "secondary": {
+        "role": "neutral",
+        "displayName": "Soft Neutral",
+        "tonalRamp": [
+          "oklch(15% 0.0007 264.53)",
+          "oklch(27% 0.0007 264.53)",
+          "oklch(39% 0.0058 264.53)",
+          "oklch(51% 0.0058 264.53)",
+          "oklch(63% 0.0058 264.53)",
+          "oklch(75% 0.0058 264.53)",
+          "oklch(87% 0.0007 264.53)",
+          "oklch(95% 0.0007 264.53)"
+        ]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Success Green",
+        "tonalRamp": [
+          "oklch(15% 0.0098 167.2)",
+          "oklch(27% 0.0098 167.2)",
+          "oklch(39% 0.0813 167.2)",
+          "oklch(51% 0.0813 167.2)",
+          "oklch(63% 0.0813 167.2)",
+          "oklch(75% 0.0813 167.2)",
+          "oklch(87% 0.0098 167.2)",
+          "oklch(95% 0.0098 167.2)"
+        ]
+      },
+      "success-bg": {
+        "role": "semantic",
+        "displayName": "Pale Success Green",
+        "tonalRamp": [
+          "oklch(15% 0.0017 162.47)",
+          "oklch(27% 0.0017 162.47)",
+          "oklch(39% 0.0141 162.47)",
+          "oklch(51% 0.0141 162.47)",
+          "oklch(63% 0.0141 162.47)",
+          "oklch(75% 0.0141 162.47)",
+          "oklch(87% 0.0017 162.47)",
+          "oklch(95% 0.0017 162.47)"
+        ]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Warning Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0118 76.8)",
+          "oklch(27% 0.0118 76.8)",
+          "oklch(39% 0.0983 76.8)",
+          "oklch(51% 0.0983 76.8)",
+          "oklch(63% 0.0983 76.8)",
+          "oklch(75% 0.0983 76.8)",
+          "oklch(87% 0.0118 76.8)",
+          "oklch(95% 0.0118 76.8)"
+        ]
+      },
+      "warning-bg": {
+        "role": "semantic",
+        "displayName": "Pale Warning Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0029 85.79)",
+          "oklch(27% 0.0029 85.79)",
+          "oklch(39% 0.024 85.79)",
+          "oklch(51% 0.024 85.79)",
+          "oklch(63% 0.024 85.79)",
+          "oklch(75% 0.024 85.79)",
+          "oklch(87% 0.0029 85.79)",
+          "oklch(95% 0.0029 85.79)"
+        ]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Danger Red",
+        "tonalRamp": [
+          "oklch(15% 0.0185 13.25)",
+          "oklch(27% 0.0185 13.25)",
+          "oklch(39% 0.1544 13.25)",
+          "oklch(51% 0.1544 13.25)",
+          "oklch(63% 0.1544 13.25)",
+          "oklch(75% 0.1544 13.25)",
+          "oklch(87% 0.0185 13.25)",
+          "oklch(95% 0.0185 13.25)"
+        ]
+      },
+      "danger-bg": {
+        "role": "semantic",
+        "displayName": "Pale Danger Red",
+        "tonalRamp": [
+          "oklch(15% 0.0022 0.39)",
+          "oklch(27% 0.0022 0.39)",
+          "oklch(39% 0.0181 0.39)",
+          "oklch(51% 0.0181 0.39)",
+          "oklch(63% 0.0181 0.39)",
+          "oklch(75% 0.0181 0.39)",
+          "oklch(87% 0.0022 0.39)",
+          "oklch(95% 0.0022 0.39)"
+        ]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Readable Pink Accent",
+        "tonalRamp": [
+          "oklch(15% 0.0208 353.47)",
+          "oklch(27% 0.0208 353.47)",
+          "oklch(39% 0.1734 353.47)",
+          "oklch(51% 0.1734 353.47)",
+          "oklch(63% 0.1734 353.47)",
+          "oklch(75% 0.1734 353.47)",
+          "oklch(87% 0.0208 353.47)",
+          "oklch(95% 0.0208 353.47)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Rose Focus",
+        "tonalRamp": [
+          "oklch(15% 0.0215 355.58)",
+          "oklch(27% 0.0215 355.58)",
+          "oklch(39% 0.1788 355.58)",
+          "oklch(51% 0.1788 355.58)",
+          "oklch(63% 0.1788 355.58)",
+          "oklch(75% 0.1788 355.58)",
+          "oklch(87% 0.0215 355.58)",
+          "oklch(95% 0.0215 355.58)"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Visible Control Boundary",
+        "tonalRamp": [
+          "oklch(15% 0.0033 255.62)",
+          "oklch(27% 0.0033 255.62)",
+          "oklch(39% 0.0278 255.62)",
+          "oklch(51% 0.0278 255.62)",
+          "oklch(63% 0.0278 255.62)",
+          "oklch(75% 0.0278 255.62)",
+          "oklch(87% 0.0033 255.62)",
+          "oklch(95% 0.0033 255.62)"
+        ]
+      },
+      "primary-border": {
+        "role": "primary",
+        "displayName": "Pink Action Boundary",
+        "tonalRamp": [
+          "oklch(15% 0.0199 354.28)",
+          "oklch(27% 0.0199 354.28)",
+          "oklch(39% 0.1656 354.28)",
+          "oklch(51% 0.1656 354.28)",
+          "oklch(63% 0.1656 354.28)",
+          "oklch(75% 0.1656 354.28)",
+          "oklch(87% 0.0199 354.28)",
+          "oklch(95% 0.0199 354.28)"
+        ]
+      },
+      "surface-hover": {
+        "role": "neutral",
+        "displayName": "Neutral Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0005 271.37)",
+          "oklch(27% 0.0005 271.37)",
+          "oklch(39% 0.0041 271.37)",
+          "oklch(51% 0.0041 271.37)",
+          "oklch(63% 0.0041 271.37)",
+          "oklch(75% 0.0041 271.37)",
+          "oklch(87% 0.0005 271.37)",
+          "oklch(95% 0.0005 271.37)"
+        ]
+      },
+      "table-header": {
+        "role": "neutral",
+        "displayName": "Neutral Table Heading",
+        "tonalRamp": [
+          "oklch(15% 0.0007 264.53)",
+          "oklch(27% 0.0007 264.53)",
+          "oklch(39% 0.0057 264.53)",
+          "oklch(51% 0.0057 264.53)",
+          "oklch(63% 0.0057 264.53)",
+          "oklch(75% 0.0057 264.53)",
+          "oklch(87% 0.0007 264.53)",
+          "oklch(95% 0.0007 264.53)"
+        ]
+      },
+      "scrollbar": {
+        "role": "neutral",
+        "displayName": "Neutral Scrollbar",
+        "tonalRamp": [
+          "oklch(15% 0.0027 259.19)",
+          "oklch(27% 0.0027 259.19)",
+          "oklch(39% 0.0223 259.19)",
+          "oklch(51% 0.0223 259.19)",
+          "oklch(63% 0.0223 259.19)",
+          "oklch(75% 0.0223 259.19)",
+          "oklch(87% 0.0027 259.19)",
+          "oklch(95% 0.0027 259.19)"
+        ]
+      },
+      "selection-bg": {
+        "role": "primary",
+        "displayName": "Pink Selection",
+        "tonalRamp": [
+          "oklch(15% 0.0045 347.96)",
+          "oklch(27% 0.0045 347.96)",
+          "oklch(39% 0.0375 347.96)",
+          "oklch(51% 0.0375 347.96)",
+          "oklch(63% 0.0375 347.96)",
+          "oklch(75% 0.0375 347.96)",
+          "oklch(87% 0.0045 347.96)",
+          "oklch(95% 0.0045 347.96)"
+        ]
+      },
+      "divider-accent": {
+        "role": "primary",
+        "displayName": "Pink Navigation Divider",
+        "tonalRamp": [
+          "oklch(15% 0.0108 351.62)",
+          "oklch(27% 0.0108 351.62)",
+          "oklch(39% 0.0898 351.62)",
+          "oklch(51% 0.0898 351.62)",
+          "oklch(63% 0.0898 351.62)",
+          "oklch(75% 0.0898 351.62)",
+          "oklch(87% 0.0108 351.62)",
+          "oklch(95% 0.0108 351.62)"
+        ]
+      },
+      "info": {
+        "role": "semantic",
+        "displayName": "Information Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0162 258.63)",
+          "oklch(27% 0.0162 258.63)",
+          "oklch(39% 0.1350 258.63)",
+          "oklch(51% 0.1350 258.63)",
+          "oklch(63% 0.1350 258.63)",
+          "oklch(75% 0.1350 258.63)",
+          "oklch(87% 0.0162 258.63)",
+          "oklch(95% 0.0162 258.63)"
+        ]
+      },
+      "info-bg": {
+        "role": "semantic",
+        "displayName": "Pale Information Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0021 264.49)",
+          "oklch(27% 0.0021 264.49)",
+          "oklch(39% 0.0173 264.49)",
+          "oklch(51% 0.0173 264.49)",
+          "oklch(63% 0.0173 264.49)",
+          "oklch(75% 0.0173 264.49)",
+          "oklch(87% 0.0021 264.49)",
+          "oklch(95% 0.0021 264.49)"
+        ]
+      },
+      "chart-track": {
+        "role": "semantic",
+        "displayName": "Neutral Chart Track",
+        "tonalRamp": [
+          "oklch(15% 0.0009 260.73)",
+          "oklch(27% 0.0009 260.73)",
+          "oklch(39% 0.0074 260.73)",
+          "oklch(51% 0.0074 260.73)",
+          "oklch(63% 0.0074 260.73)",
+          "oklch(75% 0.0074 260.73)",
+          "oklch(87% 0.0009 260.73)",
+          "oklch(95% 0.0009 260.73)"
+        ]
+      },
+      "chart-cash": {
+        "role": "semantic",
+        "displayName": "Received Cash Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0114 171.29)",
+          "oklch(27% 0.0114 171.29)",
+          "oklch(39% 0.0950 171.29)",
+          "oklch(51% 0.0950 171.29)",
+          "oklch(63% 0.0950 171.29)",
+          "oklch(75% 0.0950 171.29)",
+          "oklch(87% 0.0114 171.29)",
+          "oklch(95% 0.0114 171.29)"
+        ]
+      },
+      "chart-cash-current": {
+        "role": "semantic",
+        "displayName": "Current Cash Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0101 170.47)",
+          "oklch(27% 0.0101 170.47)",
+          "oklch(39% 0.0844 170.47)",
+          "oklch(51% 0.0844 170.47)",
+          "oklch(63% 0.0844 170.47)",
+          "oklch(75% 0.0844 170.47)",
+          "oklch(87% 0.0101 170.47)",
+          "oklch(95% 0.0101 170.47)"
+        ]
+      },
+      "chart-occupied": {
+        "role": "semantic",
+        "displayName": "Occupied Teal",
+        "tonalRamp": [
+          "oklch(15% 0.0114 171.29)",
+          "oklch(27% 0.0114 171.29)",
+          "oklch(39% 0.0950 171.29)",
+          "oklch(51% 0.0950 171.29)",
+          "oklch(63% 0.0950 171.29)",
+          "oklch(75% 0.0950 171.29)",
+          "oklch(87% 0.0114 171.29)",
+          "oklch(95% 0.0114 171.29)"
+        ]
+      },
+      "chart-vacant": {
+        "role": "semantic",
+        "displayName": "Vacant Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0149 260.72)",
+          "oklch(27% 0.0149 260.72)",
+          "oklch(39% 0.1244 260.72)",
+          "oklch(51% 0.1244 260.72)",
+          "oklch(63% 0.1244 260.72)",
+          "oklch(75% 0.1244 260.72)",
+          "oklch(87% 0.0149 260.72)",
+          "oklch(95% 0.0149 260.72)"
+        ]
+      },
+      "chart-other": {
+        "role": "semantic",
+        "displayName": "Maintenance Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0141 73.36)",
+          "oklch(27% 0.0141 73.36)",
+          "oklch(39% 0.1171 73.36)",
+          "oklch(51% 0.1171 73.36)",
+          "oklch(63% 0.1171 73.36)",
+          "oklch(75% 0.1171 73.36)",
+          "oklch(87% 0.0141 73.36)",
+          "oklch(95% 0.0141 73.36)"
+        ]
+      },
+      "chart-electric": {
+        "role": "semantic",
+        "displayName": "Electricity Amber",
+        "tonalRamp": [
+          "oklch(15% 0.0141 68.19)",
+          "oklch(27% 0.0141 68.19)",
+          "oklch(39% 0.1178 68.19)",
+          "oklch(51% 0.1178 68.19)",
+          "oklch(63% 0.1178 68.19)",
+          "oklch(75% 0.1178 68.19)",
+          "oklch(87% 0.0141 68.19)",
+          "oklch(95% 0.0141 68.19)"
+        ]
+      },
+      "chart-water": {
+        "role": "semantic",
+        "displayName": "Water Blue",
+        "tonalRamp": [
+          "oklch(15% 0.0149 256.16)",
+          "oklch(27% 0.0149 256.16)",
+          "oklch(39% 0.1238 256.16)",
+          "oklch(51% 0.1238 256.16)",
+          "oklch(63% 0.1238 256.16)",
+          "oklch(75% 0.1238 256.16)",
+          "oklch(87% 0.0149 256.16)",
+          "oklch(95% 0.0149 256.16)"
+        ]
+      },
+      "ring-focus": {
+        "role": "primary",
+        "displayName": "Translucent Rose Focus"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Page Headline",
+        "purpose": "Page titles; local responsive adjustments preserve body legibility."
+      },
+      "title": {
+        "displayName": "Panel Title",
+        "purpose": "Reusable content-panel headings."
+      },
+      "body": {
+        "displayName": "Interface Body",
+        "purpose": "Ordinary Vietnamese interface content."
+      },
+      "label": {
+        "displayName": "Control Label",
+        "purpose": "Buttons, fields and navigation."
+      },
+      "supporting": {
+        "displayName": "Supporting Text",
+        "purpose": "Secondary dates and explanatory hints."
+      }
+    },
+    "shadows": [
+      {
+        "name": "search-results",
+        "value": "0 12px 40px #48223424",
+        "purpose": "Temporary global-search result surface."
+      },
+      {
+        "name": "dialog",
+        "value": "0 24px 80px #25101e30",
+        "purpose": "Protected-focus dialog over a dim backdrop."
+      },
+      {
+        "name": "toast",
+        "value": "0 10px 40px #48223425",
+        "purpose": "Temporary feedback message."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-state",
+        "value": "160ms",
+        "purpose": "Background, boundary and focus-state changes."
+      },
+      {
+        "name": "workspace-resize",
+        "value": "200ms",
+        "purpose": "Sidebar width/transform and content margin changes."
+      },
+      {
+        "name": "dialog-enter",
+        "value": "180ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Dialog entry; reduced-motion styles suppress duration."
+      }
+    ],
+    "breakpoints": [
+      {
+        "value": "1399px",
+        "name": "header-compact"
+      },
+      {
+        "value": "1280px",
+        "name": "dashboard-intro-stack"
+      },
+      {
+        "value": "1199px",
+        "name": "automatic-rail"
+      },
+      {
+        "value": "1100px",
+        "name": "shared-columns"
+      },
+      {
+        "value": "900px",
+        "name": "navigation-drawer"
+      },
+      {
+        "value": "640px",
+        "name": "touch-layout"
+      },
+      {
+        "value": "600px",
+        "name": "dashboard-chart-stack"
+      },
+      {
+        "value": "380px",
+        "name": "small-phone"
+      },
+      {
+        "value": "360px",
+        "name": "dashboard-single-metric"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary task action with a fresh light-pink fill and readable dark-pink label.",
+      "html": "<button class=\"ds-button-primary\">Lưu thông tin</button>",
+      "css": ".ds-button-primary{min-height:42px;padding:10px 16px;border:1px solid var(--primary-border,#c64c85);border-radius:9px;background:var(--primary,#ffb3d5);color:var(--primary-foreground,#751442);font:600 13px/1.5 \"Segoe UI\",sans-serif;cursor:pointer;transition:background 160ms,border-color 160ms}.ds-button-primary:hover,.ds-button-primary:active{background:var(--primary-hover,#ff9ecb);border-color:var(--primary-hover,#ff9ecb)}.ds-button-primary:focus-visible{outline:3px solid var(--focus,#b52f70);outline-offset:3px}.ds-button-primary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Lower-priority action on a quiet surface.",
+      "html": "<button class=\"ds-button-secondary\">Hủy</button>",
+      "css": ".ds-button-secondary{min-height:42px;padding:10px 16px;border:1px solid transparent;border-radius:9px;background:var(--secondary,#f1f3f7);color:var(--foreground,#273142);font:600 13px/1.5 \"Segoe UI\",sans-serif;cursor:pointer;transition:background 160ms,border-color 160ms}.ds-button-secondary:hover{border-color:#dca9c7}.ds-button-secondary:active{background:#ffe0f0}.ds-button-secondary:focus-visible{outline:3px solid var(--focus,#b52f70);outline-offset:3px}.ds-button-secondary:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive action with semantic red.",
+      "html": "<button class=\"ds-button-danger\">Xóa</button>",
+      "css": ".ds-button-danger{min-height:42px;padding:10px 16px;border:1px solid #f1ccd4;border-radius:9px;background:var(--danger-bg,#fcecf0);color:var(--danger,#ac354c);font:600 13px/1.5 \"Segoe UI\",sans-serif;cursor:pointer;transition:background 160ms,border-color 160ms}.ds-button-danger:hover,.ds-button-danger:active{background:#f6dce3;border-color:#e3afbb}.ds-button-danger:focus-visible{outline:3px solid var(--focus,#b52f70);outline-offset:3px}.ds-button-danger:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Labeled field with a strong boundary and rose focus.",
+      "html": "<label class=\"ds-field\">Tên cơ sở<input placeholder=\"Nhập tên cơ sở\" /></label>",
+      "css": ".ds-field{display:flex;flex-direction:column;gap:8px;color:var(--foreground,#273142);font:600 13px/1.5 \"Segoe UI\",sans-serif}.ds-field input{min-height:44px;padding:10px 12px;border:1px solid var(--control-border,#818d9d);border-radius:9px;background:var(--surface,#fff);color:var(--foreground,#273142);font:400 14px/1.65 \"Segoe UI\",sans-serif;caret-color:var(--accent-text,#a32367);transition:border-color 160ms,box-shadow 160ms}.ds-field input::placeholder{color:var(--muted,#5e6878);opacity:1}.ds-field input:focus{outline:none;border-color:var(--focus,#b52f70);box-shadow:0 0 0 3px var(--ring-focus,#b52f7026)}.ds-field input:disabled{background:var(--secondary,#f1f3f7);color:var(--muted,#5e6878)}"
+    },
+    {
+      "name": "Active Navigation",
+      "kind": "nav",
+      "description": "Active page within the workspace navigation.",
+      "html": "<button class=\"ds-nav\" aria-current=\"page\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z\"/></svg><span>Tổng quan</span></button>",
+      "css": ".ds-nav{width:100%;display:flex;align-items:center;gap:12px;min-height:43px;padding:10px 13px;border:0;border-radius:8px;background:#ffe0f0;color:#a32367;font:650 13px/1.65 \"Segoe UI\",sans-serif;text-align:left;cursor:pointer}.ds-nav:hover{background:#fff0f7}.ds-nav:focus-visible{outline:3px solid var(--focus,#b52f70);outline-offset:3px}.ds-nav:active{background:#ffe0f0}"
+    },
+    {
+      "name": "Success Status",
+      "kind": "chip",
+      "refersTo": "badge-success",
+      "description": "Written state with an independent semantic color.",
+      "html": "<span class=\"ds-badge\"><i></i>Đã xác nhận</span>",
+      "css": ".ds-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:6px;background:var(--success-bg,#eaf5ef);color:var(--success,#226a52);font:550 12px/1.6 \"Segoe UI\",sans-serif;white-space:nowrap}.ds-badge i{width:5px;height:5px;border-radius:50%;background:currentColor}"
+    },
+    {
+      "name": "Work Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat content surface with a separated header.",
+      "html": "<section class=\"ds-card\"><h2>Hóa đơn cần theo dõi</h2><p>Thông tin được cập nhật từ dữ liệu ứng dụng.</p></section>",
+      "css": ".ds-card{border:1px solid var(--border,#dce1e8);border-radius:14px;background:var(--surface,#fff);color:var(--foreground,#273142);font:400 14px/1.65 \"Segoe UI\",sans-serif}.ds-card h2{margin:0;padding:20px 22px;border-bottom:1px solid var(--border,#dce1e8);font-size:16px;font-weight:650;line-height:1.4}.ds-card p{margin:0;padding:22px;color:var(--muted,#5e6878)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A calmer rental workspace",
+    "overview": "Trozy's implemented interface uses fresh light-pink fills, white work surfaces and readable dark-pink labels for actions and current selection. The visual direction supports everyday Vietnamese rental-management tasks through readable hierarchy, consistent controls and clear separation between information and decisions.\n\nThe system is restrained and practical. A content-sized property selector in the topbar and a primary navigation bar that groups trailing destinations into Thêm (n) when space is limited handle frequent tasks, while the supplementary sidebar uses three accordion groups plus utility links and can become a compact rail or overlay drawer. The topbar and primary navigation hide together after 24px of downward travel beyond 140px of page scroll and reveal after 12px upward; open drawer/property-picker/search/More-menu/logout states and keyboard focus keep them available. Focus or route/property/user changes reveal the header, reduced-motion settings suppress its transition, and tables and forms adapt structurally to the available width. Original meter images and verification controls remain operational content rather than decoration.\n\nThe content-sized property combobox keeps its closed trigger compact with the workspace caption and selected name. Addresses appear only after expanding its listbox, beneath each individual active property name. There is no all-properties option. A per-account preference restores a valid selection; missing or archived IDs fall back before content renders, and an empty active set produces an operational empty state. Names and addresses truncate inside the available width, with full text available in titles and accessible descriptions. Pale fills use the separate primary-foreground token; links and selected labels use accent-text, and visible control outlines use focus. Rendered browser QA is not claimed. The Trozy wordmark starts with an uppercase T. A continuous 2px fresh-pink divider separates the primary navigation from content. The dashboard opens with the current weekday/date and preserved task buttons, without greetings or a question banner. Room management defaults to a property/floor-grouped summary table with a separate individual-room tab. Shared filters also scope its landlord XLSX download. Current-lease and actual reservation deposits are kept separate, issued invoice debt is labelled per room, and only confirmed utility readings enter the overview. The primary bar measures actual container and active-label widths, keeping the leading routes that fit and exposing the remainder through a keyboard-accessible Thêm menu. A hidden current route highlights its trigger; outside focus, resizing and route/property/account changes dismiss the popup with focus recovery. Inert zero-size measurement spans avoid duplicate controls, and observers plus font-loading events keep the split current. Color roles now separate a neutral gray work canvas and dark ink from light-pink outlined actions. Solid teal cash/occupied, blue vacant/water and amber maintenance/electric series retain written labels and exact values. Room badges and card backgrounds use the same status families. Focus and interactive boundaries use dedicated contrast-tested tokens; utility history no longer fades older periods. Manual meter entry explicitly distinguishes cumulative start/end readings from period consumption. The optional consumption method shows read-only cumulative starts and calculated ends, preserves a valid interval when switching methods, and still requires owner evidence comparison and confirmation. Smaller monthly usage is allowed without changing the canonical cumulative API, historical readings or tenant photo-only workflow. Property selection also scopes notification/maintenance counters and tenant dashboard deposits. The picker supports keyboard navigation and explicit header visibility locking, closes on outside interaction or resizing and clamps its popup inside the viewport. Landlords can create properties through a header plus button or open property management from the selector footer. A single dialog supports listing, editing, opening, archive/restore and explicitly confirmed deletion. New properties are selected after refreshed data contains the returned ID. Pending work prevents repeated requests; errors retain input. Server deletion allows only truly empty properties, blocks linked business records and uploaded files, removes only the empty property configuration and retains audit history. Tenant views omit management actions; archive retains the existing active-contract guard.",
+    "keyCharacteristics": [
+      "Light-pink actions, neutral work surfaces and distinct semantic chart colors.",
+      "Familiar navigation and consistent controls.",
+      "Responsive composition with independently scrollable data tables.",
+      "Quiet surfaces with deliberate overlay elevation."
+    ],
+    "rules": [
+      {
+        "section": "colors",
+        "body": "Use rose to indicate an action, current selection or focus; preserve independent semantic colors for status.",
+        "name": "The Meaningful Accent Rule"
+      },
+      {
+        "section": "typography",
+        "body": "Change columns, navigation and action wrapping when space is limited instead of proportionally shrinking all text.",
+        "name": "The Structural Resize Rule"
+      },
+      {
+        "section": "elevation",
+        "body": "Use borders and tone for persistent content; reserve diffuse shadows for temporary overlays.",
+        "name": "The Flat Workspace Rule"
+      }
+    ],
+    "dos": [
+      "Do use the shared rose tokens for primary actions and current selection.",
+      "Do preserve green, amber and red status meaning.",
+      "Do change layout structure when the window becomes narrow.",
+      "Do keep exact money values and original meter evidence legible.",
+      "Do retain visible focus and reduced-motion behavior."
+    ],
+    "donts": [
+      "Don't use brand color to imply that an AI proposal has been verified.",
+      "Don't hide primary actions behind a fixed-width composition that overflows the viewport.",
+      "Don't treat an unrendered source review as a browser visual pass."
+    ]
+  }
+}

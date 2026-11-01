@@ -1,0 +1,427 @@
+{
+  "checkedAt": "2026-10-28T07:41:15.939Z",
+  "passed": true,
+  "validationScope": "HTTP integration, OCR register transcription and safe abstention; not general model accuracy",
+  "visionEnabled": true,
+  "sourceHashes": {
+    "ocr.mjs": "af64f539f8f96bf3fd53cfc6de6df0dae8a6ab5aaf79151126d34a1961bdccb6",
+    "paddle-ocr.mjs": "bfa08913a784102ab3a88f4a07b27d96523b9205132b09502683079c9115f044",
+    "paddle-ocr-worker.py": "8bce6d29837cee9972dab0c7fa621901b7e391d7b4f2dedfd63f40b80c40172e",
+    "paddle-evidence.mjs": "05b8e6a356f35dea76329a9a0118704bd889385864be92cefde6494f0f2ad2f8",
+    "meter-regions.mjs": "f493ac843b00e19eee037adc270a619c0fa0396b95606a3d7e4bcff59b7bb4a1",
+    "meter-vision.mjs": "e77c06564c68d90dd770ab171f82c6dbc736ffaba0aed385312ff1072a53a5ae",
+    "meter-vision-reader.mjs": "42fe94359845abdcb7dfda8c62e98bc29648c2f7736c63dece6c5ea5ad9dd8a5",
+    "meter-reading-format.mjs": "bb21aa53e64c515d4e84a86a3181d00861f27d02824511858f8bc48ea50a7df2",
+    "meter-consensus.mjs": "a96c77f2c0815a5950faaaf1c0d8f71784fdde7133b2af38a5be01a5fe31db0e"
+  },
+  "photoSha256": "588d46bc3342da934bc40042c66fd59414809954cb2d4df81bd4855574b9d13d",
+  "photoBytes": 24359,
+  "expectedRegister": "012345",
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "hybrid",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\nELECTRIC METER\n012345\nkWh\n\n[Xoay 0° · kiểm tra vùng số]\n012345\n\n[Xoay 90° · toàn vùng]\nELECTRIC METER\n012345\nAN\n\n[Xoay 270° · toàn vùng]\nkKwk\n0345\nELEC MMER",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [
+      {
+        "digits": "012345",
+        "confidence": 100,
+        "passes": 2,
+        "stable": true,
+        "regionId": "r0-line1",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "geometry": {
+          "kind": "auto",
+          "angle": 0.5059098497041452,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 108,
+            "top": 158,
+            "width": 453,
+            "height": 113
+          }
+        }
+      }
+    ],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "Các nhóm chữ số quan sát được chưa thống nhất với cách chia chỉ số."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 1000,
+      "sourceHeight": 400,
+      "width": 1000,
+      "height": 400,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "ELECTRIC METER",
+        "confidence": 100,
+        "polygon": [
+          [
+            90,
+            70
+          ],
+          [
+            352,
+            70
+          ],
+          [
+            352,
+            98
+          ],
+          [
+            90,
+            98
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            108,
+            158
+          ],
+          [
+            561,
+            162
+          ],
+          [
+            560,
+            271
+          ],
+          [
+            108,
+            267
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full",
+        "layoutEvidence": {
+          "unitNearby": true,
+          "weightsNearby": false,
+          "counterWindow": true,
+          "colorGroups": false,
+          "blockedContext": false
+        }
+      },
+      {
+        "text": "kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            784,
+            199
+          ],
+          [
+            885,
+            199
+          ],
+          [
+            885,
+            249
+          ],
+          [
+            784,
+            249
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            102.12784515057615,
+            157.00790286975717
+          ],
+          [
+            565.2254744111632,
+            158.2972626931567
+          ],
+          [
+            564.7394481236204,
+            277.5822075055188
+          ],
+          [
+            102.64178807947016,
+            273.49284768211925
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-confirm0-line0",
+        "variant": "region-confirmation"
+      },
+      {
+        "text": "ELECTRIC METER",
+        "confidence": 100,
+        "polygon": [
+          [
+            298,
+            87
+          ],
+          [
+            330,
+            87
+          ],
+          [
+            330,
+            354
+          ],
+          [
+            298,
+            354
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            111,
+            103
+          ],
+          [
+            248,
+            102
+          ],
+          [
+            251,
+            570
+          ],
+          [
+            115,
+            571
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "AN",
+        "confidence": 28,
+        "polygon": [
+          [
+            136,
+            777
+          ],
+          [
+            216,
+            777
+          ],
+          [
+            216,
+            892
+          ],
+          [
+            136,
+            892
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "kKwk",
+        "confidence": 44,
+        "polygon": [
+          [
+            186,
+            107
+          ],
+          [
+            261,
+            107
+          ],
+          [
+            261,
+            220
+          ],
+          [
+            186,
+            220
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "0345",
+        "confidence": 78,
+        "polygon": [
+          [
+            146,
+            432
+          ],
+          [
+            282,
+            432
+          ],
+          [
+            282,
+            899
+          ],
+          [
+            146,
+            899
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "ELEC MMER",
+        "confidence": 74,
+        "polygon": [
+          [
+            66,
+            643
+          ],
+          [
+            101,
+            643
+          ],
+          [
+            99,
+            912
+          ],
+          [
+            63,
+            912
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3932,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 4,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 13962,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "regions": [
+      {
+        "regionId": "r0-line1",
+        "role": "counter",
+        "text": "012345",
+        "evidence": [
+          "unit_label",
+          "counter_window"
+        ],
+        "selectable": true,
+        "sourceRectangle": {
+          "left": 108,
+          "top": 158,
+          "width": 453,
+          "height": 113
+        },
+        "geometry": {
+          "kind": "auto",
+          "angle": 0.5059098497041452,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 108,
+            "top": 158,
+            "width": 453,
+            "height": 113
+          }
+        },
+        "observationRegionIds": [
+          "r0-line1",
+          "r90-line1",
+          "r270-line1"
+        ]
+      }
+    ],
+    "regionSelection": {
+      "status": "selected",
+      "selectedRegionId": "r0-line1",
+      "source": "layout"
+    },
+    "ocrReadings": [
+      {
+        "regionId": "r0-line1",
+        "digits": "012345",
+        "integerDigits": "",
+        "fractionalDigits": "",
+        "displayText": "012345",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "boundarySource": "unresolved",
+        "unitSource": "ocr",
+        "complete": false,
+        "stable": true
+      }
+    ],
+    "ocrCandidates": [],
+    "confirmedReading": null,
+    "assessment": "needs_review",
+    "vision": {
+      "available": true,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "digital",
+      "unit": "kWh",
+      "regionRole": "counter",
+      "fractionalScale": "none",
+      "scaleLabels": [],
+      "integerDigits": "012345",
+      "fractionalDigits": "",
+      "decimalEvidence": "none",
+      "uncertainDigits": false,
+      "displayText": "012345",
+      "readable": false,
+      "issues": [
+        "Các nhóm chữ số quan sát được chưa thống nhất với cách chia chỉ số."
+      ],
+      "preparation": {
+        "rotationDegrees": 0,
+        "cropApplied": true,
+        "regionSource": "ocr",
+        "attempts": 2
+      }
+    },
+    "fileId": "file_aef17e6cb2d2474d93",
+    "roomId": "room_101"
+  }
+}

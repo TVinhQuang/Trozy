@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="400" viewBox="0 0 1000 400">
+  <rect width="1000" height="400" fill="#e5e7eb"/>
+  <rect x="40" y="30" width="920" height="340" rx="28" fill="#fafafa" stroke="#555" stroke-width="4"/>
+  <text x="90" y="95" font-family="Arial, sans-serif" font-size="30" fill="#333">ELECTRIC METER</text>
+  <rect x="90" y="135" width="660" height="160" rx="8" fill="white" stroke="#777" stroke-width="3"/>
+  <text x="115" y="258" font-family="Arial, sans-serif" font-size="118" font-weight="bold" letter-spacing="9" fill="#111">012345</text>
+  <text x="790" y="240" font-family="Arial, sans-serif" font-size="46" fill="#222">kWh</text>
+</svg>

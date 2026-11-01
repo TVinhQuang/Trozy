@@ -1,0 +1,348 @@
+{
+  "checkedAt": "2026-10-27T15:03:42.083Z",
+  "passed": true,
+  "sourceHashes": {
+    "ocr.mjs": "8c45b69a558c3230349b857fcc4cba627e7c3b2f894abce7d5c6c1a44d8d0c4b",
+    "paddle-ocr.mjs": "6a88fb21f60a1a29168b85a2d42d9cd4a0be21d92b60c7fb95cc2d11a5b3eea3",
+    "paddle-ocr-worker.py": "2f452b4fdc0f5e8d3e67d6512e972121aeee8cf5b8d3797569e5baa356e3d12d",
+    "paddle-evidence.mjs": "76e53f60ae8306f033d3384199ea1b5f005a612eb46d0734db4bd4d531068013",
+    "meter-vision.mjs": "f1a2df9a4b3f8ac3fe0499cebad6f984648345a8e0ab431d38ce488563ec4f79"
+  },
+  "photoSha256": "588d46bc3342da934bc40042c66fd59414809954cb2d4df81bd4855574b9d13d",
+  "photoBytes": 24359,
+  "expectedRegister": "012345",
+  "businessRecordsUnchanged": true,
+  "authoritativePreviousAndHistoryVerified": true,
+  "result": {
+    "feature": "B03",
+    "engine": "paddleocr",
+    "model": "PP-OCRv6 small",
+    "rawText": "[Xoay 0° · toàn vùng]\nELECTRIC METER\n012345\nkWh\n\n[Xoay 0° · kiểm tra vùng số]\n012345\n\n[Xoay 90° · toàn vùng]\nELECTRIC METER\n012345\nAN\n\n[Xoay 270° · toàn vùng]\nkKwk\n0345\nELEC MMER",
+    "confidence": 100,
+    "ocrConfidence": 100,
+    "candidates": [],
+    "suggestedValue": null,
+    "registers": [
+      {
+        "digits": "012345",
+        "confidence": 100,
+        "passes": 2,
+        "stable": true,
+        "regionId": "r0-line1",
+        "unit": "kWh",
+        "decimalEvidence": "unknown",
+        "geometry": {
+          "kind": "auto",
+          "angle": 0.5059098497041452,
+          "rotationDegrees": 0,
+          "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation",
+          "rectangle": {
+            "left": 108,
+            "top": 158,
+            "width": 453,
+            "height": 113
+          }
+        }
+      }
+    ],
+    "warnings": [
+      "PaddleOCR cung cấp chữ và vùng nhận dạng; đơn vị, phần thập phân và hàng chỉ số cần được đối chiếu trên ảnh.",
+      "OCR có bằng chứng chữ số, chưa đủ bằng chứng về đơn vị hoặc vị trí thập phân để đề xuất chỉ số độc lập.",
+      "Điểm OCR là điểm nhận dạng văn bản. Đọc lặp lại chỉ kiểm tra sự ổn định, không phải xác suất chỉ số đúng.",
+      "AI đang tắt trong cấu hình; vẫn có thể dùng OCR và nhập tay. Đang dùng OCR cục bộ."
+    ],
+    "requiresConfirmation": true,
+    "image": {
+      "sourceWidth": 1000,
+      "sourceHeight": 400,
+      "width": 1000,
+      "height": 400,
+      "rectangle": null,
+      "coordinateSpace": "exif-oriented-crop-then-clockwise-rotation"
+    },
+    "observations": [
+      {
+        "text": "ELECTRIC METER",
+        "confidence": 100,
+        "polygon": [
+          [
+            90,
+            70
+          ],
+          [
+            352,
+            70
+          ],
+          [
+            352,
+            98
+          ],
+          [
+            90,
+            98
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line0",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            108,
+            158
+          ],
+          [
+            561,
+            162
+          ],
+          [
+            560,
+            271
+          ],
+          [
+            108,
+            267
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line1",
+        "variant": "full"
+      },
+      {
+        "text": "kWh",
+        "confidence": 100,
+        "polygon": [
+          [
+            784,
+            199
+          ],
+          [
+            885,
+            199
+          ],
+          [
+            885,
+            249
+          ],
+          [
+            784,
+            249
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-line2",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            101,
+            158
+          ],
+          [
+            564,
+            158
+          ],
+          [
+            564,
+            272
+          ],
+          [
+            101,
+            272
+          ]
+        ],
+        "rotationDegrees": 0,
+        "regionId": "r0-confirm-line0",
+        "variant": "region-confirmation"
+      },
+      {
+        "text": "ELECTRIC METER",
+        "confidence": 100,
+        "polygon": [
+          [
+            298,
+            87
+          ],
+          [
+            330,
+            87
+          ],
+          [
+            330,
+            354
+          ],
+          [
+            298,
+            354
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line0",
+        "variant": "full"
+      },
+      {
+        "text": "012345",
+        "confidence": 100,
+        "polygon": [
+          [
+            111,
+            103
+          ],
+          [
+            248,
+            102
+          ],
+          [
+            251,
+            570
+          ],
+          [
+            115,
+            571
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line1",
+        "variant": "full"
+      },
+      {
+        "text": "AN",
+        "confidence": 28,
+        "polygon": [
+          [
+            136,
+            777
+          ],
+          [
+            216,
+            777
+          ],
+          [
+            216,
+            892
+          ],
+          [
+            136,
+            892
+          ]
+        ],
+        "rotationDegrees": 90,
+        "regionId": "r90-line2",
+        "variant": "full"
+      },
+      {
+        "text": "kKwk",
+        "confidence": 44,
+        "polygon": [
+          [
+            186,
+            107
+          ],
+          [
+            261,
+            107
+          ],
+          [
+            261,
+            220
+          ],
+          [
+            186,
+            220
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line0",
+        "variant": "full"
+      },
+      {
+        "text": "0345",
+        "confidence": 78,
+        "polygon": [
+          [
+            146,
+            432
+          ],
+          [
+            282,
+            432
+          ],
+          [
+            282,
+            899
+          ],
+          [
+            146,
+            899
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line1",
+        "variant": "full"
+      },
+      {
+        "text": "ELEC MMER",
+        "confidence": 74,
+        "polygon": [
+          [
+            66,
+            643
+          ],
+          [
+            101,
+            643
+          ],
+          [
+            99,
+            912
+          ],
+          [
+            63,
+            912
+          ]
+        ],
+        "rotationDegrees": 270,
+        "regionId": "r270-line2",
+        "variant": "full"
+      }
+    ],
+    "runtime": {
+      "backend": "onnxruntime-cpu",
+      "initMs": 3540,
+      "pythonNetworkBlocked": true
+    },
+    "preprocessing": {
+      "version": 3,
+      "attempts": 4,
+      "regions": 0,
+      "passes": []
+    },
+    "elapsedMs": 4462,
+    "ocrEngine": "paddleocr",
+    "utility": "electric",
+    "assessment": "needs_review",
+    "vision": {
+      "available": false,
+      "model": "qwen3-vl:4b-instruct",
+      "meterType": "unknown",
+      "unit": "unknown",
+      "integerDigits": "",
+      "fractionalDigits": "",
+      "displayText": "",
+      "decimalEvidence": "uncertain",
+      "uncertainDigits": true,
+      "readable": false,
+      "issues": [
+        "AI đang tắt trong cấu hình; vẫn có thể dùng OCR và nhập tay."
+      ]
+    },
+    "fileId": "file_e25e2bfea5014b6c96",
+    "roomId": "room_101"
+  }
+}

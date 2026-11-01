@@ -1,0 +1,607 @@
+{
+  "createdAt": "2026-10-31T16:38:06.691Z",
+  "policy": "Reused exploratory photos and agent visual annotations, not a held-out accuracy benchmark. Layout counts are explicit fixture configuration. No reference values or manual coordinates enter automatic inference.",
+  "samples": [
+    {
+      "id": "electric-clear",
+      "sourceSha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+      "profile": {
+        "digits": 6,
+        "decimals": 1
+      },
+      "result": {
+        "width": 415,
+        "height": 739,
+        "status": "needs_review",
+        "reading": null,
+        "confidence": 0,
+        "quality": null,
+        "cells": [],
+        "warnings": [
+          "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": null,
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "selected",
+          "geometryStatus": "rejected",
+          "orientation": null
+        }
+      },
+      "reference": {
+        "exactDigits": "007664",
+        "integerDigits": "00766",
+        "userVerified": false
+      },
+      "exactMatch": null,
+      "integerPrefixMatch": null
+    },
+    {
+      "id": "electric-26762",
+      "sourceSha256": "5e8b308031f2e98ec578acc9af3c8285248b7386820aebc49b8a9d503089e67d",
+      "profile": {
+        "digits": 6,
+        "decimals": 1
+      },
+      "result": {
+        "width": 453,
+        "height": 676,
+        "status": "needs_review",
+        "reading": null,
+        "confidence": 0,
+        "quality": null,
+        "cells": [],
+        "warnings": [
+          "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": null,
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "ambiguous_window",
+          "geometryStatus": "not_run",
+          "orientation": null
+        }
+      },
+      "reference": {
+        "exactDigits": null,
+        "integerDigits": "26762",
+        "userVerified": false
+      },
+      "exactMatch": null,
+      "integerPrefixMatch": null
+    },
+    {
+      "id": "electric-screenshot",
+      "sourceSha256": "db1a436b661c58c9414717f03d5133592366592cca63157b8bb631cd83a45fc7",
+      "profile": {
+        "digits": 6,
+        "decimals": 1
+      },
+      "result": {
+        "width": 800,
+        "height": 538,
+        "status": "ready",
+        "reading": {
+          "digits": "136240",
+          "displayText": "13624.0",
+          "integerDigits": "13624",
+          "fractionalDigits": "0",
+          "integerValue": 13624,
+          "unit": "kWh"
+        },
+        "confidence": 0.9611999160885278,
+        "quality": {
+          "canRead": true,
+          "checks": {
+            "resolution": true,
+            "exposure": true,
+            "contrast": true,
+            "sharpness": true
+          },
+          "metrics": {
+            "width": 118,
+            "height": 26,
+            "cellWidth": 19.666666666666668,
+            "meanLuma": 54.15026075619296,
+            "contrast": 47.71542014915339,
+            "edgeEnergy": 2099.4507085593787
+          }
+        },
+        "cells": [
+          {
+            "index": 0,
+            "position": 1,
+            "confidence": 0.994630676157531,
+            "alternatives": [
+              {
+                "position": 1.1,
+                "confidence": 0.5618938771802028
+              },
+              {
+                "position": 1,
+                "confidence": 0.4304436164710677
+              },
+              {
+                "position": 0.9,
+                "confidence": 0.0011825054239445205
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "position": 3,
+            "confidence": 0.9905813367505574,
+            "alternatives": [
+              {
+                "position": 3,
+                "confidence": 0.8084254410554812
+              },
+              {
+                "position": 2.9,
+                "confidence": 0.18040285012267795
+              },
+              {
+                "position": 7,
+                "confidence": 0.0012141810450483697
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "position": 6,
+            "confidence": 0.9748469132750658,
+            "alternatives": [
+              {
+                "position": 5.9,
+                "confidence": 0.5121083776813532
+              },
+              {
+                "position": 6,
+                "confidence": 0.4611524407980096
+              },
+              {
+                "position": 8,
+                "confidence": 0.0036238943569426615
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "position": 2,
+            "confidence": 0.9942649049245397,
+            "alternatives": [
+              {
+                "position": 2.1,
+                "confidence": 0.7223324217376828
+              },
+              {
+                "position": 2,
+                "confidence": 0.26347114802823024
+              },
+              {
+                "position": 2.2,
+                "confidence": 0.008247268136730226
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "position": 3.6,
+            "confidence": 0.9965129547507813,
+            "alternatives": [
+              {
+                "position": 3.6,
+                "confidence": 0.7943973413913842
+              },
+              {
+                "position": 3.7,
+                "confidence": 0.14823518214365042
+              },
+              {
+                "position": 3.5,
+                "confidence": 0.05028084939770298
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "position": 9.6,
+            "confidence": 0.9611999160885278,
+            "alternatives": [
+              {
+                "position": 9.6,
+                "confidence": 0.5599878636004084
+              },
+              {
+                "position": 9.7,
+                "confidence": 0.3329598996169409
+              },
+              {
+                "position": 9.5,
+                "confidence": 0.039884788939805696
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Đây là đề xuất từ ảnh. Chủ nhà phải đối chiếu từng ô và phần lẻ trước khi lưu."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": {
+          "digits": 6,
+          "decimals": 1,
+          "corners": [
+            [
+              0.6056781777854596,
+              0.22358040695979398
+            ],
+            [
+              0.7535729101964174,
+              0.21989847622995987
+            ],
+            [
+              0.7552820511174175,
+              0.26799817615163496
+            ],
+            [
+              0.6073873187064598,
+              0.2716801068814691
+            ]
+          ]
+        },
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "selected",
+          "geometryStatus": "selected",
+          "orientation": 0
+        }
+      },
+      "reference": {
+        "exactDigits": null,
+        "integerDigits": "13624",
+        "userVerified": false
+      },
+      "exactMatch": null,
+      "integerPrefixMatch": true
+    },
+    {
+      "id": "water-blue",
+      "sourceSha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+      "profile": {
+        "digits": 8,
+        "decimals": 3
+      },
+      "result": {
+        "width": 1280,
+        "height": 1707,
+        "status": "ready",
+        "reading": {
+          "digits": "00001056",
+          "displayText": "00001.056",
+          "integerDigits": "00001",
+          "fractionalDigits": "056",
+          "integerValue": 1,
+          "unit": "m3"
+        },
+        "confidence": 0.9544519782476825,
+        "quality": {
+          "canRead": true,
+          "checks": {
+            "resolution": true,
+            "exposure": true,
+            "contrast": true,
+            "sharpness": true
+          },
+          "metrics": {
+            "width": 747,
+            "height": 129,
+            "cellWidth": 93.375,
+            "meanLuma": 58.73889355873105,
+            "contrast": 50.370048436842026,
+            "edgeEnergy": 672.8127912845962
+          }
+        },
+        "cells": [
+          {
+            "index": 0,
+            "position": 0,
+            "confidence": 0.995995062260762,
+            "alternatives": [
+              {
+                "position": 0,
+                "confidence": 0.8538610893239159
+              },
+              {
+                "position": 9.9,
+                "confidence": 0.14012501583297998
+              },
+              {
+                "position": 0.1,
+                "confidence": 0.00135803031350818
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "position": 0,
+            "confidence": 0.9969376939267903,
+            "alternatives": [
+              {
+                "position": 0,
+                "confidence": 0.925373978256308
+              },
+              {
+                "position": 0.1,
+                "confidence": 0.06608497291832148
+              },
+              {
+                "position": 9.9,
+                "confidence": 0.0053837770899433915
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "position": 0,
+            "confidence": 0.9961627620745195,
+            "alternatives": [
+              {
+                "position": 0,
+                "confidence": 0.9246786871886635
+              },
+              {
+                "position": 9.9,
+                "confidence": 0.06658125118615903
+              },
+              {
+                "position": 0.1,
+                "confidence": 0.004379028005441082
+              }
+            ]
+          },
+          {
+            "index": 3,
+            "position": 0,
+            "confidence": 0.9796177077352272,
+            "alternatives": [
+              {
+                "position": 0.1,
+                "confidence": 0.5106762628281161
+              },
+              {
+                "position": 0,
+                "confidence": 0.46106637840617437
+              },
+              {
+                "position": 9.9,
+                "confidence": 0.003951910887205322
+              }
+            ]
+          },
+          {
+            "index": 4,
+            "position": 1,
+            "confidence": 0.9764600396345381,
+            "alternatives": [
+              {
+                "position": 0.9,
+                "confidence": 0.728345723951547
+              },
+              {
+                "position": 1,
+                "confidence": 0.18888485703269584
+              },
+              {
+                "position": 0.8,
+                "confidence": 0.055946255993722015
+              }
+            ]
+          },
+          {
+            "index": 5,
+            "position": 0,
+            "confidence": 0.9558768007818392,
+            "alternatives": [
+              {
+                "position": 0,
+                "confidence": 0.8144738269754317
+              },
+              {
+                "position": 9.9,
+                "confidence": 0.13244116213730509
+              },
+              {
+                "position": 4,
+                "confidence": 0.011755000755360644
+              }
+            ]
+          },
+          {
+            "index": 6,
+            "position": 5,
+            "confidence": 0.9891115249905568,
+            "alternatives": [
+              {
+                "position": 5.1,
+                "confidence": 0.6461397383985258
+              },
+              {
+                "position": 5,
+                "confidence": 0.3302908170596973
+              },
+              {
+                "position": 5.2,
+                "confidence": 0.010548045928368433
+              }
+            ]
+          },
+          {
+            "index": 7,
+            "position": 6.1,
+            "confidence": 0.9544519782476825,
+            "alternatives": [
+              {
+                "position": 6.1,
+                "confidence": 0.5971425643474243
+              },
+              {
+                "position": 6,
+                "confidence": 0.32008337541530707
+              },
+              {
+                "position": 6.2,
+                "confidence": 0.030900825989597275
+              }
+            ]
+          }
+        ],
+        "warnings": [
+          "Đây là đề xuất từ ảnh. Chủ nhà phải đối chiếu từng ô và phần lẻ trước khi lưu."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": {
+          "digits": 8,
+          "decimals": 3,
+          "corners": [
+            [
+              0.20899448860149294,
+              0.34717426750397873
+            ],
+            [
+              0.7852795363797602,
+              0.2797482297212413
+            ],
+            [
+              0.8016609626183933,
+              0.35438288479859653
+            ],
+            [
+              0.22537591484012584,
+              0.421808922581334
+            ]
+          ]
+        },
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "selected",
+          "geometryStatus": "selected",
+          "orientation": 0
+        }
+      },
+      "reference": {
+        "exactDigits": "00001056",
+        "integerDigits": "00001",
+        "userVerified": false
+      },
+      "exactMatch": true,
+      "integerPrefixMatch": true
+    },
+    {
+      "id": "water-weathered",
+      "sourceSha256": "b3f6eb362ad2a4440be011e62fc071edc6dc1cf13e01e409ca93299f8031a425",
+      "profile": {
+        "digits": 5,
+        "decimals": 1
+      },
+      "result": {
+        "width": 2000,
+        "height": 1502,
+        "status": "needs_review",
+        "reading": null,
+        "confidence": 0,
+        "quality": null,
+        "cells": [],
+        "warnings": [
+          "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": null,
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "no_window",
+          "geometryStatus": "not_run",
+          "orientation": null
+        }
+      },
+      "reference": {
+        "exactDigits": "13038",
+        "integerDigits": "1303",
+        "userVerified": false
+      },
+      "exactMatch": null,
+      "integerPrefixMatch": null
+    }
+  ],
+  "controls": [
+    {
+      "kind": "blank",
+      "result": {
+        "width": 1280,
+        "height": 1707,
+        "status": "needs_review",
+        "reading": null,
+        "confidence": 0,
+        "quality": null,
+        "cells": [],
+        "warnings": [
+          "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": null,
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "no_window",
+          "geometryStatus": "not_run",
+          "orientation": null
+        }
+      }
+    },
+    {
+      "kind": "blur",
+      "result": {
+        "width": 1280,
+        "height": 1707,
+        "status": "needs_review",
+        "reading": null,
+        "confidence": 0,
+        "quality": null,
+        "cells": [],
+        "warnings": [
+          "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+        ],
+        "model": "wheels-v2",
+        "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+        "config": null,
+        "profileSource": "confirmed",
+        "configNeedsConfirmation": false,
+        "automation": {
+          "locatorStatus": "no_window",
+          "geometryStatus": "not_run",
+          "orientation": null
+        }
+      }
+    }
+  ],
+  "sourceSha256": {
+    "src/ai/meter-reader.mjs": "9c001fefcc708d91fabda47d7cdc2e6396c4b4e5f47385afd1a180cf5235c65f",
+    "src/ai/meter_reader_worker.py": "a4236393f3983b03656b7de2cd78d81b7d6c9a981de074a522c29a739b2c1602",
+    "src/ai/meter_wheels.py": "796323311d61bdb1f142d628ba357ee2ae9b4a4c78dbf0a1213e281eb44ea922",
+    "src/ai/meter_geometry.py": "cac8cd5d6ca46b5a77223f3eac8085aee0b499bd21131ad7c3a3bd9f69c2181a",
+    "src/ai/meter_row_geometry.py": "b035af3819994a9e0d6bfd4309437960183847566254f02c4b64a7064bb42ed2",
+    "scripts/evaluate-meter-automatic.mjs": "38e51062ecc8fe063b49012fa23adf2168575e2c7b8401cf40669ddf3603b46d"
+  }
+}

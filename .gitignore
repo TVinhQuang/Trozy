@@ -85,9 +85,15 @@ htmlcov/
 
 # Local runtime cache and temporary working directories
 .cache/
+.runtime/
 /logs/
 /tmp/
 /temp/
+/data/
+/backups/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 
 # Keep dependency lockfiles, course documents, PA archives, images,
 # SQL scripts and datasets versioned unless a specific rule above applies.
