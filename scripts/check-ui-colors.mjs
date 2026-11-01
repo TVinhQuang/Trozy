@@ -51,7 +51,17 @@ group('Links, selected labels and primary actions', [
   ['--accent-text', '--selection-bg'], ['--primary-foreground', '--selection-bg'],
 ], 4.5);
 
-const actionRoles = ['success', 'warning', 'assistant'];
+const actionRoles = ['success', 'warning', 'assistant', 'info', 'report'];
+
+function assertDarkNeutral(name) {
+  const value = resolveToken(name);
+  const channels = [1, 3, 5].map(offset => parseInt(value.slice(offset, offset + 2), 16));
+  assert.ok(Math.max(...channels) - Math.min(...channels) <= 32 && luminance(value) < 0.15,
+    `${name} must be dark neutral ink, not a colored text accent`);
+}
+for (const name of ['--foreground', '--muted', '--accent-text', '--primary-foreground', ...actionRoles.map(role => `--action-${role}-foreground`)]) assertDarkNeutral(name);
+for (const role of actionRoles) assert.equal(resolveToken(`--action-${role}-foreground`), resolveToken('--foreground'), `${role} buttons must share the normal dark text color`);
+console.log('PASS Content, links and functional button labels use dark neutral ink rather than multicolor text');
 group('Functional button text in default, hover and pressed states', actionRoles.flatMap(role => [
   [`--action-${role}-foreground`, `--action-${role}-bg`],
   [`--action-${role}-foreground`, `--action-${role}-hover`],
@@ -70,7 +80,8 @@ group('Control boundaries and keyboard focus', [
   ['--primary-border', '--surface'], ['--primary-border', '--background'],
   ['--focus', '--surface'], ['--focus', '--background'], ['--focus', '--primary'], ['--focus', '--primary-hover'], ['--focus', '--primary-light'],
 ], 3);
-group('Status text', ['success', 'warning', 'danger', 'info'].map(name => [`--${name}`, `--${name}-bg`]), 4.5);
+group('Status label text', ['success', 'warning', 'danger', 'info'].map(name => ['--foreground', `--${name}-bg`]), 4.5);
+group('Status indicator marks', ['success', 'warning', 'danger', 'info'].map(name => [`--${name}`, `--${name}-bg`]), 3);
 group('Chart marks on the surface and track', ['cash', 'cash-current', 'occupied', 'vacant', 'other', 'electric', 'water']
   .flatMap(name => [[`--chart-${name}`, '--surface'], [`--chart-${name}`, '--chart-track']]), 3);
 
@@ -97,6 +108,10 @@ assert.equal(declaration('.btn:disabled', 'opacity'), '1', 'Disabled button labe
 assert.equal(declaration('.btn:disabled', 'background'), 'var(--secondary)');
 assert.equal(declaration('.btn:disabled', 'color'), 'var(--muted)');
 assert.equal(declaration('.btn:disabled', 'border-color'), 'var(--control-border)');
+for (const status of ['success', 'warning', 'danger', 'info']) {
+  assert.equal(declaration(`.badge-${status}`, 'color'), 'var(--foreground)', `${status} status labels must remain dark ink`);
+  assert.equal(declaration(`.badge-${status} .badge-dot`, 'background'), `var(--${status})`, `${status} badges preserve a separate colored indicator`);
+}
 console.log('PASS Functional button colors bind default/hover/pressed states to their tokens and keep disabled labels readable');
 
 const meterCss = postcss.parse(await readFile(new URL('../src/frontend/meter-reader.css', import.meta.url), 'utf8'));

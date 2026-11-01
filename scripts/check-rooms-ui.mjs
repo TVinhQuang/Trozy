@@ -259,6 +259,9 @@ try {
   for(const unwanted of ['Chào ','một ngày tốt lành','Hôm nay, mình chăm chút','Mọi hoạt động nhà trọ, trong một góc nhìn.'])assert.equal(document.body.textContent.includes(unwanted),false);
   const stamp=document.querySelector('time.rose-dashboard-date'); assert.ok(stamp); assert.match(stamp.getAttribute('datetime'),/^\d{4}-\d{2}-\d{2}$/);
   assert.match(stamp.textContent,/\d{4}/);
+  for(const [label,variant]of [['Quản lý phòng trọ','btn-primary'],['Theo dõi điện nước','btn-info'],['Xem báo cáo','btn-report']]) {
+    assert.ok(screen.getByRole('button',{name:label,exact:true}).classList.contains(variant), `${label} must retain its distinct action background`);
+  }
   fireEvent.click(screen.getByRole('button',{name:'Quản lý phòng trọ',exact:true}));
   fireEvent.click(screen.getByRole('button',{name:'Theo dõi điện nước',exact:true}));
   fireEvent.click(screen.getByRole('button',{name:'Xem báo cáo',exact:true}));

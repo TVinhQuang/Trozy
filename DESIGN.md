@@ -1,18 +1,18 @@
 ---
 name: Trozy Blue
-description: Blue navigation, distinct functional actions and readable data colors for rental management.
+description: Blue navigation, distinct pastel action fills and dark neutral ink for clear rental management.
 colors:
   primary: "#c8ddff"
   primary-hover: "#b6d2ff"
   primary-light: "#edf4ff"
-  primary-foreground: "#163e73"
-  accent-text: "#2154a2"
+  primary-foreground: "#171b24"
+  accent-text: "#171b24"
   focus: "#23539a"
   primary-border: "#4879bc"
   background: "#f5f6f8"
   surface: "#ffffff"
-  foreground: "#273142"
-  muted: "#5e6878"
+  foreground: "#171b24"
+  muted: "#46505f"
   border: "#dce1e8"
   border-strong: "#b7c0cd"
   control-border: "#818d9d"
@@ -41,16 +41,24 @@ colors:
   ring-focus: "#23539a26"
   action-success-bg: "#e2f3eb"
   action-success-hover: "#cdebdc"
-  action-success-foreground: "#1b5e42"
+  action-success-foreground: "#171b24"
   action-success-border: "#3c8466"
   action-warning-bg: "#fff1d7"
   action-warning-hover: "#ffe4b5"
-  action-warning-foreground: "#754708"
+  action-warning-foreground: "#171b24"
   action-warning-border: "#9b6a1b"
   action-assistant-bg: "#eee9ff"
   action-assistant-hover: "#e0d5ff"
-  action-assistant-foreground: "#573593"
+  action-assistant-foreground: "#171b24"
   action-assistant-border: "#8462b3"
+  action-info-bg: "#dff3f2"
+  action-info-hover: "#c8e9e6"
+  action-info-foreground: "#171b24"
+  action-info-border: "#387f7b"
+  action-report-bg: "#eee7ff"
+  action-report-hover: "#ded2fa"
+  action-report-foreground: "#171b24"
+  action-report-border: "#8060ac"
 typography:
   headline:
     fontFamily: "'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif"
@@ -118,6 +126,16 @@ components:
     textColor: "{colors.action-assistant-foreground}"
     rounded: "{rounded.control}"
     padding: "10px 16px"
+  button-info:
+    backgroundColor: "{colors.action-info-bg}"
+    textColor: "{colors.action-info-foreground}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  button-report:
+    backgroundColor: "{colors.action-report-bg}"
+    textColor: "{colors.action-report-foreground}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
   button-secondary:
     backgroundColor: "{colors.secondary}"
     textColor: "{colors.foreground}"
@@ -125,7 +143,7 @@ components:
     padding: "10px 16px"
   button-danger:
     backgroundColor: "{colors.danger-bg}"
-    textColor: "{colors.danger}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.control}"
     padding: "10px 16px"
   field:
@@ -140,7 +158,7 @@ components:
     padding: "22px"
   badge-success:
     backgroundColor: "{colors.success-bg}"
-    textColor: "{colors.success}"
+    textColor: "{colors.foreground}"
     rounded: "{rounded.badge}"
     padding: "4px 9px"
 ---
@@ -151,7 +169,7 @@ components:
 
 **Creative North Star: "A calmer rental workspace"**
 
-Trozy's implemented interface uses fresh light-blue actions on a neutral, light-gray work canvas with white panels and dark ink. Blue identifies actions and selection; separate semantic families identify operational states and chart data. The visual direction supports everyday Vietnamese rental-management tasks through readable hierarchy, consistent controls and clear separation between information and decisions.
+Trozy's implemented interface uses distinct pastel action fills on a neutral, light-gray work canvas with white panels and near-black text. Bold room codes, amounts and headings establish hierarchy. Blue identifies navigation and selection; separate background, icon, border and badge families identify actions, operational states and chart data. The visual direction supports everyday Vietnamese rental-management tasks through readable hierarchy, consistent controls and clear separation between information and decisions.
 
 The system is restrained and practical. Navigation can become an icon rail or an overlay drawer, while tables and forms adapt structurally to the available width. Original meter images and verification controls remain operational content rather than decoration.
 
@@ -166,16 +184,16 @@ This records the implementation on 2026-11-01. Token and source checks are disti
 
 ## Colors
 
-Fresh light blue carries primary-action fills, with dark-blue text and a stronger blue boundary. The neutral canvas, white panels and gray table headings reduce competing blue surfaces. Separate tokens distinguish passive separators from interactive control boundaries; the latter meet 3:1 against the declared adjacent white and canvas colors. The YAML frontmatter is the normative token source.
+Fresh light blue carries primary-action fills, with the same near-black text used across ordinary content and a stronger blue boundary. The neutral canvas, white panels and gray table headings reduce competing blue surfaces. Separate tokens distinguish passive separators from interactive control boundaries; the latter meet 3:1 against the declared adjacent white and canvas colors. The YAML frontmatter is the normative token source.
 
 ### Primary
 
 - **Fresh Light Blue:** primary buttons and brand fills.
 - **Fresh Blue Hover:** primary hover and pressed fills.
 - **Pale Fresh Blue:** selected tabs, workspace context and quiet accent surfaces.
-- **Dark Blue on Light Blue:** primary-action text.
+- **Dark Interface Ink on Light Blue:** primary-action text.
 - **Blue Action Boundary:** clear primary-button and workspace-selector boundaries.
-- **Readable Blue Accent:** links, selected labels and icon text.
+- **Dark Link and Selection Ink:** links and selected labels; blue remains in their background, focus or indicator.
 - **Blue Focus:** keyboard outlines, focused boundaries and small control indicators.
 
 ### Neutral
@@ -188,7 +206,7 @@ Fresh light blue carries primary-action fills, with dark-blue text and a stronge
 - **Visible Control Boundary:** stronger borders for buttons, fields, search and upload controls.
 - **Soft Neutral / Neutral Table Heading:** secondary controls and grouped data surfaces.
 
-Green, amber and red remain semantic success, warning and danger families. Blue adds an information/availability family. Written status labels and dots remain present. Occupied room badges/cards use green, vacant rooms use blue, and maintenance/handover use amber; those families match the occupancy legend.
+Green, amber and red remain semantic success, warning and danger families in fills, borders, dots and icons. Status words use dark ink instead of colored lettering. Blue adds an information/availability family. Written labels and dots remain present. Occupied room badges/cards use green, vacant rooms use blue, and maintenance/handover use amber; those families match the occupancy legend.
 
 ### Charts
 
@@ -203,7 +221,7 @@ Green, amber and red remain semantic success, warning and danger families. Blue 
 
 Chart marks use solid colors rather than lowering historical periods to partial opacity. The latest utility period has a bold date and a tooltip; its positive bar has an outline. Zero values have no filled bar. Occupancy renders only positive segments so a zero category cannot acquire a separator pixel; the written legend retains every count. White segment boundaries aid separation.
 
-`npm.cmd run check:ui-colors` verifies 67 declared opaque token pairs and the real base/hover/pressed/disabled CSS bindings. Text pairs must reach 4.5:1 and control/focus/chart pairs 3:1. Current minima are 5.07:1 for body/secondary text, 6.05:1 for primary/selected text, 6.06:1 for functional button text, 3.46:1 for functional boundaries, 5.45:1 for focus on functional fills, 3.03:1 for control/focus boundaries, 5.29:1 for status text and 3.52:1 for chart marks. This calculation is not a computed-browser, photo-overlay or color-vision simulation pass.
+`npm.cmd run check:ui-colors` verifies 87 declared opaque token pairs and the real base/hover/pressed/disabled CSS bindings, including neutral action ink and dark badge words with separate colored dots. Text pairs must reach 4.5:1 and control/focus/chart pairs 3:1. Current minima are 7.35:1 for body/secondary text, 11.20:1 for primary/selected text, 12.07:1 for functional button text, 3.46:1 for functional boundaries, 5.30:1 for focus on functional fills, 3.03:1 for control/focus boundaries, 15.09:1 for status labels, 5.29:1 for status marks and 3.52:1 for chart marks. This calculation is not a computed-browser, photo-overlay or color-vision simulation pass.
 
 **The Meaningful Accent Rule.** Use blue to indicate an action, current selection or focus; preserve independent semantic colors for status.
 
@@ -242,13 +260,15 @@ Work surfaces are flat and separated by borders and tone. Shadows identify tempo
 
 ## Shapes
 
-Controls have gently curved corners; panels and dialogs use a larger radius. Status chips remain compact and carry a dot plus a written label. Lucide line icons provide a consistent icon vocabulary. Original room and meter images retain their evidentiary role; the interface does not replace them with decorative illustrations.
+Controls have gently curved corners; panels and dialogs use a larger radius. Status chips remain compact and carry a colored dot plus a dark written label. Lucide line icons provide a consistent icon vocabulary. Original room and meter images retain their evidentiary role; the interface does not replace them with decorative illustrations.
 
 ## Components
 
 ### Buttons
 
-Primary creation and navigation actions use light-blue fills with dark-blue text and the dedicated blue boundary. Save/confirm/receive-payment/Excel actions use pale green with dark green text; edit/retry actions use pale amber with dark amber text; AI actions use pale violet with dark violet text. These roles add hierarchy without recoloring the horizontal or vertical navigation by function: both navigation regions keep the shared blue selection and focus language. Standard and cancel controls remain white or neutral. Danger controls retain semantic red. Every action family declares default, hover and pressed fills, text and boundary. The visible 3px blue focus outline remains distinct on all action fills. Disabled buttons use opaque neutral fills, readable secondary ink and the control boundary instead of fading the whole button.
+Primary creation and navigation actions use light-blue fills and the dedicated blue boundary. The three dashboard actions use separate blue, teal and lavender fills: room management, utility monitoring and reporting. The same classes apply to comparable actions on other pages. Save/confirm/receive-payment/Excel actions use pale green; edit/retry actions use pale amber; AI actions use pale violet. Every action label uses the same near-black ink, with weight rather than a different text hue for emphasis. These roles add hierarchy without recoloring the horizontal or vertical navigation by function: both navigation regions keep the shared blue selection and focus language. Standard and cancel controls remain white or neutral. Danger controls retain semantic red. Every action family declares default, hover and pressed fills, text and boundary. The visible 3px blue focus outline remains distinct on all action fills. Disabled buttons use opaque neutral fills, readable secondary ink and the control boundary instead of fading the whole button.
+
+Near-black and dark-gray text are the normal reading colors for headings, tables, buttons, links, helper text and statuses. Monetary values and room identifiers use stronger weight. Room groups use a pale blue band; restrained row surfaces and clearly labelled status/financial chips separate information without turning names, subtitles or debt paragraphs blue/red.
 
 ### Inputs / Fields
 
@@ -258,7 +278,7 @@ Fields use the dedicated control-boundary token, white surface, control radius a
 
 The wordmark is written **Trozy.** with an uppercase T. A continuous 2px fresh-blue line below the primary navigation separates the moving header from the page content; the active-route underline remains stronger and local to its button.
 
-Navigation is split by frequency of use. The horizontal primary bar contains Tổng quan, Phòng trọ, Điện & nước, Hóa đơn, Thanh toán, Hợp đồng, Người thuê and Bảo trì; tenant access removes destinations not permitted for that role. The shorter visible labels Thanh toán and Bảo trì retain the full accessible labels Lịch sử thanh toán and Bảo trì & sự cố. The active primary route uses blue text, a pale fill and an underline.
+Navigation is split by frequency of use. The horizontal primary bar contains Tổng quan, Phòng trọ, Điện & nước, Hóa đơn, Thanh toán, Hợp đồng, Người thuê and Bảo trì; tenant access removes destinations not permitted for that role. The shorter visible labels Thanh toán and Bảo trì retain the full accessible labels Lịch sử thanh toán and Bảo trì & sự cố. The active primary route uses dark bold text, a pale blue fill and a blue underline.
 
 The bar measures its container and natural active-weight labels, including icons and counters, then retains the leading destinations that fit alongside **Thêm (n)**. The remaining routes appear in that menu in the same order. Wide containers show all permitted destinations without a More button. ResizeObserver, viewport resizing and font-loading events recalculate the split; inert, aria-hidden measurement spans add no duplicate controls or horizontal page overflow.
 
@@ -288,7 +308,7 @@ White cards use the card radius, a subtle boundary and typically 22px of body pa
 
 ### Data Tables and Status Chips
 
-Tables retain a consistent row rhythm and tabular money. Status chips combine text with semantic color and a dot. They convey existing application states and do not imply autonomous approval of a reading, invoice or payment.
+Tables retain a consistent row rhythm and tabular money. Room codes and monetary figures use stronger weight; tenant names and explanatory lines use neutral ink. Property/floor headers use a pale blue band. Status chips combine dark text with semantic background color and a separate colored dot. They convey existing application states and do not imply autonomous approval of a reading, invoice or payment.
 
 ### Room Inventory
 

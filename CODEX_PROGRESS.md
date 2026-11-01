@@ -1,3 +1,11 @@
+## Ba màu nút, chữ tối và bảng phòng — 01/11/2026 (hoàn tất triển khai và kiểm thử)
+
+- Ba nút dashboard dùng nền xanh dương/xanh ngọc/tím nhạt, chung chữ tối đậm. Các nút xem/trao đổi, lịch sử/in, tạo mới, lưu/xác nhận, sửa/thử lại và xóa ở trang khác được gắn nhóm màu nhất quán; hủy/đóng trung tính. Nội dung/nút/nhãn dùng #171b24, chữ phụ #46505f; màu thể hiện qua nền/viền/icon/chấm và biểu đồ. Điều hướng vẫn giữ hệ xanh dương.
+- Bảng phòng có chữ mã/số tiền/người thuê đậm tối, dải nhóm tầng xanh nhạt, nền hàng theo trạng thái và cột sticky cùng nền. Quá hạn/sự cố dùng nhãn nền màu với chữ tối. Chỉ thêm thuộc tính data-room-status từ trạng thái hiện có; không đổi dữ liệu, tính tiền, handler, API hoặc quyền.
+- Kiểm chứng cuối: **87 cặp contrast**, build TypeScript/Vite, **132 render**, **8 phòng/dashboard**, **21 shell**, **41 AI UI**, **5 hỗ trợ** đạt. Test dashboard giữ ba màu variant khác nhau và điều hướng đúng. CSS/JSON/whitespace đạt. Không chạy lại backend 157 tests vì chỉ sửa hiển thị.
+- Đã xem dashboard trong Chrome và thấy ba nền riêng/chữ tối. Khi thử chuyển trang phòng, người dùng nhấn Esc; đã dừng Computer Use, không gọi lại trong lượt này. Chưa tuyên bố bảng/form/zoom/mobile mới đã qua visual QA đầy đủ. Chi tiết `docs/test/UI-DARK-INK-ACTIONS-20261101.md`.
+- Docs thiết kế và trạng thái cập nhật, OCR/B03 vẫn đang hoàn thiện. Không tải dependency/model, không tạo tệp tạm riêng, không đụng PA2/crop/dữ liệu thật. Bản sửa lưu riêng sau `5888db3` để đồng bộ GitHub theo yêu cầu hiện hành. Nếu gián đoạn xuất bản, kiểm tra `git status`, `git log -3 --oneline`, `git ls-remote origin refs/heads/main` và chỉ push commit còn thiếu, không force push. Không có cơ chế tự mở lượt chạy sau cấp quota; gửi “tiếp tục theo CODEX_PROGRESS.md” khi cần.
+
 ## Theme xanh dương và phân màu nút — 01/11/2026 (hoàn tất triển khai và kiểm thử)
 
 - Theo yêu cầu mới, hệ màu chủ đạo chuyển từ hồng sang xanh dương; thanh ngang/dọc giữ cấu trúc và cùng màu chủ đạo. Nút chính/tạo mới xanh dương; lưu/xác nhận/xuất dữ liệu xanh lá; sửa/điều chỉnh/thử lại hổ phách; trợ lý/AI/OCR proposal tím; xóa đỏ, hủy trung tính. Chữ đậm dễ đọc; disabled action không làm mờ chữ bằng opacity.
