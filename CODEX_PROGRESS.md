@@ -1,3 +1,8 @@
+## Bỏ dòng môn học/nhóm ở footer — 01/11/2026 (hoàn tất)
+
+- Đã xóa dòng “Nhập môn Công nghệ phần mềm · Nhóm 11” khỏi footer ứng dụng theo ảnh người dùng. Bỏ selector mobile ẩn span cuối để dòng bản quyền còn lại không bị ẩn nhầm.
+- Build TypeScript/Vite đạt; không còn chuỗi bị xóa trong source giao diện, không thay đổi nghiệp vụ hoặc dữ liệu. Lưu riêng bản sửa sau mốc `d0d87e2` để đồng bộ GitHub như yêu cầu hiện hành. Các thay đổi PA2/crop ngoài phạm vi giữ nguyên.
+
 ## Hỗ trợ theo vai trò — 01/11/2026 (hoàn tất triển khai và kiểm thử)
 
 - Mục **Cần một chút hỗ trợ?** của chủ trọ mở **Trợ lý Trozy**, của khách trọ mở **Yêu cầu hỗ trợ**. Dòng mô tả, icon và tooltip xác định đúng đích đến. Drawer điện thoại đóng và trả focus như luồng điều hướng hiện tại.

@@ -578,7 +578,6 @@ tbody tr:hover { background: var(--surface-hover); }
   .notification-item>.btn { margin-left: 52px; }
   .photo-grid, .room-gallery { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .app-footer { padding-inline: 18px; }
-  .app-footer>span:last-child { display: none; }
   .auth-layout { grid-template-columns: 1fr; }
   .auth-story { display: none; }
   .auth-main { min-height: 100dvh; padding: 28px 24px; }

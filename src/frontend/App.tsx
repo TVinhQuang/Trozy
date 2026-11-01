@@ -119,7 +119,7 @@ export default function App(){
         <QuickNavigation role={user.role} page={safePage} navigate={chooseSearchPage} unread={unread} issues={issues} resetKey={`${safePage}:${propertyId}:${user.id}`} onOpenChange={setQuickMenuOpen}/>
       </div>
       <main id="main-content" tabIndex={-1} className="main-content" key={`${safePage}-${propertyId}`}>{propertyId===emptyWorkspaceId&&!['properties','profile','settings','assistant'].includes(safePage)?<section className="card"><div className="card-body stack"><h1>Chưa có cơ sở đang hoạt động</h1><p className="muted">{user.role==='landlord'?'Thêm cơ sở hoặc kiểm tra các cơ sở đã lưu trữ để bắt đầu quản lý.':'Cơ sở của bạn hiện chưa khả dụng. Vui lòng liên hệ chủ trọ.'}</p>{user.role==='landlord'&&<div><button className="btn btn-primary" onClick={()=>navigate('properties')}>Quản lý cơ sở</button></div>}</div></section>:<><CorePages page={safePage}/><TenancyPages page={safePage}/><OperationsPages page={safePage}/>{safePage==='assistant'&&<AssistantPage/>}</>}</main>
-      <footer className="app-footer"><span>© 2026 Trozy. Chăm chút không gian sống.</span><span>Nhập môn Công nghệ phần mềm · Nhóm 11</span></footer>
+      <footer className="app-footer"><span>© 2026 Trozy. Chăm chút không gian sống.</span></footer>
     </div>
     {safePage!=='assistant'&&<button inert={mobile&&narrow} className="assistant-fab" onClick={()=>navigate('assistant')}><Sparkles size={18}/>Hỏi Trozy</button>}
     {toast&&<div className={`toast toast-${toast.kind}`} role={toast.kind==='error'?'alert':'status'}><span>{toast.kind==='success'?<Check size={18}/>:<X size={18}/>}</span><p>{toast.message}</p><button className="icon-button" onClick={()=>setToast(null)} aria-label="Đóng thông báo"><X size={15}/></button></div>}
