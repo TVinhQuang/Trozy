@@ -10,4 +10,4 @@
 
 - For frontend design work, read the project-local Impeccable skill at `skills/impeccable/SKILL.md` and the applicable references. This copy came from the user's `E:\Downloads\impeccable-main`; preserve its included Apache-2.0 license.
 - Run its launcher through `node scripts/run-project.mjs --powershell scripts/impeccable.ps1 context --target src/frontend/App.tsx`. The wrapper keeps engine downloads in `.cache/impeccable/` and each invocation's temporary files in its own directory under `tmp/`. If the engine is unavailable, use the skill's direct-reading fallback.
-- `PRODUCT.md`, `DESIGN.md` and `.impeccable/design.json` record the Trozy context and rose visual system. Use readable type and structural reflow for narrow windows and browser zoom. Preserve all existing business permissions and meter evidence workflows.
+- `PRODUCT.md`, `DESIGN.md` and `.impeccable/design.json` record the Trozy context and blue visual system. Use readable type and structural reflow for narrow windows and browser zoom. Preserve all existing business permissions and meter evidence workflows.

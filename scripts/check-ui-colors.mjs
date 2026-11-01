@@ -48,15 +48,65 @@ group('Body and secondary text', [
 group('Links, selected labels and primary actions', [
   ['--accent-text', '--surface'], ['--accent-text', '--background'], ['--accent-text', '--primary-light'],
   ['--primary-foreground', '--primary'], ['--primary-foreground', '--primary-hover'],
+  ['--accent-text', '--selection-bg'], ['--primary-foreground', '--selection-bg'],
+], 4.5);
+
+const actionRoles = ['success', 'warning', 'assistant'];
+group('Functional button text in default, hover and pressed states', actionRoles.flatMap(role => [
+  [`--action-${role}-foreground`, `--action-${role}-bg`],
+  [`--action-${role}-foreground`, `--action-${role}-hover`],
+]), 4.5);
+group('Functional button boundaries', actionRoles.flatMap(role => ['--surface', '--background', `--action-${role}-bg`, `--action-${role}-hover`]
+  .map(background => [`--action-${role}-border`, background])), 3);
+group('Focus on functional buttons', actionRoles.flatMap(role => [
+  ['--focus', `--action-${role}-bg`], ['--focus', `--action-${role}-hover`],
+]), 3);
+group('Disabled button label', [
+  ['--muted', '--secondary'],
 ], 4.5);
 group('Control boundaries and keyboard focus', [
   ['--control-border', '--surface'], ['--control-border', '--background'],
+  ['--control-border', '--secondary'],
   ['--primary-border', '--surface'], ['--primary-border', '--background'],
   ['--focus', '--surface'], ['--focus', '--background'], ['--focus', '--primary'], ['--focus', '--primary-hover'], ['--focus', '--primary-light'],
 ], 3);
 group('Status text', ['success', 'warning', 'danger', 'info'].map(name => [`--${name}`, `--${name}-bg`]), 4.5);
 group('Chart marks on the surface and track', ['cash', 'cash-current', 'occupied', 'vacant', 'other', 'electric', 'water']
   .flatMap(name => [[`--chart-${name}`, '--surface'], [`--chart-${name}`, '--chart-track']]), 3);
+
+// A valid token pair is useful only if the real controls use it. Inspect the
+// authored declarations for base, hover/pressed and readable disabled states.
+function declaration(selector, property, stylesheet = css) {
+  let result;
+  stylesheet.walkRules(rule => {
+    if (!rule.selectors?.includes(selector)) return;
+    rule.walkDecls(property, item => { result = item.value.trim(); });
+  });
+  return result;
+}
+for (const role of actionRoles) {
+  const selector = `.btn-${role}`;
+  for (const state of ['', ':hover', ':active']) {
+    const target = selector + state;
+    assert.equal(declaration(target, 'background'), `var(--action-${role}-${state ? 'hover' : 'bg'})`, `${target} background must use its functional color`);
+    assert.equal(declaration(target, 'color'), `var(--action-${role}-foreground)`, `${target} text must use its readable foreground`);
+    assert.equal(declaration(target, 'border-color'), `var(--action-${role}-border)`, `${target} must retain a visible boundary`);
+  }
+}
+assert.equal(declaration('.btn:disabled', 'opacity'), '1', 'Disabled button labels must not be faded with opacity');
+assert.equal(declaration('.btn:disabled', 'background'), 'var(--secondary)');
+assert.equal(declaration('.btn:disabled', 'color'), 'var(--muted)');
+assert.equal(declaration('.btn:disabled', 'border-color'), 'var(--control-border)');
+console.log('PASS Functional button colors bind default/hover/pressed states to their tokens and keep disabled labels readable');
+
+const meterCss = postcss.parse(await readFile(new URL('../src/frontend/meter-reader.css', import.meta.url), 'utf8'));
+for (const selector of ['.meter-reader-proposal', '.meter-reader-applied']) {
+  assert.equal(declaration(selector, 'background', meterCss), 'var(--action-assistant-bg)', `${selector} is an unverified AI proposal, not a success state`);
+}
+for (const selector of ['.meter-reader-proposal>strong', '.meter-reader-proposal>p', '.meter-reader-proposal>ul', '.meter-reader-applied']) {
+  assert.equal(declaration(selector, 'color', meterCss), 'var(--action-assistant-foreground)', `${selector} must use the contrast-checked proposal foreground`);
+}
+console.log('PASS Unverified and merely applied OCR proposals use assistant colors until landlord verification');
 
 let count = 0;
 const failures = [];

@@ -12,7 +12,7 @@ Cập nhật **01/11/2026**. Ghi chú này mô tả mã đang có trong bản ch
 | Điện nước thủ công | Nhập chỉ số tích lũy đầu/cuối kỳ hoặc lượng tiêu thụ kỳ này; hiển thị số cuối kỳ được tính và yêu cầu xác nhận. | Lượng dùng tháng này có thể thấp hơn tháng trước. Đầu kỳ vẫn là chỉ số tích lũy đã chốt; chưa bổ sung nghiệp vụ quay vòng/thay/reset công tơ. |
 | Tài chính | Xem trước/nháp/phát hành/điều chỉnh hóa đơn; ghi nhận thanh toán, công nợ, cọc, số dư và thu chi; lưu lịch sử. | Chủ trọ xác nhận tiền thực nhận. VietQR là chỉ dẫn chuyển khoản; chưa đối soát ngân hàng hoặc tự chuyển tiền. |
 | Vận hành và cổng tenant | Dashboard, thông báo, tài liệu, yêu cầu hỗ trợ, bảo trì, tài sản, phương tiện, tiện ích và bàn giao theo quyền. Chỉ khách trọ tạo yêu cầu hỗ trợ; chủ trọ xem, tiếp nhận và phản hồi. Mục hỗ trợ ở sidebar mở Trợ lý Trozy cho chủ trọ, yêu cầu hỗ trợ cho khách trọ. | Chưa có vai trò nhân viên/kỹ thuật viên, chat thời gian thực hoặc ứng dụng native. |
-| Giao diện | Màu hồng nhẹ cho thao tác, nền trung tính, màu trạng thái/biểu đồ rõ; sidebar thu gọn, thanh ngang gom mục dư vào **Thêm**. Nút chọn cơ sở gọn, địa chỉ hiện khi mở danh sách. | Kiểm tra DOM và token màu không thay thế kiểm tra bố cục/zoom/thiết bị thật. |
+| Giao diện | Xanh dương làm chủ đạo cho hai thanh điều hướng; nút xanh lá cho lưu/xác nhận/xuất Excel, hổ phách cho sửa/thử lại và tím cho AI; nền trung tính, màu trạng thái/biểu đồ rõ; sidebar thu gọn, thanh ngang gom mục dư vào **Thêm**. Nút chọn cơ sở gọn, địa chỉ hiện khi mở danh sách. | Kiểm tra DOM và token màu không thay thế kiểm tra bố cục/zoom/thiết bị thật. |
 | AI B01/B02/B04 | Trợ lý vận hành, phân tích tiêu thụ và gợi ý phân loại bảo trì có luồng cục bộ, nhãn nguồn và thao tác áp dụng/xác nhận. | Kết quả là hỗ trợ theo phạm vi tài liệu; AI không tự thanh toán, ký hợp đồng, khấu trừ cọc hoặc xác minh ảnh thay chủ nhà. |
 
 ## Đang hoàn thiện
@@ -45,8 +45,11 @@ Mốc quản lý cơ sở đã ghi nhận **156 kiểm tra Node đạt**, **18 n
 
 Mốc tách luồng hỗ trợ theo vai trò bổ sung kiểm tra quyền tạo ticket: **157/157 Node**, **21 nhóm App shell**, **5 nhóm UI hỗ trợ** và build TypeScript/Vite đạt. Các nhóm UI kiểm tra cả đường dẫn sidebar trên desktop/mobile, quyền tạo của khách và khả năng xem/phản hồi của chủ trọ.
 
+Mốc đổi theme xanh dương bổ sung **67 cặp tương phản token** cho nút theo chức năng, gồm trạng thái thường/hover/active/disabled; build và các nhóm kiểm tra UI liên quan đạt. Đã xem trực tiếp dashboard và trang phòng trên Chrome ở cửa sổ desktop; kiểm tra zoom/thiết bị và mọi trạng thái vẫn cần hoàn thiện.
+
 - [Biên bản quản lý cơ sở](test/PROPERTY-MANAGEMENT-20261101.md)
 - [Biên bản hỗ trợ theo vai trò](test/UI-SUPPORT-ROLES-20261101.md)
+- [Biên bản theme xanh dương](test/UI-BLUE-THEME-20261101.md)
 - [Biên bản nhập lượng tiêu thụ](test/METER-CONSUMPTION-ENTRY-20261101.md)
 - [Biên bản màu giao diện](test/UI-COLOR-CLARITY-20261101.md)
 - [Đối chiếu module và giới hạn](requirements/FEATURE-COVERAGE.md) — có phần lịch sử; đọc hướng dẫn công tơ hiện hành cho engine mới.

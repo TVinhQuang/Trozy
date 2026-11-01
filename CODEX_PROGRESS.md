@@ -1,3 +1,13 @@
+## Theme xanh dương và phân màu nút — 01/11/2026 (hoàn tất triển khai và kiểm thử)
+
+- Theo yêu cầu mới, hệ màu chủ đạo chuyển từ hồng sang xanh dương; thanh ngang/dọc giữ cấu trúc và cùng màu chủ đạo. Nút chính/tạo mới xanh dương; lưu/xác nhận/xuất dữ liệu xanh lá; sửa/điều chỉnh/thử lại hổ phách; trợ lý/AI/OCR proposal tím; xóa đỏ, hủy trung tính. Chữ đậm dễ đọc; disabled action không làm mờ chữ bằng opacity.
+- Đã đồng bộ CSS, auth, logo/favicon, theme-color, menu/selection và vùng chọn ảnh. TSX chỉ đổi className (đối chiếu AST), không đổi handler, nhãn, quyền hoặc nghiệp vụ. Đề xuất OCR chưa xác minh dùng tím; chỉ xác minh/lưu chính thức xanh lá. OCR/B03 vẫn đang hoàn thiện/thử nghiệm.
+- Review cuối phát hiện nền proposal/applied OCR cũ vẫn xanh lá; đã đổi cả hai vùng sang tím và thêm kiểm tra binding màu để tránh biểu thị đã xác minh. Focus/đường chọn vùng dùng xanh chủ đạo; chạy lại contrast, AI UI và build sau sửa.
+- Kiểm chứng: **67 cặp contrast**, build TypeScript/Vite, **132 render**, **21 shell**, **41 AI UI**, **8 phòng/dashboard**, **6 nhập lượng tiêu thụ**, **10 quản lý cơ sở**, **5 hỗ trợ** đạt; CSS/JSON/whitespace đạt. Chữ nút chức năng >=6.06:1. Không chạy lại backend vì chỉ đổi màu/class; mốc 157/157 trước giữ nguyên.
+- Native Computer Use lần này xem được Chrome: dashboard và trang phòng khoảng1286×810 có điều hướng xanh, Xuất Excel xanh lá/Thêm phòng xanh và FAB tím. Không lưu/xuất hoặc sửa dữ liệu thật. Nút chỉnh sửa ngoài khung bị chặn; thao tác tab sau phát hiện người dùng nhập nên dừng điều khiển. Chưa tuyên bố toàn bộ form/hover/zoom/mobile render đạt; browser DOM host chưa khả dụng. Chi tiết `docs/test/UI-BLUE-THEME-20261101.md`.
+- PRODUCT/DESIGN/sidecar, README và PROJECT-STATUS đã cập nhật. Các biên bản lịch sử, PA2/crop ngoài phạm vi giữ nguyên. Không tải thêm dependency/model hoặc tạo tệp tạm riêng. Tác vụ lưu bằng commit riêng sau `86f5110` để đồng bộ GitHub theo yêu cầu hiện hành; dùng push fast-forward và đối chiếu SHA, không force push.
+- Nếu phiên ngắt ở bước xuất bản: kiểm tra `git status`, `git log -3 --oneline`, `git ls-remote origin refs/heads/main` rồi chỉ push commit còn thiếu. Không có cơ chế tự mở lượt chạy sau cấp lại quota; gửi “tiếp tục theo CODEX_PROGRESS.md” khi cần.
+
 ## Bỏ dòng môn học/nhóm ở footer — 01/11/2026 (hoàn tất)
 
 - Đã xóa dòng “Nhập môn Công nghệ phần mềm · Nhóm 11” khỏi footer ứng dụng theo ảnh người dùng. Bỏ selector mobile ẩn span cuối để dòng bản quyền còn lại không bị ẩn nhầm.

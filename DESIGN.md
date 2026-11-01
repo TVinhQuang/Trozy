@@ -1,14 +1,14 @@
 ---
-name: Trozy Rose
-description: Light-pink actions, neutral work surfaces and distinct data colors for clear rental management.
+name: Trozy Blue
+description: Blue navigation, distinct functional actions and readable data colors for rental management.
 colors:
-  primary: "#ffb3d5"
-  primary-hover: "#ff9ecb"
-  primary-light: "#fff0f7"
-  primary-foreground: "#751442"
-  accent-text: "#a32367"
-  focus: "#b52f70"
-  primary-border: "#c64c85"
+  primary: "#c8ddff"
+  primary-hover: "#b6d2ff"
+  primary-light: "#edf4ff"
+  primary-foreground: "#163e73"
+  accent-text: "#2154a2"
+  focus: "#23539a"
+  primary-border: "#4879bc"
   background: "#f5f6f8"
   surface: "#ffffff"
   foreground: "#273142"
@@ -20,8 +20,8 @@ colors:
   surface-hover: "#f8f9fc"
   table-header: "#f4f6fa"
   scrollbar: "#b1bac8"
-  selection-bg: "#ffe1ef"
-  divider-accent: "#e7a2c0"
+  selection-bg: "#dceaff"
+  divider-accent: "#aac5eb"
   info: "#2b5eab"
   info-bg: "#edf3ff"
   chart-track: "#edf0f5"
@@ -38,7 +38,19 @@ colors:
   warning-bg: "#fcf4e3"
   danger: "#ac354c"
   danger-bg: "#fcecf0"
-  ring-focus: "#b52f7026"
+  ring-focus: "#23539a26"
+  action-success-bg: "#e2f3eb"
+  action-success-hover: "#cdebdc"
+  action-success-foreground: "#1b5e42"
+  action-success-border: "#3c8466"
+  action-warning-bg: "#fff1d7"
+  action-warning-hover: "#ffe4b5"
+  action-warning-foreground: "#754708"
+  action-warning-border: "#9b6a1b"
+  action-assistant-bg: "#eee9ff"
+  action-assistant-hover: "#e0d5ff"
+  action-assistant-foreground: "#573593"
+  action-assistant-border: "#8462b3"
 typography:
   headline:
     fontFamily: "'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif"
@@ -91,6 +103,21 @@ components:
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
     textColor: "{colors.primary-foreground}"
+  button-success:
+    backgroundColor: "{colors.action-success-bg}"
+    textColor: "{colors.action-success-foreground}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  button-warning:
+    backgroundColor: "{colors.action-warning-bg}"
+    textColor: "{colors.action-warning-foreground}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
+  button-assistant:
+    backgroundColor: "{colors.action-assistant-bg}"
+    textColor: "{colors.action-assistant-foreground}"
+    rounded: "{rounded.control}"
+    padding: "10px 16px"
   button-secondary:
     backgroundColor: "{colors.secondary}"
     textColor: "{colors.foreground}"
@@ -118,38 +145,38 @@ components:
     padding: "4px 9px"
 ---
 
-# Design System: Trozy Rose
+# Design System: Trozy Blue
 
 ## Overview
 
 **Creative North Star: "A calmer rental workspace"**
 
-Trozy's implemented interface uses fresh light-pink actions on a neutral, light-gray work canvas with white panels and dark ink. Pink identifies actions and selection; separate semantic families identify operational states and chart data. The visual direction supports everyday Vietnamese rental-management tasks through readable hierarchy, consistent controls and clear separation between information and decisions.
+Trozy's implemented interface uses fresh light-blue actions on a neutral, light-gray work canvas with white panels and dark ink. Blue identifies actions and selection; separate semantic families identify operational states and chart data. The visual direction supports everyday Vietnamese rental-management tasks through readable hierarchy, consistent controls and clear separation between information and decisions.
 
 The system is restrained and practical. Navigation can become an icon rail or an overlay drawer, while tables and forms adapt structurally to the available width. Original meter images and verification controls remain operational content rather than decoration.
 
 **Key Characteristics:**
 
-- Light-pink actions, neutral work surfaces and distinct semantic chart colors.
+- Light-blue actions, neutral work surfaces and distinct semantic chart colors.
 - Familiar navigation and consistent controls.
 - Responsive composition with independently scrollable data tables.
 - Quiet surfaces with deliberate overlay elevation.
 
-This is a source-extracted record of the implementation on 2026-11-01. Rendered browser QA for this refinement has not been completed because the browser access host is unavailable. This document does not assert user approval of a rendered result or a visual pass.
+This records the implementation on 2026-11-01. Token and source checks are distinct from rendered layout, zoom and device acceptance; this document does not claim a complete visual QA pass.
 
 ## Colors
 
-Fresh light pink carries primary-action fills, with dark-pink text and a stronger rose boundary. The neutral canvas, white panels and gray table headings reduce competing pink surfaces. Separate tokens distinguish passive separators from interactive control boundaries; the latter meet 3:1 against the declared adjacent white and canvas colors. The YAML frontmatter is the normative token source.
+Fresh light blue carries primary-action fills, with dark-blue text and a stronger blue boundary. The neutral canvas, white panels and gray table headings reduce competing blue surfaces. Separate tokens distinguish passive separators from interactive control boundaries; the latter meet 3:1 against the declared adjacent white and canvas colors. The YAML frontmatter is the normative token source.
 
 ### Primary
 
-- **Fresh Light Pink:** primary buttons and brand fills.
-- **Fresh Pink Hover:** primary hover and pressed fills.
-- **Pale Fresh Pink:** selected tabs, workspace context and quiet accent surfaces.
-- **Dark Pink on Light Pink:** primary-action text.
-- **Pink Action Boundary:** clear primary-button and workspace-selector boundaries.
-- **Readable Pink Accent:** links, selected labels and icon text.
-- **Pink Focus:** keyboard outlines, focused boundaries and small control indicators.
+- **Fresh Light Blue:** primary buttons and brand fills.
+- **Fresh Blue Hover:** primary hover and pressed fills.
+- **Pale Fresh Blue:** selected tabs, workspace context and quiet accent surfaces.
+- **Dark Blue on Light Blue:** primary-action text.
+- **Blue Action Boundary:** clear primary-button and workspace-selector boundaries.
+- **Readable Blue Accent:** links, selected labels and icon text.
+- **Blue Focus:** keyboard outlines, focused boundaries and small control indicators.
 
 ### Neutral
 
@@ -176,9 +203,9 @@ Green, amber and red remain semantic success, warning and danger families. Blue 
 
 Chart marks use solid colors rather than lowering historical periods to partial opacity. The latest utility period has a bold date and a tooltip; its positive bar has an outline. Zero values have no filled bar. Occupancy renders only positive segments so a zero category cannot acquire a separator pixel; the written legend retains every count. White segment boundaries aid separation.
 
-`npm.cmd run check:ui-colors` verifies 39 declared opaque token pairs. Current minimum contrast is 5.07:1 for ordinary/secondary text, 5.69:1 for links/primary text, 3.05:1 for control/focus boundaries, 5.29:1 for status text and 3.52:1 for chart marks against their declared backgrounds. This calculation is not a computed-browser, photo-overlay or color-vision simulation pass.
+`npm.cmd run check:ui-colors` verifies 67 declared opaque token pairs and the real base/hover/pressed/disabled CSS bindings. Text pairs must reach 4.5:1 and control/focus/chart pairs 3:1. Current minima are 5.07:1 for body/secondary text, 6.05:1 for primary/selected text, 6.06:1 for functional button text, 3.46:1 for functional boundaries, 5.45:1 for focus on functional fills, 3.03:1 for control/focus boundaries, 5.29:1 for status text and 3.52:1 for chart marks. This calculation is not a computed-browser, photo-overlay or color-vision simulation pass.
 
-**The Meaningful Accent Rule.** Use rose to indicate an action, current selection or focus; preserve independent semantic colors for status.
+**The Meaningful Accent Rule.** Use blue to indicate an action, current selection or focus; preserve independent semantic colors for status.
 
 ## Typography
 
@@ -221,17 +248,17 @@ Controls have gently curved corners; panels and dialogs use a larger radius. Sta
 
 ### Buttons
 
-Primary actions use fresh light-pink fills with dark-pink text and the dedicated pink action boundary. Standard controls use a white surface and a visible control boundary; secondary actions use a soft neutral fill with the same clear boundary. Danger controls use semantic red text and border on a pale background. Focus is a visible 3px focus-token rose outline; hover and pressed states change fill or boundary. Disabled controls reduce opacity and indicate their disabled state.
+Primary creation and navigation actions use light-blue fills with dark-blue text and the dedicated blue boundary. Save/confirm/receive-payment/Excel actions use pale green with dark green text; edit/retry actions use pale amber with dark amber text; AI actions use pale violet with dark violet text. These roles add hierarchy without recoloring the horizontal or vertical navigation by function: both navigation regions keep the shared blue selection and focus language. Standard and cancel controls remain white or neutral. Danger controls retain semantic red. Every action family declares default, hover and pressed fills, text and boundary. The visible 3px blue focus outline remains distinct on all action fills. Disabled buttons use opaque neutral fills, readable secondary ink and the control boundary instead of fading the whole button.
 
 ### Inputs / Fields
 
-Fields use the dedicated control-boundary token, white surface, control radius and a 44px minimum height. Focus changes the boundary to rose and adds a translucent ring. Supporting hints stay near their field. Text areas can be resized vertically. Disabled controls use the soft neutral surface.
+Fields use the dedicated control-boundary token, white surface, control radius and a 44px minimum height. Focus changes the boundary to blue and adds a translucent ring. Supporting hints stay near their field. Text areas can be resized vertically. Disabled controls use the soft neutral surface.
 
 ### Navigation
 
-The wordmark is written **Trozy.** with an uppercase T. A continuous 2px fresh-pink line below the primary navigation separates the moving header from the page content; the active-route underline remains stronger and local to its button.
+The wordmark is written **Trozy.** with an uppercase T. A continuous 2px fresh-blue line below the primary navigation separates the moving header from the page content; the active-route underline remains stronger and local to its button.
 
-Navigation is split by frequency of use. The horizontal primary bar contains Tổng quan, Phòng trọ, Điện & nước, Hóa đơn, Thanh toán, Hợp đồng, Người thuê and Bảo trì; tenant access removes destinations not permitted for that role. The shorter visible labels Thanh toán and Bảo trì retain the full accessible labels Lịch sử thanh toán and Bảo trì & sự cố. The active primary route uses rose text, a pale fill and an underline.
+Navigation is split by frequency of use. The horizontal primary bar contains Tổng quan, Phòng trọ, Điện & nước, Hóa đơn, Thanh toán, Hợp đồng, Người thuê and Bảo trì; tenant access removes destinations not permitted for that role. The shorter visible labels Thanh toán and Bảo trì retain the full accessible labels Lịch sử thanh toán and Bảo trì & sự cố. The active primary route uses blue text, a pale fill and an underline.
 
 The bar measures its container and natural active-weight labels, including icons and counters, then retains the leading destinations that fit alongside **Thêm (n)**. The remaining routes appear in that menu in the same order. Wide containers show all permitted destinations without a More button. ResizeObserver, viewport resizing and font-loading events recalculate the split; inert, aria-hidden measurement spans add no duplicate controls or horizontal page overflow.
 
@@ -239,7 +266,7 @@ The **Thêm** trigger uses the active treatment when the current destination is 
 
 The supplementary sidebar has three exclusive accordion groups: Quản lý cơ sở contains Cơ sở nhà trọ, Dịch vụ & phụ phí, Tài sản & thiết bị, Phương tiện, Tiện ích chung and Bàn giao phòng; Tài chính & báo cáo contains Sổ thu chi, Tiền cọc, Báo cáo and Tiêu thụ điện nước; Trao đổi & tài liệu contains Thông báo, Yêu cầu hỗ trợ and Tài liệu & nội quy. Trợ lý Trozy and Cài đặt remain separate utility links. Entries and empty groups are filtered by role. Group toggles expose their expanded state and controlled region; closed entries are hidden and unmounted. An active secondary route opens its group, and opening a group from the compact icon rail first expands the sidebar.
 
-The active supplementary destination uses a pale fresh-pink fill and readable accent-text labels. Compact mode preserves accessible labels and title text for icon-only controls. Collapse controls are available in the desktop topbar and sidebar. The chosen compact/expanded preference is saved locally; narrow-screen drawer state is temporary. Notifications and maintenance links display their existing application counts where applicable.
+The active supplementary destination uses a pale fresh-blue fill and readable accent-text labels. Compact mode preserves accessible labels and title text for icon-only controls. Collapse controls are available in the desktop topbar and sidebar. The chosen compact/expanded preference is saved locally; narrow-screen drawer state is temporary. Notifications and maintenance links display their existing application counts where applicable.
 
 The sidebar footer **Cần một chút hỗ trợ?** opens **Trợ lý Trozy** for landlords and **Yêu cầu hỗ trợ** for tenants. Its supporting text and icon identify that destination. Only tenants see the support-ticket creation action and form; the ticket is tied to their own tenancy. Landlords see incoming requests, replies and handling actions, with role-appropriate empty-state text. The API also restricts ticket creation to tenants. The separate maintenance workflow retains its existing permissions.
 
@@ -293,7 +320,7 @@ Cashflow bars display exact month amounts beside proportional widths; a zero amo
 
 ### Do:
 
-- **Do** use the shared rose tokens for primary actions and current selection.
+- **Do** use the shared blue tokens for primary actions and current selection.
 - **Do** preserve green, amber and red status meaning.
 - **Do** change layout structure when the window becomes narrow.
 - **Do** keep exact money values and original meter evidence legible.

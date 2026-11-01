@@ -88,7 +88,7 @@ function OwnerPropertyManager({ mode, onClose, onSelect }: PropertyManagerProps)
           <span className="property-manager-icon"><Building2 size={23}/></span>
           <div className="property-manager-information"><h3>{property.name}</h3><p>{property.address || 'Chưa có địa chỉ'}</p><div className="property-manager-meta"><Badge value={property.archived ? 'archived' : 'active'} label={property.archived ? 'Đã lưu trữ' : 'Hoạt động'}/><span>{roomCount(property.id)} phòng</span>{property.id === propertyId && <span>Đang quản lý</span>}</div></div>
           <div className="property-manager-actions">
-            <button className="icon-button" aria-label={`Chỉnh sửa cơ sở ${property.name}`} title="Chỉnh sửa" disabled={busy} onClick={() => edit(property)}><Pencil size={17}/></button>
+            <button className="icon-button btn-warning" aria-label={`Chỉnh sửa cơ sở ${property.name}`} title="Chỉnh sửa" disabled={busy} onClick={() => edit(property)}><Pencil size={17}/></button>
             <button className="icon-button" aria-label={`${property.archived ? 'Khôi phục' : 'Lưu trữ'} cơ sở ${property.name}`} title={property.archived ? 'Khôi phục' : 'Lưu trữ'} disabled={busy} onClick={() => confirm(property, property.archived ? 'restore' : 'archive')}>{property.archived ? <RotateCcw size={17}/> : <Archive size={17}/>}</button>
             <button className="icon-button danger-text" aria-label={`Xóa cơ sở ${property.name}`} title="Xóa" disabled={busy} onClick={() => confirm(property, 'delete')}><Trash2 size={17}/></button>
             {!property.archived && <button className="btn btn-sm" aria-label={`Mở cơ sở ${property.name}`} disabled={busy} onClick={() => choose(property.id)}>Mở<ArrowRight size={16}/></button>}
@@ -106,7 +106,7 @@ function OwnerPropertyManager({ mode, onClose, onSelect }: PropertyManagerProps)
         </div>
         {!view.id && <p className="form-note">Sau khi tạo cơ sở, bạn có thể thêm phòng trong mục Phòng trọ.</p>}
         {error && <p ref={errorRef} className="form-error" role="alert" tabIndex={-1}>{error}</p>}
-        <div className="form-actions"><button type="button" className="btn" disabled={busy} onClick={mode === 'create' && !view.id ? close : list}>{mode === 'create' && !view.id ? 'Hủy' : 'Quay lại danh sách'}</button><button type="submit" className="btn btn-primary" disabled={busy}>{busy ? 'Đang lưu…' : view.id ? 'Lưu thay đổi' : 'Tạo cơ sở'}</button></div>
+        <div className="form-actions"><button type="button" className="btn" disabled={busy} onClick={mode === 'create' && !view.id ? close : list}>{mode === 'create' && !view.id ? 'Hủy' : 'Quay lại danh sách'}</button><button type="submit" className={`btn ${view.id ? 'btn-success' : 'btn-primary'}`} disabled={busy}>{busy ? 'Đang lưu…' : view.id ? 'Lưu thay đổi' : 'Tạo cơ sở'}</button></div>
       </form> : <>
         {selected ? <>
           <div className="property-manager-target"><Building2 size={23}/><div><strong>{selected.name}</strong><p className="muted">{selected.address || 'Chưa có địa chỉ'}</p></div></div>
@@ -117,7 +117,7 @@ function OwnerPropertyManager({ mode, onClose, onSelect }: PropertyManagerProps)
           </> : <p>{view.action === 'delete' ? 'Xóa cơ sở này khỏi danh sách? Chỉ cơ sở không có phòng và không có dữ liệu liên quan mới có thể xóa. Thao tác này không thể hoàn tác.' : view.action === 'archive' ? 'Lưu trữ sẽ ẩn cơ sở khỏi danh sách đang quản lý và giữ lại lịch sử. Hãy kết thúc các hợp đồng đang hoạt động trước khi lưu trữ.' : 'Cơ sở sẽ hiển thị lại trong danh sách để bạn tiếp tục quản lý.'}</p>}
           {view.action === 'delete' && roomCount(selected.id) === 0 && <div className="property-manager-alternatives"><button className="btn" disabled={busy} onClick={() => confirm(selected, selected.archived ? 'restore' : 'archive')}>{selected.archived ? 'Khôi phục cơ sở' : 'Lưu trữ cơ sở'}</button><span className="form-note">Giữ lại dữ liệu và lịch sử của cơ sở.</span></div>}
           {error && <p ref={errorRef} className="form-error" role="alert" tabIndex={-1}>{error}</p>}
-          <div className="form-actions"><button className="btn" data-manager-focus disabled={busy} onClick={list}>Quay lại danh sách</button>{!(view.action === 'delete' && roomCount(selected.id) > 0) && <button className={`btn ${view.action === 'delete' ? 'btn-danger' : 'btn-primary'}`} disabled={busy} onClick={apply}>{busy ? 'Đang xử lý…' : view.action === 'delete' ? 'Xóa cơ sở' : view.action === 'archive' ? 'Lưu trữ' : 'Khôi phục'}</button>}</div>
+          <div className="form-actions"><button className="btn" data-manager-focus disabled={busy} onClick={list}>Quay lại danh sách</button>{!(view.action === 'delete' && roomCount(selected.id) > 0) && <button className={`btn ${view.action === 'delete' ? 'btn-danger' : view.action === 'archive' ? 'btn-warning' : 'btn-success'}`} disabled={busy} onClick={apply}>{busy ? 'Đang xử lý…' : view.action === 'delete' ? 'Xóa cơ sở' : view.action === 'archive' ? 'Lưu trữ' : 'Khôi phục'}</button>}</div>
         </> : <><p role="status">Cơ sở không còn trong danh sách. Hãy kiểm tra danh sách mới nhất.</p><div><button className="btn" data-manager-focus onClick={list}>Quay lại danh sách</button></div></>}
       </>}
     </div>

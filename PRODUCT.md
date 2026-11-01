@@ -29,7 +29,7 @@ The existing application is React/TypeScript with Vite, a Node.js HTTP API and S
 
 ## Brand Commitments
 
-Keep the Trozy name and Vietnamese product language. The user explicitly requested a complete interface refresh using a gentle light-pink palette and more convenient behavior when shrinking or enlarging a browser tab/window. Exact visual tokens and component behavior are documented separately in `DESIGN.md`.
+Keep the Trozy name and Vietnamese product language. The latest user direction is a blue interface with distinct functional button colors and readable foregrounds. Horizontal and vertical navigation keep their current structure and a consistent blue brand treatment. Preserve the earlier improvements for shrinking or enlarging a browser tab/window. Exact visual tokens and component behavior are documented separately in `DESIGN.md`.
 
 ## Evidence on Hand
 
