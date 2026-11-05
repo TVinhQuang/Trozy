@@ -1,5 +1,5 @@
 import { useId, useMemo, useState, type ReactNode } from 'react';
-import { ArrowDownLeft, ArrowRight, ArrowUpRight, Building2, CalendarDays, Check, CheckCircle2, ChevronRight, CircleDollarSign, Download, Eye, FileText, Grid2X2, Home, List, Plus, ReceiptText, Search, ShieldCheck, TrendingUp, Users, Wallet, Wrench, X } from 'lucide-react';
+import { ArrowDownLeft, ArrowRight, ArrowUpRight, Building2, CalendarDays, Camera, Car, Check, CheckCircle2, ChevronRight, CircleDollarSign, Coffee, Download, Eye, FileText, Grid2X2, Home, List, MessageSquare, Plus, ReceiptText, Search, ShieldCheck, TrendingUp, Users, Wallet, Wrench, X, Zap } from 'lucide-react';
 import { api, date, download, money, number, today } from '../api';
 import { useApp, useRecords } from '../context';
 import { Badge, DataTable, EmptyState, EntityPage, Field, Modal, PageHeader, StatCard, type FieldDefinition } from '../ui';
@@ -14,34 +14,271 @@ import { MeterReadingEntry } from '../meter-reading-entry';
 
 export function invoiceState(invoice:RecordData){if(invoice.status==='cancelled'||invoice.status==='draft')return invoice.status;if(invoice.paid>=invoice.total)return 'paid';if(invoice.dueDate&&invoice.dueDate<today())return 'overdue';return invoice.paid>0?'partial':'unpaid';}
 const sum=(rows:RecordData[],key:string)=>rows.reduce((total,row)=>total+Number(row[key]||0),0);
-export function Dashboard(){
- const {user,data,navigate}=useApp(),rooms=useRecords('rooms').filter(r=>r.status!=='archived'),invoices=useRecords('invoices').filter(i=>i.status!=='cancelled'&&i.status!=='draft'),payments=useRecords('payments').map<RecordData>(payment=>({...payment,amount:actualCashAmount(payment)})),issues=useRecords('issues'),notifications=useRecords('notifications'),deposits=useRecords('deposits');
- const landlord=user.role==='landlord',occupied=rooms.filter(r=>r.status==='occupied').length,vacant=rooms.filter(r=>r.status==='vacant').length,debts=invoices.filter(i=>i.total>i.paid),debt=sum(debts,'total')-sum(debts,'paid'),openIssues=issues.filter(i=>!['closed'].includes(i.status));
+
+function LandlordDashboard(){
+ const {data,navigate}=useApp(),rooms=useRecords('rooms').filter(r=>r.status!=='archived'),invoices=useRecords('invoices').filter(i=>i.status!=='cancelled'&&i.status!=='draft'),payments=useRecords('payments').map<RecordData>(payment=>({...payment,amount:actualCashAmount(payment)})),issues=useRecords('issues'),notifications=useRecords('notifications'),deposits=useRecords('deposits');
+ const occupied=rooms.filter(r=>r.status==='occupied').length,vacant=rooms.filter(r=>r.status==='vacant').length,debts=invoices.filter(i=>i.total>i.paid),debt=sum(debts,'total')-sum(debts,'paid'),openIssues=issues.filter(i=>!['closed'].includes(i.status));
  const now=today(),currentMonth=now.slice(0,7),monthly=payments.filter(p=>String(p.date||p.createdAt).startsWith(currentMonth));
  const months=Array.from({length:6},(_,i)=>{const d=new Date(`${currentMonth}-01T12:00:00`);d.setMonth(d.getMonth()-5+i);const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;return {key,label:`Tháng ${d.getMonth()+1}`,value:sum(payments.filter(p=>String(p.date||p.createdAt).startsWith(key)),'amount')};});
  const peak=Math.max(...months.map(m=>m.value),1),periodTotal=months.reduce((total,month)=>total+month.value,0),occupancy=Math.round(occupied/Math.max(rooms.length,1)*100);
  const roomName=(id:string)=>data.rooms.find(r=>r.id===id)?.code||'—';
  const roomStates=[{label:'Đang thuê',value:occupied,className:'occupied'},{label:'Phòng trống',value:vacant,className:'vacant'},{label:'Bảo trì / bàn giao',value:rooms.filter(r=>['maintenance','handover'].includes(r.status)).length,className:'other'}];
- const metrics=landlord?[
+ const metrics=[
   {label:'Phòng trọ',value:number(rooms.length),detail:`${occupied} đang thuê · ${vacant} còn trống`,icon:Building2},
   {label:'Đã thu trong tháng',value:money(sum(monthly,'amount')),detail:`Tháng ${currentMonth.split('-').reverse().join('/')}`,icon:Wallet},
   {label:'Công nợ cần thu',value:money(debt),detail:`${debts.length} hóa đơn chưa thu đủ`,icon:ReceiptText},
   {label:'Yêu cầu sửa chữa',value:number(openIssues.length),detail:`${issues.filter(i=>i.status==='urgent'||i.priority==='urgent').length} yêu cầu ưu tiên cao`,icon:Wrench},
- ]:[
-  {label:'Phòng đang thuê',value:rooms.find(r=>r.status==='occupied')?.code||'Chưa liên kết',detail:data.properties.find(property=>property.id===rooms[0]?.propertyId)?.name||'Thông tin lưu trú',icon:Home},
-  {label:'Cần thanh toán',value:money(debt),detail:`${debts.length} hóa đơn đang chờ`,icon:ReceiptText},
-  {label:'Tiền cọc đang giữ',value:money(deposits.reduce((s,d)=>s+(d.type==='receipt'?1:-1)*d.amount,0)),detail:'Được quyết toán khi trả phòng',icon:Wallet},
-  {label:'Yêu cầu của bạn',value:number(openIssues.length),detail:'Đang được theo dõi',icon:Wrench},
  ];
  return <div className="page-stack rose-dashboard">
   <h1 className="sr-only">Tổng quan</h1>
-  <div className="rose-dashboard-toolbar"><div className="rose-date-label"><CalendarDays size={17}/><DashboardDate/></div><div className="rose-overview-actions"><button className="btn btn-primary" onClick={()=>navigate(landlord?'rooms':'contracts')}>{landlord?<Home size={17}/>:<FileText size={17}/>} {landlord?'Quản lý phòng trọ':'Xem hợp đồng'}<ArrowRight size={16}/></button><button className="btn btn-info" onClick={()=>navigate(landlord?'readings':'issues')}>{landlord?'Theo dõi điện nước':'Gửi yêu cầu sửa chữa'}</button><button className="btn btn-report" onClick={()=>navigate(landlord?'reports':'invoices')}>{landlord?'Xem báo cáo':'Hóa đơn của tôi'}</button></div></div>
+  <div className="rose-dashboard-toolbar"><div className="rose-date-label"><CalendarDays size={17}/><DashboardDate/></div><div className="rose-overview-actions"><button className="btn btn-primary" onClick={()=>navigate('rooms')}><Home size={17}/> Quản lý phòng trọ<ArrowRight size={16}/></button><button className="btn btn-info" onClick={()=>navigate('readings')}>Theo dõi điện nước</button><button className="btn btn-report" onClick={()=>navigate('reports')}>Xem báo cáo</button></div></div>
   <section className="rose-overview" aria-label="Thông tin tổng quan"><dl className="rose-metrics">{metrics.map(metric=><div className="rose-metric" key={metric.label}><dt><metric.icon size={17}/>{metric.label}</dt><dd>{metric.value}</dd><p>{metric.detail}</p></div>)}</dl></section>
-  <div className="rose-dashboard-panels"><section className="card rose-cashflow"><div className="card-header"><div><h2>{landlord?'Dòng tiền thực thu':'Lịch sử thanh toán'}</h2><p>Sáu tháng gần nhất · tiền đã nhận</p></div><button className="icon-button" aria-label="Xem lịch sử thanh toán" onClick={()=>navigate('payments')}><ArrowUpRight size={19}/></button></div><div className="card-body"><div className="rose-cashflow-summary"><span>Tổng trong kỳ</span><strong>{money(periodTotal)}</strong></div><ol className="rose-cashflow-chart" aria-label="Số tiền thực thu từng tháng">{months.map((month,index)=><li key={month.key} className={index===5?'is-current':''}><span className="rose-cashflow-month">{month.label}{index===5&&<small>Hiện tại</small>}</span><div className="rose-cashflow-track" aria-hidden="true"><span style={{width:`${Math.max(0,month.value)/peak*100}%`}}/></div><strong>{money(month.value)}</strong></li>)}</ol>{periodTotal===0&&<p className="rose-chart-note">Chưa có khoản thanh toán trong sáu tháng này.</p>}</div></section>
-  <section className="card rose-room-overview"><div className="card-header"><div><h2>{landlord?'Tình trạng phòng':'Truy cập nhanh'}</h2><p>{landlord?'Không gian của bạn hôm nay':'Những việc thường dùng'}</p></div><button className="icon-button" aria-label="Xem phòng" onClick={()=>navigate('rooms')}><ArrowUpRight size={19}/></button></div>{landlord?<div className="card-body"><div className="rose-occupancy-title"><span>Tỷ lệ lấp đầy</span><strong>{occupancy}<small>%</small></strong></div><div className="rose-occupancy-track" role="img" aria-label={`${occupied} trên ${rooms.length} phòng đang thuê, tỷ lệ lấp đầy ${occupancy}%`}>{roomStates.filter(state=>state.value>0).map(state=><span key={state.className} className={state.className} style={{width:`${state.value/Math.max(rooms.length,1)*100}%`}}/>)}</div><dl className="rose-room-states">{roomStates.map(state=><div key={state.className}><dt><i className={state.className}/>{state.label}</dt><dd>{state.value}<span> phòng</span></dd></div>)}</dl><button className="text-button rose-room-link" onClick={()=>navigate('rooms')}>Xem danh sách phòng<ArrowRight size={16}/></button></div>:<div className="card-body rose-quick-links">{[['contracts','Hợp đồng & tiền cọc',FileText],['issues','Gửi yêu cầu sửa chữa',Wrench],['documents','Tài liệu & nội quy',Building2],['tickets','Liên hệ chủ trọ',Users]].map(([id,label,Icon]:any)=><button className="rose-quick-link" key={id} onClick={()=>navigate(id)}><Icon size={18}/><span>{label}</span><ChevronRight size={17}/></button>)}</div>}</section></div>
-  <div className="rose-dashboard-panels rose-dashboard-details"><section className="card"><div className="card-header"><div><h2>Hóa đơn cần theo dõi</h2><p>{debts.length} hóa đơn chưa thanh toán đủ</p></div><button className="text-button" onClick={()=>navigate('invoices')}>Xem tất cả<ArrowRight size={16}/></button></div><DataTable rows={debts.slice(0,4)} columns={[{key:'roomId',label:'Phòng / kỳ',render:i=><div className="inline"><span className="room-avatar">{roomName(i.roomId)}</span><div><b>Phòng {roomName(i.roomId)}</b><small className="block muted">Kỳ {i.period}</small></div></div>},{key:'remaining',label:landlord?'Còn phải thu':'Cần thanh toán',render:i=><b className="money">{money(i.total-i.paid)}</b>},{key:'status',label:'Trạng thái',render:i=><Badge value={invoiceState(i)}/>},{key:'link',label:'',render:()=> <button className="icon-button" aria-label="Xem hóa đơn" onClick={()=>navigate('invoices')}><ChevronRight size={17}/></button>}]} empty={<EmptyState title="Không có hóa đơn cần theo dõi" description="Hóa đơn chưa thanh toán đủ sẽ xuất hiện tại đây."/>}/></section>
+  <div className="rose-dashboard-panels"><section className="card rose-cashflow"><div className="card-header"><div><h2>Dòng tiền thực thu</h2><p>Sáu tháng gần nhất · tiền đã nhận</p></div><button className="icon-button" aria-label="Xem lịch sử thanh toán" onClick={()=>navigate('payments')}><ArrowUpRight size={19}/></button></div><div className="card-body"><div className="rose-cashflow-summary"><span>Tổng trong kỳ</span><strong>{money(periodTotal)}</strong></div><ol className="rose-cashflow-chart" aria-label="Số tiền thực thu từng tháng">{months.map((month,index)=><li key={month.key} className={index===5?'is-current':''}><span className="rose-cashflow-month">{month.label}{index===5&&<small>Hiện tại</small>}</span><div className="rose-cashflow-track" aria-hidden="true"><span style={{width:`${Math.max(0,month.value)/peak*100}%`}}/></div><strong>{money(month.value)}</strong></li>)}</ol>{periodTotal===0&&<p className="rose-chart-note">Chưa có khoản thanh toán trong sáu tháng này.</p>}</div></section>
+  <section className="card rose-room-overview"><div className="card-header"><div><h2>Tình trạng phòng</h2><p>Không gian của bạn hôm nay</p></div><button className="icon-button" aria-label="Xem phòng" onClick={()=>navigate('rooms')}><ArrowUpRight size={19}/></button></div><div className="card-body"><div className="rose-occupancy-title"><span>Tỷ lệ lấp đầy</span><strong>{occupancy}<small>%</small></strong></div><div className="rose-occupancy-track" role="img" aria-label={`${occupied} trên ${rooms.length} phòng đang thuê, tỷ lệ lấp đầy ${occupancy}%`}>{roomStates.filter(state=>state.value>0).map(state=><span key={state.className} className={state.className} style={{width:`${state.value/Math.max(rooms.length,1)*100}%`}}/>)}</div><dl className="rose-room-states">{roomStates.map(state=><div key={state.className}><dt><i className={state.className}/>{state.label}</dt><dd>{state.value}<span> phòng</span></dd></div>)}</dl><button className="text-button rose-room-link" onClick={()=>navigate('rooms')}>Xem danh sách phòng<ArrowRight size={16}/></button></div></section></div>
+  <div className="rose-dashboard-panels rose-dashboard-details"><section className="card"><div className="card-header"><div><h2>Hóa đơn cần theo dõi</h2><p>{debts.length} hóa đơn chưa thanh toán đủ</p></div><button className="text-button" onClick={()=>navigate('invoices')}>Xem tất cả<ArrowRight size={16}/></button></div><DataTable rows={debts.slice(0,4)} columns={[{key:'roomId',label:'Phòng / kỳ',render:i=><div className="inline"><span className="room-avatar">{roomName(i.roomId)}</span><div><b>Phòng {roomName(i.roomId)}</b><small className="block muted">Kỳ {i.period}</small></div></div>},{key:'remaining',label:'Còn phải thu',render:i=><b className="money">{money(i.total-i.paid)}</b>},{key:'status',label:'Trạng thái',render:i=><Badge value={invoiceState(i)}/>},{key:'link',label:'',render:()=> <button className="icon-button" aria-label="Xem hóa đơn" onClick={()=>navigate('invoices')}><ChevronRight size={17}/></button>}]} empty={<EmptyState title="Không có hóa đơn cần theo dõi" description="Hóa đơn chưa thanh toán đủ sẽ xuất hiện tại đây."/>}/></section>
   <section className="card"><div className="card-header"><div><h2>Bảng tin nhà trọ</h2><p>Thông tin mới từ không gian của bạn</p></div><button className="icon-button" aria-label="Xem thông báo" onClick={()=>navigate('notifications')}><ArrowUpRight size={19}/></button></div><div className="rose-notice-list">{notifications.slice(-3).reverse().map(n=><button className="rose-notice" key={n.id} onClick={()=>navigate('notifications')}><FileText size={19}/><span><b>{n.title}</b><small>{String(n.body||'').slice(0,85)}</small><time>{date(n.createdAt)}</time></span><ChevronRight size={16}/></button>)}{!notifications.length&&<EmptyState title="Bảng tin đang yên tĩnh" description="Thông báo mới sẽ xuất hiện tại đây."/>}</div></section></div>
  </div>;
+}
+
+function TenantPortalDashboard() {
+  const { user, data, navigate, action, notify } = useApp();
+  const rooms = useRecords('rooms').filter(r => r.status !== 'archived');
+  const invoices = useRecords('invoices').filter(i => i.status !== 'cancelled' && i.status !== 'draft');
+  const issues = useRecords('issues');
+  const tickets = useRecords('tickets');
+  const notifications = useRecords('notifications');
+  const deposits = useRecords('deposits');
+  const handovers = useRecords('handovers');
+  const credits: RecordData[] = (data as any).credits || [];
+
+  const myTenant = data.tenants.find(t => t.id === user.tenantId || t.userId === user.id) || data.tenants[0];
+  const myRoom = data.rooms.find(r => r.id === myTenant?.roomId) || rooms[0];
+  const myProperty = data.properties.find(p => p.id === myTenant?.propertyId) || data.properties[0];
+  const activeContract = data.contracts.find(c => c.tenantId === myTenant?.id && ['active', 'draft'].includes(c.status));
+
+  const debts = invoices.filter(i => i.total > i.paid);
+  const debt = sum(debts, 'total') - sum(debts, 'paid');
+  const heldDeposit = deposits.reduce((s, d) => s + (d.type === 'receipt' ? 1 : -1) * d.amount, 0);
+  const creditBalance = credits.filter(c => c.tenantId === myTenant?.id).reduce((s, c) => s + c.balance, 0);
+  const openIssues = issues.filter(i => !['closed'].includes(i.status));
+  const resolvedIssues = issues.filter(i => i.status === 'resolved');
+  const pendingHandover = handovers.find(h => h.status === 'confirmed' && !h.tenantAcceptedAt);
+  const latestReading = data.readings.filter(r => r.roomId === myRoom?.id && r.confirmed).sort((a, b) => b.period.localeCompare(a.period))[0];
+  const roomName = (id: string) => data.rooms.find(r => r.id === id)?.code || '—';
+  const tenantName = (id: string) => data.tenants.find(t => t.id === id)?.name || '—';
+
+  const [selectedInvoice, setSelectedInvoice] = useState<RecordData | null>(null);
+  const [ratingIssue, setRatingIssue] = useState<RecordData | null>(null);
+  const [ratingValue, setRatingValue] = useState(5);
+  const [busyRating, setBusyRating] = useState(false);
+
+  const metrics = [
+    { label: 'Phòng đang thuê', value: myRoom ? 'Phòng ' + myRoom.code : 'Chưa liên kết', detail: `${myProperty?.name || 'Thông tin lưu trú'} · Tầng ${myRoom?.floor ?? 1}`, icon: Home },
+    { label: 'Cần thanh toán', value: money(debt), detail: debts.length > 0 ? `${debts.length} hóa đơn đang chờ` : 'Đã thanh toán đủ mọi khoản', icon: ReceiptText },
+    { label: 'Tiền cọc & số dư', value: money(heldDeposit + creditBalance), detail: `Cọc: ${money(heldDeposit)}${creditBalance > 0 ? ` · Dư: ${money(creditBalance)}` : ' · Quyết toán khi trả phòng'}`, icon: Wallet },
+    { label: 'Yêu cầu của bạn', value: number(openIssues.length), detail: resolvedIssues.length > 0 ? `${resolvedIssues.length} chờ bạn xác nhận` : 'Đang được theo dõi', icon: Wrench },
+  ];
+
+  return <div className="page-stack rose-dashboard">
+    <h1 className="sr-only">Tổng quan</h1>
+    <div className="rose-dashboard-toolbar">
+      <div className="rose-date-label"><CalendarDays size={17}/><DashboardDate/></div>
+      <div className="rose-overview-actions">
+        <button className="btn btn-primary" onClick={() => navigate('contracts')}><FileText size={17}/> Xem hợp đồng<ArrowRight size={16}/></button>
+        <button className="btn btn-info" onClick={() => navigate('issues')}>Gửi yêu cầu sửa chữa</button>
+        <button className="btn btn-report" onClick={() => navigate('invoices')}>Hóa đơn của tôi</button>
+      </div>
+    </div>
+
+    {pendingHandover && <div className="tenant-alert-banner info">
+      <div className="tenant-alert-lead"><CalendarDays size={18}/><span>Có biên bản bàn giao phòng cần bạn xác nhận ({pendingHandover.type === 'move_out' ? 'Trả phòng' : 'Nhận phòng'}).</span></div>
+      <button className="btn btn-sm btn-info" onClick={() => navigate('handovers')}>Xem &amp; xác nhận</button>
+    </div>}
+
+    {resolvedIssues.length > 0 && <div className="tenant-alert-banner success">
+      <div className="tenant-alert-lead"><CheckCircle2 size={18}/><span>Chủ trọ đã thông báo xử lý xong sự cố: “{resolvedIssues[0].title || resolvedIssues[0].category}”. Vui lòng xác nhận kết quả và đánh giá.</span></div>
+      <button className="btn btn-sm btn-success" onClick={() => setRatingIssue(resolvedIssues[0])}><Check size={15}/>Xác nhận &amp; đánh giá</button>
+    </div>}
+
+    {debt > 0 && <div className="tenant-alert-banner warning">
+      <div className="tenant-alert-lead"><ReceiptText size={18}/><span>Bạn có {debts.length} hóa đơn chưa thanh toán đủ, còn lại {money(debt)}.</span></div>
+      <button className="btn btn-sm btn-warning" onClick={() => setSelectedInvoice(debts[0])}>Xem mã VietQR</button>
+    </div>}
+
+    <section className="rose-overview" aria-label="Thông tin tổng quan">
+      <dl className="rose-metrics">
+        {metrics.map(metric => <div className="rose-metric" key={metric.label}>
+          <dt><metric.icon size={17}/>{metric.label}</dt>
+          <dd>{metric.value}</dd>
+          <p>{metric.detail}</p>
+        </div>)}
+      </dl>
+    </section>
+
+    <section className="card">
+      <div className="card-header">
+        <div><h2>Tác vụ nhanh</h2><p>Các chức năng thường dùng trong cổng thông tin người thuê</p></div>
+      </div>
+      <div className="card-body">
+        <div className="tenant-quick-grid">
+          <button className="tenant-quick-btn" onClick={() => navigate('readings')}><Zap size={20}/><span>Gửi ảnh công tơ</span></button>
+          <button className="tenant-quick-btn" onClick={() => navigate('issues')}><Wrench size={20}/><span>Báo sự cố</span></button>
+          <button className="tenant-quick-btn" onClick={() => navigate('tickets')}><MessageSquare size={20}/><span>Gửi hỗ trợ</span></button>
+          <button className="tenant-quick-btn" onClick={() => navigate('contracts')}><FileText size={20}/><span>Hợp đồng &amp; cọc</span></button>
+          <button className="tenant-quick-btn" onClick={() => navigate('vehicles')}><Car size={20}/><span>Đăng ký gửi xe</span></button>
+          <button className="tenant-quick-btn" onClick={() => navigate('amenities')}><Coffee size={20}/><span>Đặt tiện ích</span></button>
+        </div>
+      </div>
+    </section>
+
+    <div className="rose-dashboard-panels">
+      <section className="card">
+        <div className="card-header">
+          <div><h2>Hóa đơn của tôi</h2><p>{debts.length > 0 ? `${debts.length} hóa đơn chưa thanh toán đủ` : 'Các hóa đơn gần đây'}</p></div>
+          <button className="text-button" onClick={() => navigate('invoices')}>Xem tất cả<ArrowRight size={16}/></button>
+        </div>
+        <DataTable rows={(debts.length ? debts : invoices).slice(0, 4)} columns={[
+          { key: 'roomId', label: 'Phòng / kỳ', render: i => <div className="inline"><span className="room-avatar">{roomName(i.roomId)}</span><div><b>Phòng {roomName(i.roomId)}</b><small className="block muted">Kỳ {i.period}</small></div></div> },
+          { key: 'remaining', label: 'Cần thanh toán', render: i => <b className="money">{money(i.total - i.paid)}</b> },
+          { key: 'status', label: 'Trạng thái', render: i => <Badge value={invoiceState(i)}/> },
+          { key: 'link', label: '', render: i => <button className="btn btn-sm btn-info" onClick={() => setSelectedInvoice(i)}>Chi tiết &amp; VietQR</button> }
+        ]} empty={<EmptyState title="Không có hóa đơn cần theo dõi" description="Hóa đơn tiền thuê sẽ xuất hiện tại đây khi chủ trọ phát hành."/>}/>
+      </section>
+
+      <section className="card">
+        <div className="card-header">
+          <div><h2>Yêu cầu của bạn</h2><p>{openIssues.length + tickets.filter(t => t.status !== 'resolved').length} yêu cầu đang xử lý</p></div>
+          <button className="btn btn-sm btn-primary" onClick={() => navigate('issues')}><Plus size={15}/>Gửi sự cố</button>
+        </div>
+        <div className="card-body stack">
+          {issues.slice(-3).reverse().map(issue => <div key={issue.id} className="inline" style={{ justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+            <div>
+              <strong>{issue.title || issue.category}</strong>
+              <small className="block muted">{date(issue.createdAt)} · {issue.description?.slice(0, 60)}</small>
+            </div>
+            <div className="inline">
+              <Badge value={issue.status} label={({ new: 'Mới tiếp nhận', progress: 'Đang xử lý', resolved: 'Chờ xác nhận', closed: 'Hoàn tất' } as Record<string, string>)[issue.status] || issue.status}/>
+              {issue.status === 'resolved' && <button className="btn btn-sm btn-success" onClick={() => setRatingIssue(issue)}>Xác nhận</button>}
+            </div>
+          </div>)}
+          {!issues.length && <p className="muted small">Chưa gửi yêu cầu sửa chữa nào.</p>}
+          <div className="tenant-stay-card">
+            <strong style={{ fontSize: '.875rem' }}>Thông tin thuê phòng</strong>
+            <div className="tenant-stay-row"><span>Người đại diện</span><strong>{myTenant?.name || user.name}</strong></div>
+            <div className="tenant-stay-row"><span>Phòng</span><strong>{myRoom ? 'Phòng ' + myRoom.code : '—'}</strong></div>
+            <div className="tenant-stay-row"><span>Cơ sở</span><strong>{myProperty?.name || '—'}</strong></div>
+            <div className="tenant-stay-row"><span>Hợp đồng đến</span><strong>{activeContract?.endDate ? date(activeContract.endDate) : '—'}</strong></div>
+            <div className="tenant-stay-row"><span>Thành viên cùng phòng</span><strong>{myTenant?.members || 'Chưa ghi nhận'}</strong></div>
+            {myProperty?.contact && <div className="tenant-stay-row"><span>Liên hệ chủ trọ</span><strong>{myProperty.contact} {myProperty.phone ? `(${myProperty.phone})` : ''}</strong></div>}
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div className="rose-dashboard-panels rose-dashboard-details">
+      <section className="card">
+        <div className="card-header">
+          <div><h2>Chỉ số điện nước &amp; công tơ</h2><p>Chỉ số kỳ gần nhất và gửi ảnh công tơ</p></div>
+          <button className="btn btn-sm btn-info" onClick={() => navigate('readings')}><Zap size={15}/>Gửi ảnh công tơ</button>
+        </div>
+        <div className="card-body stack">
+          {latestReading ? <div className="grid-2">
+            <div className="stat-card">
+              <span>Chỉ số điện ({latestReading.period})</span>
+              <strong>{number(latestReading.electricNew)} <small style={{ fontSize: '.875rem', fontWeight: 400 }}>kWh</small></strong>
+              <small className="muted">Tiêu thụ: {number(latestReading.electricNew - latestReading.electricOld)} kWh</small>
+            </div>
+            <div className="stat-card">
+              <span>Chỉ số nước ({latestReading.period})</span>
+              <strong>{number(latestReading.waterNew)} <small style={{ fontSize: '.875rem', fontWeight: 400 }}>m³</small></strong>
+              <small className="muted">Tiêu thụ: {number(latestReading.waterNew - latestReading.waterOld)} m³</small>
+            </div>
+          </div> : <p className="muted small">Chưa có chỉ số điện nước được xác nhận.</p>}
+          <div className="callout" style={{ marginTop: 8 }}>
+            <Camera size={18}/>
+            <div>
+              <b>Chụp ảnh công tơ kỳ mới</b>
+              <p>Chụp rõ mặt số công tơ điện và nước gửi cho chủ trọ để đối chiếu và xác minh chỉ số kỳ mới.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="card">
+        <div className="card-header">
+          <div><h2>Bảng tin nhà trọ</h2><p>Thông tin mới từ không gian của bạn</p></div>
+          <button className="icon-button" aria-label="Xem thông báo" onClick={() => navigate('notifications')}><ArrowUpRight size={19}/></button>
+        </div>
+        <div className="rose-notice-list">
+          {notifications.slice(-3).reverse().map(n => <button className="rose-notice" key={n.id} onClick={() => navigate('notifications')}>
+            <FileText size={19}/>
+            <span><b>{n.title}</b><small>{String(n.body || '').slice(0, 85)}</small><time>{date(n.createdAt)}</time></span>
+            <ChevronRight size={16}/>
+          </button>)}
+          {!notifications.length && <EmptyState title="Bảng tin đang yên tĩnh" description="Thông báo mới sẽ xuất hiện tại đây."/>}
+        </div>
+      </section>
+    </div>
+
+    {selectedInvoice && <Modal title="Chi tiết hóa đơn & thanh toán" wide onClose={() => setSelectedInvoice(null)}>
+      <div className="invoice-sheet">
+        <div className="invoice-letterhead">
+          <div className="brand-word">trozy<span>.</span></div>
+          <div><h3>HÓA ĐƠN TIỀN THUÊ</h3><p>Kỳ {selectedInvoice.period} · Phòng {roomName(selectedInvoice.roomId)}</p></div>
+        </div>
+        <div className="detail-grid">
+          <div><span>Người thuê</span><b>{tenantName(selectedInvoice.tenantId)}</b></div>
+          <div><span>Hạn thanh toán</span><b>{date(selectedInvoice.dueDate)}</b></div>
+        </div>
+        <InvoiceLines invoice={selectedInvoice}/>
+        <div className="summary-line"><span>Đã thanh toán</span><b className="success-text">{money(selectedInvoice.paid)}</b></div>
+        <div className="summary-line"><span>Còn phải thanh toán</span><b>{money(Math.max(0, selectedInvoice.total - selectedInvoice.paid))}</b></div>
+        {selectedInvoice.note && <p className="muted">Ghi chú: {selectedInvoice.note}</p>}
+        {selectedInvoice.status === 'issued' && selectedInvoice.total > selectedInvoice.paid && <TransferInfo invoice={selectedInvoice}/>}
+      </div>
+      <div className="form-actions">
+        <button className="btn btn-report" onClick={() => window.print()}>In hóa đơn</button>
+        <button className="btn btn-primary" onClick={() => setSelectedInvoice(null)}>Đóng</button>
+      </div>
+    </Modal>}
+
+    {ratingIssue && <Modal title="Xác nhận giải quyết sự cố" onClose={() => setRatingIssue(null)}>
+      <div className="stack">
+        <p>Chủ trọ đã thông báo hoàn tất sửa chữa cho sự cố: <strong>{ratingIssue.title || ratingIssue.category}</strong></p>
+        {ratingIssue.resolution && <div className="callout"><b>Kết quả xử lý từ chủ trọ:</b><p>{ratingIssue.resolution}</p></div>}
+        <div className="field">
+          <label htmlFor="tenant-rating-select">Đánh giá chất lượng xử lý</label>
+          <select id="tenant-rating-select" value={ratingValue} onChange={e => setRatingValue(Number(e.target.value))}>
+            <option value="5">⭐⭐⭐⭐⭐ 5/5 — Rất hài lòng</option>
+            <option value="4">⭐⭐⭐⭐ 4/5 — Hài lòng</option>
+            <option value="3">⭐⭐⭐ 3/5 — Bình thường</option>
+            <option value="2">⭐⭐ 2/5 — Cần cải thiện</option>
+            <option value="1">⭐ 1/5 — Chưa hài lòng</option>
+          </select>
+        </div>
+        <div className="form-actions">
+          <button className="btn btn-secondary" onClick={() => setRatingIssue(null)} disabled={busyRating}>Hủy</button>
+          <button className="btn btn-success" disabled={busyRating} onClick={async () => {
+            setBusyRating(true);
+            try {
+              await action('issue-transition', { id: ratingIssue.id, status: 'closed', rating: ratingValue });
+              notify('Đã xác nhận giải quyết sự cố.');
+              setRatingIssue(null);
+            } catch (e) {
+              notify((e as Error).message, 'error');
+            } finally {
+              setBusyRating(false);
+            }
+          }}>{busyRating ? 'Đang lưu…' : 'Xác nhận hoàn tất'}</button>
+        </div>
+      </div>
+    </Modal>}
+  </div>;
+}
+
+export function Dashboard() {
+  const { user } = useApp();
+  return user.role === 'landlord' ? <LandlordDashboard /> : <TenantPortalDashboard />;
 }
 type Values = Record<string, any>;
 type ServiceItem = { serviceId?: string; name: string; quantity: number; rate: number; amount?: number };
