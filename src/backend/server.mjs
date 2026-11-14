@@ -8,7 +8,7 @@ import {openStore,createUser,safeUser,passwordMatches,passwordHash,hashToken,id,
 import {seedDemo} from './seed.mjs';
 import {HttpError,fail,dataFor,createRecord,updateRecord,deleteRecord,performAction,importRecords,generateReminders,audit,ownerId,tenantFor,visible} from './domain.mjs';
 import {extensionCapabilities} from './extensions.mjs';
-import {smtpConfigured,deliverAuthMail} from './mail.mjs';
+import {smtpConfigured,deliverAuthMail,deliverNotificationMail} from './mail.mjs';
 import {registerDefaultExtensions} from '../ai/register.mjs';
 import {createAIService,syncUtilityNotifications} from './ai-service.mjs';
 import {rasterMimeFromBytes} from '../shared/raster-image.mjs';
@@ -52,6 +52,53 @@ export function createApp(options={}){
     const record={id:id('mail'),email:user.email,kind,token};
     store.db.prepare('INSERT INTO mail_outbox(id,email,kind,token,created_at) VALUES(?,?,?,?,?)').run(record.id,user.email,kind,token,now());
     if(smtpConfigured())setImmediate(()=>{void deliverAuthMail(store,record);});
+  }
+  function notificationRecipients(notification){
+    const people=new Map();
+    const add=(account,tenantId)=>{if(!account)return;let preferences={};try{preferences=JSON.parse(account.notification_preferences||'{}')}catch{};const category=notification.kind==='invoice'?'invoices':notification.kind==='contract'?'contracts':notification.kind==='maintenance'?'maintenance':'general';if(preferences.emailNotifications===false||preferences.email===false||preferences[category]===false)return;people.set(account.id,{id:account.id,email:account.email});};
+    if(notification.recipientUserId){add(store.db.prepare('SELECT id,email,notification_preferences FROM users WHERE id=?').get(notification.recipientUserId));return [...people.values()];}
+    const tenants=store.list('tenants',notification.ownerId).filter(tenant=>tenant.status==='active'&&tenant.userId&&tenant.propertyId===notification.propertyId);
+    let targets=tenants;
+    if(notification.tenantId)targets=tenants.filter(tenant=>tenant.id===notification.tenantId);
+    else if(notification.roomId)targets=tenants.filter(tenant=>tenant.roomId===notification.roomId);
+    else if(Array.isArray(notification.roomIds)&&notification.roomIds.length)targets=tenants.filter(tenant=>notification.roomIds.includes(tenant.roomId));
+    if(notification.scope==='all'||notification.automatic){
+      add(store.db.prepare('SELECT id,email,notification_preferences FROM users WHERE id=?').get(notification.ownerId));
+      if(notification.scope==='all')targets=tenants;
+    }
+    for(const tenant of targets)add(store.db.prepare("SELECT id,email,notification_preferences FROM users WHERE id=? AND role='tenant'").get(tenant.userId));
+    return [...people.values()];
+  }
+  function queueNotificationEmails(notification,recipients){
+    let queued=0;
+    for(const recipient of recipients||[]){if(!recipient?.email||recipient.enabled===false)continue;const result=store.db.prepare("INSERT OR IGNORE INTO notification_mail_outbox(id,notification_id,owner_id,user_id,email,status,created_at) VALUES(?,?,?,?,?,'queued',?)").run(id('nmail'),notification.id,notification.ownerId,recipient.userId||recipient.id,recipient.email,now());queued+=Number(result.changes||0);}
+    return queued;
+  }
+  async function dispatchNotificationEmails(){
+    if(!smtpConfigured())return;
+    const retryLimit=Math.max(1,Math.min(5,Number(process.env.TROZY_NOTIFICATION_RETRIES||3)));
+    const queue=store.db.prepare("SELECT * FROM notification_mail_outbox WHERE status IN ('queued','failed') AND attempts<? ORDER BY created_at LIMIT 40").all(retryLimit);
+    for(const item of queue){
+      const notification=store.get('notifications',item.notification_id);if(!notification){store.db.prepare("UPDATE notification_mail_outbox SET status='failed',last_error='NOTIFICATION_NOT_FOUND' WHERE id=?").run(item.id);continue;}
+      let file; if(notification.fileId){const saved=store.db.prepare('SELECT name,type,bytes FROM files WHERE id=? AND owner_id=?').get(notification.fileId,notification.ownerId);if(saved)file={name:saved.name,type:saved.type,bytes:Buffer.from(saved.bytes)};}
+      await deliverNotificationMail(store,item,notification,{file});
+    }
+  }
+  let closing=false;
+  let notificationDispatch=Promise.resolve();
+  const scheduleNotificationDispatch=()=>{
+    if(closing)return;
+    notificationDispatch=notificationDispatch.then(()=>dispatchNotificationEmails()).catch(error=>{console.error('[Trozy notification mail]',error);});
+  };
+  function runReminderCycle(){
+    if(closing)return;
+    try{
+      const landlords=store.db.prepare("SELECT * FROM users WHERE role='landlord'").all();
+      for(const landlord of landlords)store.transaction(()=>generateReminders(store,landlord));
+      const automatic=store.db.prepare("SELECT id,owner_id,data FROM records WHERE collection='notifications' AND json_extract(data,'$.automatic')=1 ORDER BY rowid DESC LIMIT 500").all();
+      for(const item of automatic){const notification=JSON.parse(item.data);queueNotificationEmails({...notification,id:item.id,ownerId:item.owner_id},notificationRecipients({...notification,id:item.id,ownerId:item.owner_id}));}
+      scheduleNotificationDispatch();
+    }catch(error){if(!closing)console.error('[Trozy reminders]',error);}
   }
   const json=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
   function mutationOrigin(req){
@@ -212,7 +259,15 @@ export function createApp(options={}){
           const input=await readJson(req);const value=await ai.run(user,name,input);return json(res,200,{result:value});
         }
         const actionMatch=path.match(/^\/api\/actions\/([a-z-]+)$/);
-        if(actionMatch&&req.method==='POST'){const input=await readJson(req);const result=store.transaction(()=>performAction(store,user,actionMatch[1],input));return json(res,200,result);}
+        if(actionMatch&&req.method==='POST'){
+          const input=await readJson(req),before=new Set(store.list('notifications',ownerId(user)).map(row=>row.id));
+          const result=store.transaction(()=>performAction(store,user,actionMatch[1],input));
+          const created=store.list('notifications',ownerId(user)).filter(row=>!before.has(row.id));
+          for(const notification of created)queueNotificationEmails(notification,notificationRecipients(notification));
+          if(created.length)setImmediate(scheduleNotificationDispatch);
+          if(actionMatch[1]==='notification-send')return json(res,200,{notification:result.notification,emailQueued:result.emailRecipients?.filter(item=>item.enabled&&item.email).length||0,emailDelivery:smtpConfigured()?'queued':'awaiting_smtp_configuration'});
+          return json(res,200,result);
+        }
         const collectionMatch=path.match(/^\/api\/([a-z]+)(?:\/([^/]+))?$/);
         if(collectionMatch&&COLLECTIONS.includes(collectionMatch[1])){
           const [,collection,key]=collectionMatch;
@@ -238,13 +293,16 @@ export function createApp(options={}){
     }
   }
   const server=httpCreateServer(handler);server.requestTimeout=30000;server.headersTimeout=15000;
+  const reminderTimer=setInterval(runReminderCycle,24*60*60*1000);reminderTimer.unref?.();
+  const initialReminder=setImmediate(runReminderCycle);
   let closePromise;
   return {server,store,handler,meterAutomatic,close:()=>{
     if(closePromise)return closePromise;
     // Stop new connections before closing the queue. An in-flight submission either
     // commits with its durable jobs or rolls back through the creation hook.
+    closing=true;clearInterval(reminderTimer);clearImmediate(initialReminder);
     const serverStopped=new Promise((resolve,reject)=>server.close(error=>error&&error.code!=='ERR_SERVER_NOT_RUNNING'?reject(error):resolve()));
-    closePromise=Promise.allSettled([serverStopped,meterAutomatic.close()]).then(results=>{store.close();const failed=results.find(result=>result.status==='rejected');if(failed)throw failed.reason;});
+    closePromise=Promise.allSettled([serverStopped,meterAutomatic.close(),notificationDispatch]).then(results=>{store.close();const failed=results.find(result=>result.status==='rejected');if(failed)throw failed.reason;});
     return closePromise;
   }};
 }
