@@ -9,31 +9,33 @@ const fields={
   rooms:'propertyId code floor area capacity price status amenities description imageFileId imageFileIds',
   tenants:'propertyId roomId name email phone identityNumber moveInDate moveOutDate status members',
   contracts:'propertyId roomId tenantId startDate endDate rent deposit terms status version',
-  readings:'propertyId roomId period electricOld electricNew waterOld waterNew confirmed photoFileId electricPhotoFileId waterPhotoFileId',
-  services:'propertyId name rate unit active',
+  readings:'propertyId roomId period electricOld electricNew waterOld waterNew confirmed photoFileId electricPhotoFileId waterPhotoFileId meterBreakdown',
+  meters:'propertyId roomId utility code initialReading installedAt finalReading removedAt status replacedBy',
+  services:'propertyId name rate unit active roomIds contractIds effectiveFrom rateHistory discontinuedAt',
+  charges:'propertyId roomId tenantId period type amount reason evidenceFileId invoiceId',
   invoices:'propertyId roomId tenantId period dueDate rent electricOld electricNew waterOld waterNew electricRate waterRate serviceFee serviceItems adjustment note status',
-  transactions:'propertyId type category amount date description roomId',
+  transactions:'propertyId type category amount date description roomId fileId',
   issues:'propertyId roomId tenantId title category priority description estimatedDate photoFileId assetId',
   assets:'propertyId roomId name code status purchaseDate warrantyDate price note imageFileId',
   handovers:'propertyId roomId tenantId contractId type date electricReading waterReading condition assets note photoFileId',
-  notifications:'propertyId roomId roomIds tenantId title body kind',
-  tickets:'propertyId roomId tenantId title category body fileId',
+  notifications:'propertyId roomId roomIds tenantId title body kind fileId',
+  tickets:'propertyId roomId tenantId title category body fileId invoiceId',
   documents:'propertyId roomId tenantId name category version content fileId visibility isTemplate',
   vehicles:'propertyId roomId tenantId plate type parkingSpot fee status',
   amenities:'propertyId name description capacity active',
   bookings:'propertyId amenityId tenantId date startTime endTime',
-  settings:'propertyId electricRate waterRate billingDay bankName bankAccount bankOwner bankBin invoiceNote notificationDays anomalyThreshold'
+  settings:'propertyId electricRate waterRate billingDay bankName bankAccount bankOwner bankBin invoiceNote notificationDays anomalyThreshold electricMethod waterMethod electricPersonRate waterPersonRate electricFixedFee waterFixedFee effectiveFrom rateHistory'
 };
-const required={properties:'name address',rooms:'propertyId code area capacity price',tenants:'propertyId name',contracts:'propertyId roomId tenantId startDate endDate rent deposit',readings:'propertyId roomId period electricOld electricNew waterOld waterNew',services:'propertyId name rate unit',invoices:'roomId period',transactions:'propertyId type category amount date',issues:'roomId title category description',assets:'propertyId roomId name code',handovers:'roomId tenantId contractId type date condition',notifications:'propertyId title body',tickets:'roomId title body',documents:'propertyId name category visibility',vehicles:'roomId tenantId plate type',amenities:'propertyId name capacity',bookings:'amenityId date startTime endTime',settings:'propertyId electricRate waterRate billingDay'};
-const defaults={properties:{floors:1,rules:'',archived:false},rooms:{floor:1,status:'vacant',amenities:'',description:''},tenants:{status:'active',members:''},contracts:{status:'draft',version:1,terms:''},readings:{confirmed:false},services:{active:true,unit:'room'},invoices:{status:'draft',adjustment:0,serviceFee:0,note:''},transactions:{type:'expense',description:''},issues:{status:'new',priority:'normal',cost:0},assets:{status:'good',price:0,note:''},handovers:{status:'draft',electricReading:0,waterReading:0,assets:'',note:''},notifications:{kind:'general',readBy:[]},tickets:{status:'open',messages:[],category:'Khác'},documents:{version:1,visibility:'landlord',content:''},vehicles:{status:'active',fee:0,parkingSpot:''},amenities:{active:true,capacity:1},bookings:{status:'confirmed'},settings:{electricRate:3500,waterRate:15000,billingDay:5,notificationDays:3,anomalyThreshold:50,bankName:'',bankAccount:'',bankOwner:'',bankBin:'',invoiceNote:''}};
-const numeric=new Set('floor floors area capacity price rent deposit electricOld electricNew waterOld waterNew rate amount cost electricReading waterReading fee version electricRate waterRate billingDay notificationDays anomalyThreshold serviceFee adjustment'.split(' '));
+const required={properties:'name address',rooms:'propertyId code area capacity price',tenants:'propertyId name',contracts:'propertyId roomId tenantId startDate endDate rent deposit',readings:'propertyId roomId period electricOld electricNew waterOld waterNew',meters:'propertyId roomId utility code initialReading',services:'propertyId name rate unit',charges:'propertyId roomId tenantId period type amount reason',invoices:'roomId period',transactions:'propertyId type category amount date',issues:'roomId title category description',assets:'propertyId roomId name code',handovers:'roomId tenantId contractId type date condition',notifications:'propertyId title body',tickets:'roomId title body',documents:'propertyId name category visibility',vehicles:'roomId tenantId plate type',amenities:'propertyId name capacity',bookings:'amenityId date startTime endTime',settings:'propertyId electricRate waterRate billingDay'};
+const defaults={properties:{floors:1,rules:'',archived:false},rooms:{floor:1,status:'vacant',amenities:'',description:''},tenants:{status:'active',members:''},contracts:{status:'draft',version:1,terms:''},readings:{confirmed:false,history:[],meterBreakdown:[]},meters:{initialReading:0,status:'active'},services:{active:true,unit:'room',roomIds:[],contractIds:[],rateHistory:[]},charges:{type:'charge',status:'pending'},invoices:{status:'draft',adjustment:0,serviceFee:0,note:''},transactions:{type:'expense',description:''},issues:{status:'new',priority:'normal',cost:0},assets:{status:'good',price:0,note:''},handovers:{status:'draft',electricReading:0,waterReading:0,assets:'',note:''},depositSettlements:{status:'pending_tenant'},notifications:{kind:'general',readBy:[]},tickets:{status:'open',messages:[],category:'Khác'},documents:{version:1,visibility:'landlord',content:''},vehicles:{status:'active',fee:0,parkingSpot:''},amenities:{active:true,capacity:1},bookings:{status:'confirmed'},settings:{electricRate:3500,waterRate:15000,billingDay:5,notificationDays:3,anomalyThreshold:50,electricMethod:'meter',waterMethod:'meter',electricPersonRate:0,waterPersonRate:0,electricFixedFee:0,waterFixedFee:0,effectiveFrom:'0001-01-01',rateHistory:[],bankName:'',bankAccount:'',bankOwner:'',bankBin:'',invoiceNote:''}};
+const numeric=new Set('floor floors area capacity price rent deposit electricOld electricNew waterOld waterNew rate amount cost electricReading waterReading fee version electricRate waterRate billingDay notificationDays anomalyThreshold serviceFee adjustment electricPersonRate waterPersonRate electricFixedFee waterFixedFee finalReading initialReading'.split(' '));
 const booleans=new Set(['active','archived','confirmed','isTemplate']);
 const enumFields={
-  rooms:{status:['vacant','occupied','maintenance','handover','archived']},tenants:{status:['active','left']},contracts:{status:['draft','active','ended']},services:{unit:['room','person','usage']},invoices:{status:['draft','issued','cancelled']},transactions:{type:['income','expense']},issues:{priority:['low','normal','urgent']},assets:{status:['good','repair','broken','retired']},handovers:{type:['move_in','move_out']},notifications:{kind:['general','invoice','contract','maintenance']},documents:{category:['contract','receipt','rules','other'],visibility:['all','tenant','landlord']},vehicles:{status:['active','inactive']}
+  rooms:{status:['vacant','occupied','maintenance','handover','archived']},tenants:{status:['active','left']},contracts:{status:['draft','active','ended']},meters:{utility:['electric','water'],status:['active','replaced']},services:{unit:['room','person','month','usage','vehicle']},charges:{type:['charge','deduction']},invoices:{status:['draft','issued','cancelled']},transactions:{type:['income','expense']},issues:{priority:['low','normal','urgent']},assets:{status:['good','repair','broken','retired']},handovers:{type:['move_in','move_out']},notifications:{kind:['general','invoice','contract','maintenance']},documents:{category:['contract','receipt','rules','other'],visibility:['all','tenant','landlord']},settings:{electricMethod:['meter','person','fixed'],waterMethod:['meter','person','fixed']},vehicles:{status:['active','inactive']}
 };
 const tenantCreate=new Set(['issues','tickets','vehicles','bookings']);
 const tenantUpdate=new Set(['vehicles']);
-const immutable=new Set(['payments','credits','deposits','audits','meterSubmissions','meterProfiles']);
+const immutable=new Set(['payments','credits','deposits','depositSettlements','audits','meterSubmissions','meterProfiles']);
 export function creditAccounts(store,owner){
   const payments=store.list('payments',owner),accounts=[];
   for(const receipt of payments){
@@ -76,10 +78,13 @@ export function visible(store,user,collection,row){
     case 'tenants':return row.id===tenant.id;
     case 'invoices':return own&&row.status!=='draft';
     case 'readings':return row.confirmed===true&&property&&contracts.some(contract=>{const end=[contract.endDate,contract.endedAt?.slice(0,10),tenant.moveOutDate].filter(Boolean).sort()[0];return contract.roomId===row.roomId&&row.period>=contract.startDate.slice(0,7)&&row.period<=end.slice(0,7);});
-    case 'meterSubmissions':return own;
+    case 'meters':case 'meterSubmissions':return collection==='meterSubmissions'&&own;
     case 'meterProfiles':return false;
     case 'assets':return current&&property&&room;
-    case 'services':case 'amenities':case 'settings':return current&&property;
+    case 'services':return current&&property&&(!row.roomIds?.length||row.roomIds.includes(tenant.roomId))&&(!row.contractIds?.length||contracts.some(contract=>row.contractIds.includes(contract.id)));
+    case 'charges':return own&&property;
+    case 'depositSettlements':return own&&property;
+    case 'amenities':case 'settings':return current&&property;
     case 'notifications':return property&&(own||current&&!row.tenantId&&(row.roomIds?.length?row.roomIds.includes(tenant.roomId):!row.roomId||room));
     case 'documents':return property&&row.visibility!=='landlord'&&(own||current&&!row.tenantId&&(!row.roomId||room));
     case 'transactions':case 'audits':return false;
@@ -95,7 +100,7 @@ export function dataFor(store,user){
       if(user.role==='tenant'){delete result.inviteCode;delete result.inviteExpiresAt;result.identityNumber=result.identityNumber?`••••${result.identityNumber.slice(-4)}`:'';}
       else if(result.identityNumber)result.identityNumber=`••••${result.identityNumber.slice(-4)}`;
     }
-    if(user.role==='tenant'&&collection==='notifications')result.readBy=(result.readBy||[]).filter(value=>value===user.id);
+    if(user.role==='tenant'&&collection==='notifications'){result.readBy=(result.readBy||[]).filter(value=>value===user.id);if(result.readAtBy)result.readAtBy=Object.fromEntries(Object.entries(result.readAtBy).filter(([key])=>key===user.id));}
     if(user.role==='tenant'&&collection==='documents')delete result.versions;
     if(collection==='meterSubmissions')return user.role==='tenant'?tenantMeterReceipt(row):ownerMeterSubmission(row);
     return result;
@@ -122,7 +127,8 @@ function normalize(store,user,collection,input,existing){
   for(const key of fields[collection].split(' '))if(Object.hasOwn(input,key)){
     if(key==='serviceItems'){must(Array.isArray(input[key])&&input[key].length<=100,'Danh sách dịch vụ không hợp lệ.');row[key]=structuredClone(input[key]);}
     else if(key==='imageFileIds'){must(Array.isArray(input[key])&&input[key].length<=6&&input[key].every(value=>typeof value==='string'),'Thư viện phòng tối đa 6 ảnh.');row[key]=[...new Set(input[key])];row.imageFileId=row[key][0]||'';}
-    else if(key==='roomIds'){must(Array.isArray(input[key])&&input[key].length<=200&&input[key].every(value=>typeof value==='string'),'Danh sách phòng nhận thông báo không hợp lệ.');row[key]=[...new Set(input[key])];}
+    else if(key==='roomIds'||key==='contractIds'){must(Array.isArray(input[key])&&input[key].length<=200&&input[key].every(value=>typeof value==='string'),'Danh sách liên kết không hợp lệ.');row[key]=[...new Set(input[key])];}
+    else if(['rateHistory','meterBreakdown'].includes(key)){must(Array.isArray(input[key])&&input[key].length<=100,'Danh sách lịch sử không hợp lệ.');row[key]=structuredClone(input[key]);}
     else if(numeric.has(key))row[key]=number(input[key],key,{min:key==='adjustment'?-1e12:0,integer:key!=='area'});
     else if(booleans.has(key))row[key]=input[key]===true||input[key]==='true'||input[key]===1;
     else {must(typeof input[key]==='string'||input[key]===null,`Trường ${key} phải là văn bản.`);row[key]=input[key]===null?'':input[key].trim();must(row[key].length<=20000,`Trường ${key} quá dài.`);}
@@ -141,9 +147,9 @@ function normalize(store,user,collection,input,existing){
     if(row.roomIds?.length)for(const roomId of row.roomIds){const room=reference(store,user,'rooms',roomId);must(room.propertyId===row.propertyId,'Các phòng nhận thông báo phải thuộc cùng cơ sở.');if(row.tenantId)must(reference(store,user,'tenants',row.tenantId).roomId===roomId||row.roomIds.includes(reference(store,user,'tenants',row.tenantId).roomId),'Người thuê không thuộc phạm vi thông báo.');}
   }
   for(const [key,values]of Object.entries(enumFields[collection]||{}))must(values.includes(row[key]),`Giá trị ${key} không hợp lệ.`);
-  for(const key of ['startDate','endDate','moveInDate','moveOutDate','dueDate','date','purchaseDate','warrantyDate','estimatedDate'])if(row[key])date(row[key],key);
+  for(const key of ['startDate','endDate','moveInDate','moveOutDate','dueDate','date','purchaseDate','warrantyDate','estimatedDate','installedAt','removedAt','effectiveFrom'])if(row[key])date(row[key],key);
   if(row.period)period(row.period);
-  for(const key of ['fileId','photoFileId','imageFileId','electricPhotoFileId','waterPhotoFileId'])checkFile(store,user,row[key],row);
+  for(const key of ['fileId','photoFileId','imageFileId','electricPhotoFileId','waterPhotoFileId','evidenceFileId'])checkFile(store,user,row[key],row);
   for(const key of ['electricPhotoFileId','waterPhotoFileId'])if(row[key])must(store.db.prepare('SELECT type FROM files WHERE id=?').get(row[key])?.type.startsWith('image/'),'Minh chứng công tơ phải là tệp ảnh.');
   for(const fileId of row.imageFileIds||[]){checkFile(store,user,fileId,row);must(store.db.prepare('SELECT type FROM files WHERE id=?').get(fileId)?.type.startsWith('image/'),'Thư viện phòng chỉ nhận tệp ảnh.');}
   switch(collection){
@@ -165,15 +171,32 @@ function normalize(store,user,collection,input,existing){
       if(existing)must(row.status===existing.status,'Dùng thao tác hợp đồng để thay đổi trạng thái.');else must(row.status==='draft','Hợp đồng mới phải ở trạng thái nháp.');
       if(existing?.status==='active')must(['roomId','tenantId','startDate','endDate','rent','deposit'].every(key=>row[key]===existing[key]),'Hợp đồng đang hiệu lực chỉ thay đổi qua gia hạn hoặc kết thúc hợp đồng.');
       break;
+    case 'meters':{
+      must(['electric','water'].includes(row.utility),'Loại công tơ không hợp lệ.');text(row.code,'Mã công tơ',2,80);must(row.initialReading>=0,'Chỉ số ban đầu không được âm.');must(['active','replaced'].includes(row.status),'Trạng thái công tơ không hợp lệ.');if(row.status==='active')must(!store.list('meters',row.ownerId).some(item=>item.id!==row.id&&item.roomId===row.roomId&&item.utility===row.utility&&item.status==='active'),'Phòng đã có công tơ đang hoạt động cho loại dịch vụ này.',409);break;
+    }
+    case 'services':{
+      text(row.name,'Tên dịch vụ',2,120);must(row.rate>=0,'Đơn giá dịch vụ không được âm.');if(row.effectiveFrom)date(row.effectiveFrom,'Ngày áp dụng đơn giá');
+      for(const roomId of row.roomIds||[]){const linked=reference(store,user,'rooms',roomId);must(linked.propertyId===row.propertyId,'Phòng áp dụng dịch vụ phải thuộc cùng cơ sở.');}
+      for(const contractId of row.contractIds||[]){const linked=reference(store,user,'contracts',contractId);must(linked.propertyId===row.propertyId,'Hợp đồng áp dụng dịch vụ phải thuộc cùng cơ sở.');}
+      break;
+    }
+    case 'charges':{
+      const room=reference(store,user,'rooms',row.roomId);must(room.propertyId===row.propertyId,'Phòng không thuộc cơ sở.');const tenant=reference(store,user,'tenants',row.tenantId);must(tenant.roomId===row.roomId,'Người thuê không thuộc phòng đã chọn.');must(['charge','deduction'].includes(row.type),'Loại khoản thu/giảm trừ không hợp lệ.');must(row.amount>0,'Số tiền phải lớn hơn 0.');text(row.reason,'Lý do khoản thu/giảm trừ',3,1000);if(row.invoiceId)must(reference(store,user,'invoices',row.invoiceId).roomId===row.roomId,'Hóa đơn không thuộc phòng.');break;
+    }
     case 'readings':{
-      must(row.electricNew>=row.electricOld&&row.waterNew>=row.waterOld,'Chỉ số mới không được nhỏ hơn chỉ số cũ.');
+      must(Array.isArray(row.meterBreakdown||[])&&(row.meterBreakdown||[]).length<=20,'Lịch sử thay công tơ không hợp lệ.');
       if(existing)must(!store.list('invoices',row.ownerId).some(i=>i.roomId===row.roomId&&i.period===row.period&&i.status==='issued'),'Chỉ số đã dùng trong hóa đơn phát hành; hãy hủy hóa đơn theo quy trình điều chỉnh trước.',409);
       const previous=store.list('readings',row.ownerId).filter(r=>r.roomId===row.roomId&&r.period<row.period&&r.confirmed).sort((a,b)=>b.period.localeCompare(a.period))[0];
-      if(previous)must(row.electricOld===previous.electricNew&&row.waterOld===previous.waterNew,'Chỉ số cũ phải khớp chỉ số chốt kỳ trước.');
+      const replaced=store.list('meters',row.ownerId).filter(m=>m.roomId===row.roomId&&m.status==='replaced'&&String(m.removedAt||'').slice(0,7)===row.period&&m.finalReading!==undefined).sort((a,b)=>String(a.removedAt).localeCompare(String(b.removedAt)));
+      const computedSegments=replaced.map(oldMeter=>{const replacement=store.get('meters',oldMeter.replacedBy);const utility=oldMeter.utility,key=utility==='electric'?'electricNew':'waterNew';const followsSamePeriodMeter=replaced.some(candidate=>candidate.id===oldMeter.replacesId);const oldOpening=followsSamePeriodMeter?oldMeter.initialReading:(previous?.[key]??oldMeter.initialReading);return {utility,oldMeterId:oldMeter.id,newMeterId:replacement?.id||'',oldOpening:Number(oldOpening),oldClosing:Number(oldMeter.finalReading),newOpening:Number(replacement?.initialReading??0),effectiveDate:oldMeter.removedAt};});
+      if(computedSegments.length)row.meterBreakdown=[...(row.meterBreakdown||[]).filter(segment=>!computedSegments.some(next=>next.oldMeterId===segment.oldMeterId)),...computedSegments];
+      must((row.electricNew>=row.electricOld||(row.meterBreakdown||[]).some(segment=>segment.utility==='electric'&&Number(row.electricNew)>=Number(segment.newOpening)))&&(row.waterNew>=row.waterOld||(row.meterBreakdown||[]).some(segment=>segment.utility==='water'&&Number(row.waterNew)>=Number(segment.newOpening))),'Chỉ số mới không được nhỏ hơn chỉ số đầu của công tơ hiện tại.');
+      if(previous){for(const utility of ['electric','water']){const chain=computedSegments.filter(segment=>segment.utility===utility);const oldValue=row[`${utility}Old`], expected=chain.length?Number(chain.at(-1).newOpening):Number(previous[`${utility}New`]);must(oldValue===expected,chain.length?`Chỉ số đầu kỳ ${utility==='electric'?'điện':'nước'} phải khớp chỉ số ban đầu của công tơ hiện tại.`:'Chỉ số cũ phải khớp chỉ số chốt kỳ trước.');}}
       must(!store.list('readings',row.ownerId).some(r=>r.id!==row.id&&r.roomId===row.roomId&&r.period===row.period),'Phòng đã có chỉ số trong kỳ này.',409);break;
     }
     case 'invoices':must(!existing||existing.status==='draft','Hóa đơn đã phát hành không thể sửa trực tiếp.');must(row.status==='draft','Dùng thao tác phát hành/hủy hóa đơn.');break;
     case 'transactions':must(!existing?.source,'Bản ghi tự động từ nghiệp vụ không thể sửa trực tiếp.');must(row.amount>0,'Số tiền phải lớn hơn 0.');break;
+    case 'tickets':{if(row.invoiceId){const invoice=reference(store,user,'invoices',row.invoiceId);must(invoice.status==='issued'&&invoice.tenantId===row.tenantId&&invoice.roomId===row.roomId,'Yêu cầu rà soát chỉ được liên kết với hóa đơn đã phát hành của người thuê.');}break;}
     case 'issues':text(row.title,'Tiêu đề',3,150);text(row.description,'Mô tả sự cố',10,5000);must(!existing||existing.status==='new','Yêu cầu đang xử lý cần cập nhật bằng luồng trạng thái.');if(row.assetId){const asset=reference(store,user,'assets',row.assetId);must(asset.roomId===row.roomId,'Thiết bị không thuộc phòng báo sự cố.');}break;
     case 'assets':must(!store.list('assets',row.ownerId).some(a=>a.id!==row.id&&a.propertyId===row.propertyId&&a.code.toLowerCase()===row.code.toLowerCase()),'Mã tài sản đã tồn tại.',409);break;
     case 'handovers':{
@@ -191,7 +214,7 @@ function normalize(store,user,collection,input,existing){
       const overlap=store.list('bookings',row.ownerId).filter(b=>b.id!==row.id&&b.amenityId===row.amenityId&&b.date===row.date&&b.status==='confirmed'&&b.startTime<row.endTime&&b.endTime>row.startTime);
       must(overlap.length<amenity.capacity,'Tiện ích đã đủ lượt đăng ký trong thời gian này.',409);break;
     }
-    case 'settings':must(row.billingDay>=1&&row.billingDay<=28,'Ngày thu tiền từ 1 đến 28.');must(row.notificationDays<=30,'Số ngày nhắc trước tối đa 30.');break;
+    case 'settings':must(row.billingDay>=1&&row.billingDay<=28,'Ngày thu tiền từ 1 đến 28.');must(row.notificationDays<=30,'Số ngày nhắc trước tối đa 30.');if(!row.effectiveFrom)row.effectiveFrom='0001-01-01';if(!Array.isArray(row.rateHistory))row.rateHistory=[];break;
   }
   return row;
 }
@@ -203,6 +226,8 @@ export function createRecord(store,user,collection,input){
   const row=normalize(store,user,collection,input);
   if(collection==='tickets')row.messages=[{id:id('msg'),authorId:user.id,authorName:user.name,body:row.body,createdAt:now(),...(row.fileId?{fileId:row.fileId}:{})}];
   if(collection==='notifications')row.createdBy=user.id;
+  if(collection==='readings'){row.recorderId=user.id;row.recordedAt=now();if(row.confirmed)row.finalizedAt=now();row.history=row.history||[];}
+  if(collection==='services'){row.effectiveFrom=row.effectiveFrom||'0001-01-01';row.rateHistory=row.rateHistory||[];}
   if(collection==='invoices')Object.assign(row,calculateInvoice(store,user,input),{status:'draft',paid:0,version:1});
   const saved=store.put(collection,row);audit(store,user,'create',collection,saved);
   if(collection==='properties')store.put('settings',{id:id('set'),ownerId:user.id,propertyId:saved.id,...defaults.settings});
@@ -213,6 +238,9 @@ export function updateRecord(store,user,collection,key,input){
   must(!immutable.has(collection),'Không thể sửa bản ghi nghiệp vụ đã ghi nhận.',403);
   must(user.role==='landlord'||tenantUpdate.has(collection),'Bạn không có quyền chỉnh sửa dữ liệu này.',403);
   const row=normalize(store,user,collection,input,existing);
+  if(collection==='services'&&Number(row.rate)!==Number(existing.rate)){const effectiveFrom=input.effectiveFrom||today();date(effectiveFrom,'Ngày áp dụng đơn giá');row.rateHistory=[...(existing.rateHistory||[]),{effectiveFrom:existing.effectiveFrom||'0001-01-01',rate:existing.rate,changedAt:now()}].sort((a,b)=>String(a.effectiveFrom).localeCompare(String(b.effectiveFrom)));row.effectiveFrom=effectiveFrom;}
+  if(collection==='settings'&&['electricRate','waterRate','electricMethod','waterMethod','electricPersonRate','waterPersonRate','electricFixedFee','waterFixedFee'].some(key=>Object.hasOwn(input,key)&&input[key]!==existing[key])){const effectiveFrom=input.effectiveFrom||today();date(effectiveFrom,'Ngày áp dụng đơn giá');const rateFields=['electricRate','waterRate','electricMethod','waterMethod','electricPersonRate','waterPersonRate','electricFixedFee','waterFixedFee'];const prior=Object.fromEntries(rateFields.map(key=>[key,existing[key]??defaults.settings[key]]));row.rateHistory=[...(existing.rateHistory||[]),{effectiveFrom:existing.effectiveFrom||'0001-01-01',...prior}].sort((a,b)=>String(a.effectiveFrom).localeCompare(String(b.effectiveFrom)));row.effectiveFrom=effectiveFrom;}
+  if(collection==='readings'&&existing.confirmed){const changed=['electricOld','electricNew','waterOld','waterNew'].some(key=>Number(row[key])!==Number(existing[key]));if(changed){const reason=text(input.editReason||'','Lý do mở khóa/chỉnh sửa chỉ số',5,1000);row.history=[...(existing.history||[]),{...Object.fromEntries(['period','electricOld','electricNew','waterOld','waterNew','photoFileId','electricPhotoFileId','waterPhotoFileId','recordedAt','recorderId','finalizedAt'].map(key=>[key,existing[key]])),reason,editedBy:user.id,editedAt:now()}];row.recorderId=user.id;row.recordedAt=now();row.finalizedAt=row.confirmed?now():null;}}
   if(collection==='invoices')Object.assign(row,calculateInvoice(store,user,invoiceInput(existing,input)),{status:'draft',paid:0});
   if(collection==='properties'&&row.archived&&!existing.archived)must(!store.list('contracts',user.id).some(c=>c.propertyId===key&&c.status==='active'),'Cần kết thúc các hợp đồng trước khi lưu trữ cơ sở.');
   const saved=store.put(collection,row);audit(store,user,'update',collection,saved);return saved;
@@ -242,9 +270,9 @@ function heldDeposit(store,user,contractId){return store.list('deposits',ownerId
 function outstanding(store,user,contract){return store.list('invoices',ownerId(user)).filter(i=>i.status==='issued'&&i.roomId===contract.roomId&&i.tenantId===contract.tenantId).reduce((sum,i)=>sum+Math.max(0,i.total-i.paid),0);}
 function completeCheckout(store,user,contract){
   must(!store.list('contracts',ownerId(user)).some(other=>other.id!==contract.id&&other.roomId===contract.roomId&&other.status==='active'),'Phòng đã có lượt thuê khác; không thể hoàn tất lại biên bản cũ.',409);
-  must(outstanding(store,user,contract)===0,'Còn hóa đơn chưa thu đủ; cần quyết toán công nợ trước khi kết thúc.');
-  must(heldDeposit(store,user,contract.id)===0,'Cần ghi nhận hoàn/khấu trừ hết tiền cọc trước khi kết thúc.');
-  must(creditAccounts(store,ownerId(user)).filter(credit=>credit.tenantId===contract.tenantId).reduce((sum,credit)=>sum+credit.balance,0)===0,'Cần hoàn hoặc phân bổ hết tiền trả dư của người thuê trước khi hoàn tất bàn giao.');
+  // Closing the move-out handover ends the contract first; outstanding debt and held
+  // security deposits are settled afterwards by UC41. They must not block the
+  // settlement workflow itself.
   const saved=store.put('contracts',{...contract,status:'ended',endedAt:now()});
   const room=reference(store,user,'rooms',contract.roomId);store.put('rooms',{...room,status:'vacant'});
   const tenant=reference(store,user,'tenants',contract.tenantId);store.put('tenants',{...tenant,status:'left',moveOutDate:today()});
@@ -265,8 +293,9 @@ function activateContract(store,user,contract){
   store.put('rooms',{...room,status:'occupied'});store.put('tenants',{...tenant,roomId:room.id,status:'active',moveInDate:contract.startDate});
   return store.put('contracts',{...contract,status:'active',activatedAt:now()});
 }
-function invoiceServices(store,user,input,room,tenant){
-  const active=store.list('services',user.id).filter(service=>service.propertyId===room.propertyId&&service.active);
+function invoiceServices(store,user,input,room,tenant,contract,billPeriod){
+  const active=store.list('services',user.id).filter(service=>service.propertyId===room.propertyId&&service.active&&(!service.discontinuedAt||String(service.discontinuedAt).slice(0,7)>billPeriod)&&(!service.roomIds?.length||service.roomIds.includes(room.id))&&(!service.contractIds?.length||service.contractIds.includes(contract.id)));
+  const rateFor=(service)=>{const history=[...(service.rateHistory||[]),{effectiveFrom:service.effectiveFrom||'0001-01-01',rate:service.rate}].filter(item=>String(item.effectiveFrom||'0001-01-01')<=`${billPeriod}-31`).sort((a,b)=>String(a.effectiveFrom).localeCompare(String(b.effectiveFrom)));return Number(history.at(-1)?.rate??service.rate);};
   const occupants=1+(tenant.members||'').split(/[,;\n]/).filter(value=>value.trim()).length;
   let list;
   if(Object.hasOwn(input,'serviceItems')){
@@ -276,18 +305,20 @@ function invoiceServices(store,user,input,room,tenant){
   }else if(input.serviceFee!==undefined){
     const rate=number(input.serviceFee,'Phí dịch vụ');list=rate?[{name:'Dịch vụ',quantity:1,rate}]:[];
   }else{
-    list=active.map(service=>({serviceId:service.id,name:service.name,quantity:service.unit==='person'?occupants:service.unit==='usage'?0:1,rate:service.rate,unit:service.unit}));
+    list=active.map(service=>({serviceId:service.id,name:service.name,quantity:service.unit==='person'?occupants:service.unit==='usage'?0:service.unit==='vehicle'?store.list('vehicles',user.id).filter(vehicle=>vehicle.tenantId===tenant.id&&vehicle.roomId===room.id&&vehicle.status==='active').length:1,rate:rateFor(service),unit:service.unit}));
     list.push(...store.list('vehicles',user.id).filter(vehicle=>vehicle.tenantId===tenant.id&&vehicle.roomId===room.id&&vehicle.status==='active'&&vehicle.fee>0).map(vehicle=>({serviceId:'vehicle:'+vehicle.id,name:'Gửi xe '+vehicle.plate,quantity:1,rate:vehicle.fee,unit:'vehicle'})));
   }
+  for(const charge of store.list('charges',user.id).filter(item=>item.roomId===room.id&&item.tenantId===tenant.id&&item.period===billPeriod&&!item.invoiceId)){list.push({serviceId:`charge:${charge.id}`,name:charge.type==='deduction'?`Giảm trừ: ${charge.reason}`:`Phụ phí: ${charge.reason}`,quantity:1,rate:charge.type==='deduction'?-charge.amount:charge.amount,unit:'one-time'});}
   const seen=new Set();
   return list.map(item=>{
     must(item&&typeof item==='object'&&!Array.isArray(item),'Dòng dịch vụ không hợp lệ.');
     const serviceId=typeof item.serviceId==='string'?item.serviceId:'';
     if(serviceId){
       if(serviceId.startsWith('vehicle:')){const vehicle=reference(store,user,'vehicles',serviceId.slice(8));must(vehicle.roomId===room.id&&vehicle.tenantId===tenant.id,'Phương tiện không thuộc lượt thuê tính phí.');}
-      else{const service=reference(store,user,'services',serviceId);must(service.propertyId===room.propertyId,'Dịch vụ không thuộc cơ sở.');}
+      else if(serviceId.startsWith('charge:')){const charge=reference(store,user,'charges',serviceId.slice(7));must(charge.roomId===room.id&&charge.tenantId===tenant.id&&charge.period===billPeriod&&!charge.invoiceId,'Khoản phụ phí/giảm trừ không còn khả dụng.');}
+      else{const service=reference(store,user,'services',serviceId);must(service.propertyId===room.propertyId&&service.active!==false,'Dịch vụ không thuộc cơ sở hoặc đã ngừng áp dụng.');must(!service.roomIds?.length||service.roomIds.includes(room.id),'Dịch vụ không được áp dụng cho phòng này.');must(!service.contractIds?.length||service.contractIds.includes(contract.id),'Dịch vụ không được áp dụng cho hợp đồng này.');must(!service.discontinuedAt||String(service.discontinuedAt).slice(0,7)>billPeriod,'Dịch vụ đã ngừng áp dụng từ kỳ này.');}
     }
-    const name=text(item.name,'Tên dịch vụ',1,200),quantity=number(item.quantity??1,'Số lượng dịch vụ',{integer:false}),rate=number(item.rate,'Đơn giá dịch vụ');
+    const name=text(item.name,'Tên dịch vụ',1,200),quantity=number(item.quantity??1,'Số lượng dịch vụ',{integer:false}),rate=serviceId.startsWith('charge:')&&Number(item.rate)<0?-number(-Number(item.rate),'Số tiền giảm trừ'):number(item.rate,'Đơn giá dịch vụ');
     must(quantity<=1000000,'Số lượng dịch vụ vượt giới hạn.');
     const key=serviceId||name.toLocaleLowerCase('vi');must(!seen.has(key),'Một dịch vụ hoặc phương tiện chỉ được tính một lần trong hóa đơn.');seen.add(key);
     const amount=Math.round(quantity*rate);must(Number.isSafeInteger(amount)&&amount<=1e12,'Thành tiền dịch vụ vượt giới hạn.');
@@ -300,25 +331,54 @@ export function calculateInvoice(store,user,input){
   const monthStart=`${billPeriod}-01`,monthEnd=`${billPeriod}-31`;
   const contract=store.list('contracts',user.id).filter(c=>c.roomId===room.id&&['active','ended'].includes(c.status)&&(!input.contractId||input.contractId===c.id)&&(!input.tenantId||input.tenantId===c.tenantId)&&c.startDate<=monthEnd&&(c.status==='ended'?[c.endDate,c.endedAt?.slice(0,10)].filter(Boolean).sort()[0]:c.endDate)>=monthStart).sort((a,b)=>Number(b.status==='active')-Number(a.status==='active'))[0];
   must(contract,'Phòng chưa có hợp đồng phù hợp với kỳ hóa đơn.');
-  const config=store.list('settings',user.id).find(s=>s.propertyId===room.propertyId)||defaults.settings;
+  const storedConfig=store.list('settings',user.id).find(s=>s.propertyId===room.propertyId)||defaults.settings;
+  const rateHistory=[...(storedConfig.rateHistory||[]),{effectiveFrom:storedConfig.effectiveFrom||'0001-01-01',...Object.fromEntries(['electricRate','waterRate','electricMethod','waterMethod','electricPersonRate','waterPersonRate','electricFixedFee','waterFixedFee'].map(key=>[key,storedConfig[key]??defaults.settings[key]]))}].filter(item=>String(item.effectiveFrom||'0001-01-01')<=`${billPeriod}-31`).sort((a,b)=>String(a.effectiveFrom).localeCompare(String(b.effectiveFrom)));
+  const config={...defaults.settings,...storedConfig,...(rateHistory.at(-1)||{})};
   const reading=store.list('readings',user.id).find(r=>r.roomId===room.id&&r.period===billPeriod);
   const previous=store.list('readings',user.id).filter(r=>r.roomId===room.id&&r.period<billPeriod&&r.confirmed).sort((a,b)=>b.period.localeCompare(a.period))[0];
+  const electricMethod=rateHistory.at(-1)?.electricMethod||storedConfig.electricMethod||'meter',waterMethod=rateHistory.at(-1)?.waterMethod||storedConfig.waterMethod||'meter';
+  if(electricMethod==='meter'||waterMethod==='meter')must(reading?.confirmed===true,'Cần chốt chỉ số điện/nước trước khi lập hóa đơn cho phương thức tính theo công tơ.');
   const tenant=reference(store,user,'tenants',contract.tenantId);
-  const serviceItems=invoiceServices(store,user,input,room,tenant);
-  const values={roomId:room.id,propertyId:room.propertyId,tenantId:contract.tenantId,contractId:contract.id,period:billPeriod,dueDate:input.dueDate||`${billPeriod}-${String(config.billingDay||5).padStart(2,'0')}`,rent:input.rent??contract.rent,electricOld:input.electricOld??reading?.electricOld??previous?.electricNew??0,electricNew:input.electricNew??reading?.electricNew??previous?.electricNew??0,waterOld:input.waterOld??reading?.waterOld??previous?.waterNew??0,waterNew:input.waterNew??reading?.waterNew??previous?.waterNew??0,electricRate:input.electricRate??config.electricRate,waterRate:input.waterRate??config.waterRate,serviceItems,serviceFee:serviceItems.reduce((sum,item)=>sum+item.amount,0),adjustment:input.adjustment??0,note:typeof input.note==='string'?input.note.slice(0,2000):''};
+  const occupants=1+(tenant.members||'').split(/[,;\n]/).filter(value=>value.trim()).length;
+  const serviceItems=invoiceServices(store,user,input,room,tenant,contract,billPeriod);
+  const values={roomId:room.id,propertyId:room.propertyId,tenantId:contract.tenantId,contractId:contract.id,period:billPeriod,dueDate:input.dueDate||`${billPeriod}-${String(config.billingDay||5).padStart(2,'0')}`,rent:input.rent??contract.rent,electricOld:input.electricOld??reading?.electricOld??previous?.electricNew??0,electricNew:input.electricNew??reading?.electricNew??previous?.electricNew??0,waterOld:input.waterOld??reading?.waterOld??previous?.waterNew??0,waterNew:input.waterNew??reading?.waterNew??previous?.waterNew??0,electricRate:input.electricRate??config.electricRate,waterRate:input.waterRate??config.waterRate,electricMethod:config.electricMethod||'meter',waterMethod:config.waterMethod||'meter',electricQuantity:occupants,waterQuantity:occupants,electricPersonRate:config.electricPersonRate||0,waterPersonRate:config.waterPersonRate||0,electricFixedFee:config.electricFixedFee||0,waterFixedFee:config.waterFixedFee||0,serviceItems,serviceFee:serviceItems.reduce((sum,item)=>sum+item.amount,0),adjustment:input.adjustment??0,note:typeof input.note==='string'?input.note.slice(0,2000):''};
   date(values.dueDate,'Hạn thanh toán');for(const key of ['rent','electricOld','electricNew','waterOld','waterNew','electricRate','waterRate','serviceFee','adjustment'])values[key]=number(values[key],key,{min:key==='adjustment'?-1e12:0});
-  must(values.electricNew>=values.electricOld&&values.waterNew>=values.waterOld,'Chỉ số mới không được nhỏ hơn chỉ số cũ.');
-  if(previous)must(values.electricOld===previous.electricNew&&values.waterOld===previous.waterNew,'Chỉ số cũ phải khớp chỉ số chốt kỳ trước.');
-  const items=[{name:'Tiền phòng',quantity:1,rate:values.rent,amount:values.rent},{name:'Điện',quantity:values.electricNew-values.electricOld,rate:values.electricRate,amount:(values.electricNew-values.electricOld)*values.electricRate},{name:'Nước',quantity:values.waterNew-values.waterOld,rate:values.waterRate,amount:(values.waterNew-values.waterOld)*values.waterRate},...serviceItems];
+  must((values.electricNew>=values.electricOld||(reading?.meterBreakdown||[]).some(segment=>segment.utility==='electric'&&values.electricNew>=Number(segment.newOpening)))&&(values.waterNew>=values.waterOld||(reading?.meterBreakdown||[]).some(segment=>segment.utility==='water'&&values.waterNew>=Number(segment.newOpening))),'Chỉ số mới không được nhỏ hơn chỉ số đầu của công tơ hiện tại.');
+  if(previous){for(const utility of ['electric','water']){const hasReplacement=(reading?.meterBreakdown||[]).some(segment=>segment.utility===utility);if(!hasReplacement)must(values[`${utility}Old`]===previous[`${utility}New`],'Chỉ số cũ phải khớp chỉ số chốt kỳ trước.');}}
+  const utilityCharge=(kind)=>{const method=values[`${kind}Method`];if(method==='person')return {quantity:occupants,rate:values[`${kind}PersonRate`],amount:occupants*values[`${kind}PersonRate`],formula:`${occupants} người × ${values[`${kind}PersonRate`]}`};if(method==='fixed')return {quantity:1,rate:values[`${kind}FixedFee`],amount:values[`${kind}FixedFee`],formula:'Phí cố định'};const segments=(reading?.meterBreakdown||[]).filter(segment=>segment.utility===kind);const priorUsage=segments.reduce((sum,segment)=>sum+Math.max(0,Number(segment.oldClosing||0)-Number(segment.oldOpening||0)),0);const currentUsage=segments.length?Math.max(0,values[`${kind}New`]-Number(segments.at(-1).newOpening||0)):Math.max(0,values[`${kind}New`]-values[`${kind}Old`]);const quantity=priorUsage+currentUsage;return {quantity,rate:values[`${kind}Rate`],amount:quantity*values[`${kind}Rate`],formula:segments.length?`Cộng dồn ${segments.length} công tơ: phần trước thay ${priorUsage} + công tơ hiện tại ${currentUsage}`:'Chỉ số công tơ'};};
+  const electric=utilityCharge('electric'),water=utilityCharge('water');
+  const items=[{name:'Tiền phòng',quantity:1,rate:values.rent,amount:values.rent},{name:'Điện',...electric,unit:values.electricMethod},{name:'Nước',...water,unit:values.waterMethod},...serviceItems];
   if(values.adjustment)items.push({name:'Điều chỉnh',quantity:1,rate:values.adjustment,amount:values.adjustment});
   const total=items.reduce((sum,item)=>sum+item.amount,0);must(Number.isSafeInteger(total)&&total>=0&&total<=1e12,'Tổng hóa đơn phải là số tiền không âm hợp lệ.');
   return {...values,items,total,paid:0};
 }
 export function performAction(store,user,name,input){
-  const ownerActions=['contract-activate','contract-renew','contract-end','invoice-preview','invoice-draft','invoice-issue','invoice-adjust','invoice-cancel','payment-record','payment-refund','payment-apply-credit','credit-refund','credit-apply','deposit-record','invite-tenant'];
+  const ownerActions=['reading-finalize','reading-unlock','contract-activate','contract-renew','contract-end','invoice-preview','invoice-draft','invoice-issue','invoice-adjust','invoice-cancel','payment-record','payment-refund','payment-apply-credit','credit-refund','credit-apply','deposit-record','invite-tenant','meter-replace','notification-send','payment-confirm-transfer','payment-reject-transfer','debt-reminder-send','deposit-settlement-create','deposit-settlement-revise','deposit-settlement-refund'];
   if(ownerActions.includes(name))must(user.role==='landlord','Chỉ chủ trọ được thực hiện thao tác này.',403);
   let row,saved;
   switch(name){
+    case 'reading-finalize':{
+      row=getRecord(store,user,'readings',input.id);must(!row.confirmed,'Kỳ chỉ số đã được chốt.',409);
+      must(!store.list('invoices',user.id).some(invoice=>invoice.roomId===row.roomId&&invoice.period===row.period&&invoice.status==='issued'),'Kỳ đã có hóa đơn phát hành.',409);
+      must((row.electricNew>=row.electricOld||(row.meterBreakdown||[]).some(segment=>segment.utility==='electric'&&Number(row.electricNew)>=Number(segment.newOpening)))&&(row.waterNew>=row.waterOld||(row.meterBreakdown||[]).some(segment=>segment.utility==='water'&&Number(row.waterNew)>=Number(segment.newOpening))),'Chỉ số cuối kỳ không được nhỏ hơn đầu kỳ công tơ tương ứng.');
+      const previous=store.list('readings',user.id).filter(item=>item.roomId===row.roomId&&item.period<row.period&&item.confirmed).sort((a,b)=>b.period.localeCompare(a.period))[0];
+      if(previous){for(const utility of ['electric','water']){const segments=(row.meterBreakdown||[]).filter(segment=>segment.utility===utility);if(segments.length)must(Number(segments[0].oldOpening)===Number(previous[`${utility}New`]),'Chỉ số mở đầu của công tơ cũ phải khớp số chốt kỳ gần nhất.');else must(row[`${utility}Old`]===previous[`${utility}New`],'Chỉ số đầu kỳ phải khớp số chốt kỳ gần nhất.');}}
+      const history=store.list('readings',user.id).filter(item=>item.roomId===row.roomId&&item.period<row.period&&item.confirmed).sort((a,b)=>b.period.localeCompare(a.period)).slice(0,3);
+      const settings=store.list('settings',user.id).find(item=>item.propertyId===row.propertyId)||defaults.settings,threshold=Number(settings.anomalyThreshold??50);
+      const usage=(item,utility)=>{const segments=(item.meterBreakdown||[]).filter(segment=>segment.utility===utility);return segments.length?segments.reduce((sum,segment)=>sum+Math.max(0,Number(segment.oldClosing)-Number(segment.oldOpening)),0)+Math.max(0,Number(item[`${utility}New`])-Number(segments.at(-1).newOpening)):Math.max(0,Number(item[`${utility}New`])-Number(item[`${utility}Old`]));};
+      const average=utility=>history.length?history.reduce((sum,item)=>sum+usage(item,utility),0)/history.length:0;
+      const electricUsage=usage(row,'electric'),waterUsage=usage(row,'water'),electricAverage=average('electric'),waterAverage=average('water');
+      const abnormal=(electricAverage>0&&electricUsage>electricAverage*(1+threshold/100))||(waterAverage>0&&waterUsage>waterAverage*(1+threshold/100));
+      must(!abnormal||input.confirmAnomaly===true,'Mức tiêu thụ có dấu hiệu bất thường. Vui lòng xác nhận đã kiểm tra trước khi chốt kỳ.',409);
+      const meterBreakdown=(row.meterBreakdown||[]).map(segment=>({...segment,...(segment.utility==='electric'?{finalReading:row.electricNew}:{finalReading:row.waterNew})}));
+      saved=store.put('readings',{...row,confirmed:true,recorderId:user.id,recordedAt:row.recordedAt||now(),finalizedAt:now(),anomaly:abnormal?{electricUsage,waterUsage,electricAverage,waterAverage,threshold,checkedBy:user.id,checkedAt:now()}:null,meterBreakdown});
+      audit(store,user,name,'readings',saved,abnormal?'Đã xác nhận cảnh báo biến động tiêu thụ.':'');return saved;
+    }
+    case 'reading-unlock':{
+      row=getRecord(store,user,'readings',input.id);must(row.confirmed,'Kỳ chỉ số chưa được chốt.');must(!store.list('invoices',user.id).some(invoice=>invoice.roomId===row.roomId&&invoice.period===row.period&&invoice.status==='issued'),'Hóa đơn đã phát hành; cần tạo hóa đơn điều chỉnh thay vì mở khóa chỉ số.',409);
+      const reason=text(input.reason,'Lý do mở khóa',5,1000),snapshot=Object.fromEntries(['period','electricOld','electricNew','waterOld','waterNew','photoFileId','electricPhotoFileId','waterPhotoFileId','meterBreakdown','recorderId','recordedAt','finalizedAt'].map(key=>[key,row[key]]));
+      saved=store.put('readings',{...row,confirmed:false,unlockReason:reason,unlockedAt:now(),unlockedBy:user.id,history:[...(row.history||[]),{...snapshot,reason,editedBy:user.id,editedAt:now()}]});audit(store,user,name,'readings',saved,reason);return saved;
+    }
     case 'contract-activate':row=getRecord(store,user,'contracts',input.id);saved=activateContract(store,user,row);audit(store,user,name,'contracts',saved);return saved;
     case 'contract-renew':{
       row=getRecord(store,user,'contracts',input.id);must(row.status==='active','Chỉ gia hạn hợp đồng đang hiệu lực.');date(input.endDate,'Ngày kết thúc');must(input.endDate>row.endDate,'Ngày gia hạn phải sau ngày kết thúc hiện tại.');
@@ -335,7 +395,10 @@ export function performAction(store,user,name,input){
       must(!store.list('invoices',user.id).some(i=>i.id!==draft?.id&&i.roomId===calculated.roomId&&i.period===calculated.period&&i.status!=='cancelled'),'Phòng đã có hóa đơn trong kỳ này.',409);
       saved=store.put('invoices',{...draft,...calculated,id:draft?.id||id('HD'),ownerId:user.id,status:'issued',issuedAt:now(),paid:0,version:draft?.version||1});
       const existing=store.list('readings',user.id).find(r=>r.roomId===saved.roomId&&r.period===saved.period);
-      store.put('readings',{...existing,id:existing?.id||id('read'),ownerId:user.id,propertyId:saved.propertyId,roomId:saved.roomId,period:saved.period,electricOld:saved.electricOld,electricNew:saved.electricNew,waterOld:saved.waterOld,waterNew:saved.waterNew,confirmed:true});
+      // A fixed/per-person invoice does not require or manufacture meter readings.
+      // Meter-based invoices are already guarded by calculateInvoice requiring a finalized reading.
+      if(existing?.confirmed!==true&&(saved.electricMethod==='meter'||saved.waterMethod==='meter'))fail(409,'Chỉ số điện/nước cần được chốt trước khi phát hành hóa đơn.');
+      for(const item of saved.serviceItems||[])if(item.serviceId?.startsWith('charge:')){const charge=store.get('charges',item.serviceId.slice(7));if(charge)store.put('charges',{...charge,invoiceId:saved.id});}
       audit(store,user,name,'invoices',saved);notify(store,user,saved,`Hóa đơn kỳ ${saved.period}`,`Hóa đơn ${saved.id} đã phát hành. Hạn thanh toán ${saved.dueDate}.`,'invoice');return saved;
     }
     case 'invoice-adjust':{
@@ -354,6 +417,13 @@ export function performAction(store,user,name,input){
     }
     case 'invoice-cancel':{
       row=getRecord(store,user,'invoices',input.id);must(row.status!=='cancelled','Hóa đơn đã hủy.');must(row.paid===0,'Hóa đơn đã thu tiền không thể hủy.');const reason=text(input.reason,'Lý do hủy',5,1000);saved=store.put('invoices',{...row,status:'cancelled',cancelReason:reason,cancelledAt:now()});audit(store,user,name,'invoices',saved,reason);return saved;
+    }
+    case 'payment-report-transfer':{
+      must(user.role==='tenant','Chỉ người thuê báo đã chuyển khoản.',403);row=getRecord(store,user,'invoices',input.invoiceId);must(row.status==='issued'&&row.paid<row.total,'Hóa đơn không còn công nợ.');must(row.tenantId===user.tenant_id,'Hóa đơn không thuộc lượt thuê của bạn.',403);
+      const amount=number(input.amount??(row.total-row.paid),'Số tiền đã chuyển',{min:1});must(amount<=row.total-row.paid,'Số tiền báo chuyển không vượt công nợ hiện tại.');const duplicate=store.list('payments',ownerId(user)).some(item=>item.invoiceId===row.id&&item.kind==='transfer_report'&&item.status==='pending');must(!duplicate,'Đã có yêu cầu báo chuyển khoản đang chờ chủ trọ xác nhận.',409);date(input.date||today(),'Ngày chuyển khoản');
+      saved=store.put('payments',{id:id('pay'),ownerId:ownerId(user),propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,invoiceId:row.id,kind:'transfer_report',status:'pending',amount,appliedAmount:0,creditAmount:0,method:'transfer',date:input.date||today(),note:String(input.note||'').slice(0,1000),reportedAt:now(),reportedBy:user.id});
+      const landlord=store.db.prepare('SELECT id FROM users WHERE id=?').get(user.landlord_id);if(landlord)store.put('notifications',{id:id('not'),ownerId:ownerId(user),propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,recipientUserId:user.landlord_id,title:'Người thuê báo đã chuyển khoản',body:`Phòng ${row.roomId} báo chuyển ${amount.toLocaleString('vi-VN')}đ cho hóa đơn ${row.id}. Vui lòng đối chiếu tài khoản ngân hàng.`,kind:'invoice',readBy:[]});
+      audit(store,user,name,'payments',saved);return saved;
     }
     case 'payment-record':{
       row=getRecord(store,user,'invoices',input.invoiceId);must(row.status==='issued','Chỉ ghi thu hóa đơn đã phát hành.');checkPaymentIdentity(store,row);const amount=number(input.amount,'Số tiền',{min:1});must(['cash','transfer'].includes(input.method),'Phương thức thanh toán không hợp lệ.');date(input.date||today(),'Ngày thu');
@@ -391,11 +461,86 @@ export function performAction(store,user,name,input){
       for(const entry of entries){store.put('transactions',{id:id('txn'),ownerId:user.id,propertyId:entry.propertyId,roomId:entry.roomId,type:'expense',category:'Hoàn tiền thanh toán',amount:entry.amount,date:entry.date,description:entry.note,source:'payment_refund',sourceId:entry.id});audit(store,user,name,'payments',entry);}
       assertCredits(store,user.id);return {invoice:saved,entries,amount};
     }
+    case 'meter-replace':{
+      row=getRecord(store,user,'meters',input.id);must(row.status==='active','Chỉ có thể thay công tơ đang hoạt động.');
+      const finalReading=number(input.finalReading,'Chỉ số cuối công tơ cũ');must(finalReading>=row.initialReading,'Chỉ số cuối không được nhỏ hơn chỉ số ban đầu.');
+      const code=text(input.newCode,'Mã công tơ mới',2,80),initialReading=number(input.initialReading,'Chỉ số ban đầu công tơ mới'),effectiveDate=input.effectiveDate||today();date(effectiveDate,'Ngày thay công tơ');
+      must(!store.list('meters',user.id).some(item=>item.id!==row.id&&item.propertyId===row.propertyId&&item.code.toLowerCase()===code.toLowerCase()),'Mã công tơ mới đã được sử dụng.',409);
+      const periodKey=effectiveDate.slice(0,7),periodReading=store.list('readings',user.id).find(item=>item.roomId===row.roomId&&item.period===periodKey);
+      must(!periodReading?.confirmed,'Kỳ chỉ số đã chốt. Hãy tạo hồ sơ điều chỉnh theo quy trình hóa đơn nếu cần thay đổi. ',409);
+      const previous=store.list('readings',user.id).filter(item=>item.roomId===row.roomId&&item.period<periodKey&&item.confirmed).sort((a,b)=>b.period.localeCompare(a.period))[0];
+      const priorSegments=(row.replacementPeriod===periodKey?row.replacementSegments||[]:[]);
+      const utilityKey=row.utility==='electric'?'electric':'water';
+      const opening=Number(priorSegments.length?row.initialReading:(previous?.[`${utilityKey}New`]??row.initialReading));
+      const segment={utility:row.utility,oldMeterId:row.id,newMeterId:'',oldOpening:opening,oldClosing:finalReading,newOpening:initialReading,effectiveDate};
+      const periodSegments=[...priorSegments,segment];
+      const old=store.put('meters',{...row,status:'replaced',finalReading,removedAt:effectiveDate,replacedBy:null});
+      const replacement=store.put('meters',{id:id('meter'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,utility:row.utility,code,initialReading,installedAt:effectiveDate,status:'active',replacesId:row.id,replacementPeriod:periodKey,replacementSegments:[...periodSegments]});
+      periodSegments[periodSegments.length-1]={...segment,newMeterId:replacement.id};
+      store.put('meters',{...replacement,replacementSegments:periodSegments});
+      store.put('meters',{...old,replacedBy:replacement.id});
+      if(periodReading){const oldKey=row.utility==='electric'?'electricOld':'waterOld',newKey=row.utility==='electric'?'electricNew':'waterNew';store.put('readings',{...periodReading,[oldKey]:initialReading,[newKey]:initialReading,meterBreakdown:[...(periodReading.meterBreakdown||[]).filter(item=>item.utility!==row.utility),...periodSegments]});}
+      audit(store,user,name,'meters',old,{replacementId:replacement.id});audit(store,user,name,'meters',store.get('meters',replacement.id),{replacesId:row.id});return {old:store.get('meters',row.id),replacement:store.get('meters',replacement.id)};
+    }
+    case 'payment-confirm-transfer':{
+      row=store.get('payments',input.id);must(row&&row.ownerId===user.id&&row.kind==='transfer_report'&&row.status==='pending','Không tìm thấy yêu cầu báo chuyển khoản đang chờ xác nhận.',404);
+      const invoice=getRecord(store,user,'invoices',row.invoiceId);must(invoice.status==='issued','Hóa đơn không còn ở trạng thái cần thanh toán.');
+      const amount=number(input.amount??row.amount,'Số tiền xác nhận',{min:1});must(amount<=Math.max(0,invoice.total-invoice.paid),'Số tiền xác nhận vượt công nợ còn lại.');
+      const allocated=Math.min(amount,invoice.total-invoice.paid),creditAmount=amount-allocated;
+      saved=store.put('payments',{...row,kind:'receipt',status:'confirmed',amount,appliedAmount:allocated,creditAmount,confirmedAt:now(),confirmedBy:user.id,method:'transfer',date:input.date||row.date,note:String(input.note||row.note||'').slice(0,1000)});
+      const updated=store.put('invoices',{...invoice,paid:invoice.paid+allocated});
+      store.put('transactions',{id:id('txn'),ownerId:user.id,propertyId:invoice.propertyId,roomId:invoice.roomId,type:'income',category:creditAmount?'Thu hóa đơn và nhận trước':'Thanh toán hóa đơn',amount,date:saved.date,description:`Xác nhận chuyển khoản hóa đơn ${invoice.id}`,source:'payment',sourceId:saved.id});
+      checkPaymentIdentity(store,updated);assertCredits(store,user.id);audit(store,user,name,'payments',saved);notify(store,user,invoice,'Đã xác nhận chuyển khoản',`Chủ trọ đã xác nhận ${amount.toLocaleString('vi-VN')}đ cho hóa đơn ${invoice.id}.`,'invoice');return saved;
+    }
+    case 'payment-reject-transfer':{
+      row=store.get('payments',input.id);must(row&&row.ownerId===user.id&&row.kind==='transfer_report'&&row.status==='pending','Không tìm thấy yêu cầu báo chuyển khoản đang chờ xác nhận.',404);const reason=text(input.reason,'Lý do từ chối',3,1000);saved=store.put('payments',{...row,status:'rejected',rejectedAt:now(),rejectedBy:user.id,rejectionReason:reason});audit(store,user,name,'payments',saved);const invoice=store.get('invoices',row.invoiceId);if(invoice)notify(store,user,invoice,'Cần kiểm tra lại thông tin chuyển khoản',reason,'invoice');return saved;
+    }
+    case 'debt-reminder-send':{
+      row=getRecord(store,user,'invoices',input.invoiceId);must(row.status==='issued'&&row.paid<row.total,'Hóa đơn không còn công nợ cần nhắc.');const message=`Hóa đơn ${row.id} kỳ ${row.period} còn phải thanh toán ${(row.total-row.paid).toLocaleString('vi-VN')}đ. Hạn thanh toán ${row.dueDate}.`;saved=notify(store,user,row,'Nhắc thanh toán hóa đơn',message,'invoice');store.put('notifications',{...saved,reminder:true,reminderSentAt:now()});audit(store,user,name,'notifications',saved);return saved;
+    }
+    case 'deposit-settlement-create':{
+      row=getRecord(store,user,'contracts',input.contractId);must(row.status==='ended','Chỉ lập quyết toán sau khi hợp đồng đã kết thúc.');must(store.list('handovers',user.id).some(h=>h.contractId===row.id&&h.type==='move_out'&&h.status==='confirmed'),'Cần có biên bản trả phòng đã được chủ trọ xác nhận.');
+      must(!store.list('depositSettlements',user.id).some(item=>item.contractId===row.id&&!['rejected','cancelled'].includes(item.status)),'Hợp đồng đã có một hồ sơ quyết toán đang xử lý.',409);
+      const held=heldDeposit(store,user,row.id),debt=outstanding(store,user,row),deductions=Array.isArray(input.deductions)?input.deductions:[];must(deductions.length<=30,'Tối đa 30 khoản khấu trừ.');
+      const normalized=deductions.map((item,index)=>{const label=text(item.label||`Khoản khấu trừ ${index+1}`,'Tên khoản khấu trừ',2,120),reason=text(item.reason||'','Lý do khấu trừ',3,1000),amount=number(item.amount,'Số tiền khấu trừ');if(item.evidenceFileId)checkFile(store,user,item.evidenceFileId,row);return {label,reason,amount,evidenceFileId:item.evidenceFileId||''};});
+      const deductionTotal=normalized.reduce((sum,item)=>sum+item.amount,0);must(deductionTotal<=held,'Tổng khấu trừ vượt số tiền cọc đang giữ.');
+      const debtApplied=Math.min(debt,Math.max(0,held-deductionTotal)),refundAmount=Math.max(0,held-deductionTotal-debtApplied),remainingDebt=Math.max(0,debt-debtApplied);
+      saved=store.put('depositSettlements',{id:id('settle'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,contractId:row.id,depositHeld:held,debt,deductions:normalized,deductionTotal,debtApplied,refundAmount,remainingDebt,status:'pending_tenant',createdBy:user.id,createdAt:now()});
+      audit(store,user,name,'depositSettlements',saved);notify(store,user,row,'Đề nghị quyết toán tiền cọc',`Chủ trọ đã gửi đề nghị quyết toán tiền cọc. Số tiền dự kiến hoàn: ${refundAmount.toLocaleString('vi-VN')}đ.`,'general');return saved;
+    }
+    case 'deposit-settlement-revise':{
+      row=getRecord(store,user,'depositSettlements',input.id);must(row.status==='disputed','Chỉ có thể cập nhật hồ sơ đang có ý kiến chưa đồng thuận.');const deductions=Array.isArray(input.deductions)?input.deductions:[];must(deductions.length<=30,'Tối đa 30 khoản khấu trừ.');const normalized=deductions.map((item,index)=>{const evidenceFileId=item.evidenceFileId||'';if(evidenceFileId)checkFile(store,user,evidenceFileId,row);return {label:text(item.label||`Khoản ${index+1}`,'Tên khoản',2,120),reason:text(item.reason||'','Lý do',3,1000),amount:number(item.amount,'Số tiền'),evidenceFileId};});const total=normalized.reduce((sum,item)=>sum+item.amount,0);must(total<=row.depositHeld,'Tổng khấu trừ vượt cọc đang giữ.');const debtApplied=Math.min(row.debt,Math.max(0,row.depositHeld-total)),refundAmount=Math.max(0,row.depositHeld-total-debtApplied),remainingDebt=Math.max(0,row.debt-debtApplied);saved=store.put('depositSettlements',{...row,deductions:normalized,deductionTotal:total,debtApplied,refundAmount,remainingDebt,status:'pending_tenant',tenantNote:'',tenantConfirmedAt:null,updatedAt:now()});audit(store,user,name,'depositSettlements',saved,'Chủ trọ đã điều chỉnh đề nghị quyết toán.');notify(store,user,row,'Đề nghị quyết toán đã được cập nhật','Chủ trọ đã điều chỉnh các khoản quyết toán. Vui lòng kiểm tra lại.','general');return saved;
+    }
+    case 'deposit-settlement-refund':{
+      row=getRecord(store,user,'depositSettlements',input.id);must(row.status==='accepted','Người thuê cần xác nhận quyết toán trước khi hoàn tiền.');must(!row.refundedAt,'Khoản hoàn tiền đã được ghi nhận.',409);const amount=number(input.amount??row.refundAmount,'Số tiền hoàn');must(amount===row.refundAmount,'Số tiền hoàn phải đúng số tiền đã thống nhất.');const method=input.method==='cash'?'cash':'transfer',dateValue=input.date||today();date(dateValue,'Ngày hoàn tiền');
+      if(row.debtApplied>0){
+        let remainingOffset=row.debtApplied;
+        const dueInvoices=store.list('invoices',user.id).filter(invoice=>(invoice.contractId===row.contractId||!invoice.contractId&&invoice.roomId===row.roomId&&invoice.tenantId===row.tenantId)&&invoice.status==='issued'&&invoice.paid<invoice.total).sort((a,b)=>a.period.localeCompare(b.period));
+        for(const invoice of dueInvoices){
+          if(remainingOffset<=0)break;
+          const part=Math.min(remainingOffset,invoice.total-invoice.paid);remainingOffset-=part;
+          const offset=store.put('payments',{id:id('pay'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,invoiceId:invoice.id,kind:'deposit_offset',amount:part,appliedAmount:part,creditAmount:0,method:'deposit',date:dateValue,note:`Bù trừ tiền cọc theo quyết toán ${row.id}`});
+          const updatedInvoice=store.put('invoices',{...invoice,paid:invoice.paid+part});checkPaymentIdentity(store,updatedInvoice);audit(store,user,name,'payments',offset,'Bù trừ công nợ từ tiền cọc.');
+        }
+        must(remainingOffset===0,'Công nợ thay đổi trong lúc quyết toán. Vui lòng tạo lại đề nghị quyết toán.',409);
+      }
+      if(row.deductionTotal>0||row.debtApplied>0){const already=store.list('deposits',user.id).some(item=>item.contractId===row.contractId&&item.type==='deduction'&&item.settlementId===row.id);if(!already){for(const deduction of row.deductions)if(deduction.amount>0)store.put('deposits',{id:id('dep'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,contractId:row.contractId,type:'deduction',amount:deduction.amount,date:dateValue,note:`${deduction.label}: ${deduction.reason}`,settlementId:row.id,evidenceFileId:deduction.evidenceFileId});if(row.debtApplied>0)store.put('deposits',{id:id('dep'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,contractId:row.contractId,type:'deduction',amount:row.debtApplied,date:dateValue,note:`Bù trừ công nợ hóa đơn theo quyết toán ${row.id}`,settlementId:row.id});}}
+      if(amount>0){
+        store.put('deposits',{id:id('dep'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,contractId:row.contractId,type:'refund',amount,date:dateValue,note:`Hoàn cọc theo quyết toán ${row.id}`,settlementId:row.id,method});
+        store.put('transactions',{id:id('txn'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,type:'expense',category:'Hoàn tiền cọc',amount,date:dateValue,description:`Hoàn tiền cọc theo quyết toán ${row.id}`,source:'deposit_settlement',sourceId:row.id});
+      }
+      saved=store.put('depositSettlements',{...row,status:'refunded',refundMethod:method,refundDate:dateValue,refundedAt:now(),refundedBy:user.id});audit(store,user,name,'depositSettlements',saved);notify(store,user,row,'Đã hoàn tiền cọc',`Chủ trọ đã ghi nhận hoàn ${amount.toLocaleString('vi-VN')}đ theo quyết toán.`,'general');return saved;
+    }
+    case 'deposit-settlement-respond':{
+      must(user.role==='tenant','Chỉ người thuê liên kết mới được phản hồi đề nghị quyết toán.',403);row=store.get('depositSettlements',input.id);must(row&&row.ownerId===ownerId(user)&&row.tenantId===user.tenant_id&&row.status==='pending_tenant','Không tìm thấy đề nghị quyết toán cần phản hồi.',404);
+      if(input.decision==='accept'){saved=store.put('depositSettlements',{...row,status:'accepted',tenantConfirmedAt:now(),tenantNote:String(input.note||'').slice(0,1000)});}
+      else{saved=store.put('depositSettlements',{...row,status:'disputed',tenantNote:text(input.note||'','Ý kiến chưa đồng ý',5,1000),tenantRespondedAt:now()});}
+      audit(store,user,name,'depositSettlements',saved);notify(store,user,row,input.decision==='accept'?'Người thuê đã xác nhận quyết toán':'Người thuê có ý kiến về quyết toán',saved.tenantNote||'Người thuê đã xác nhận đề nghị quyết toán.','general');return saved;
+    }
     case 'deposit-record':{
       row=getRecord(store,user,'contracts',input.contractId);must(['receipt','deduction','refund'].includes(input.type),'Loại giao dịch cọc không hợp lệ.');if(input.type==='receipt')must(['active','draft'].includes(row.status),'Lượt thuê đã kết thúc; không nhận thêm cọc.');const amount=number(input.amount,'Số tiền',{min:1});const balance=heldDeposit(store,user,row.id);
       if(input.type!=='receipt')must(amount<=balance,'Số tiền vượt số cọc đang giữ.');else must(balance+amount<=row.deposit,'Tiền cọc nhận vượt tiền cọc trong hợp đồng.');date(input.date||today(),'Ngày giao dịch');if(input.type==='deduction')text(input.note,'Lý do khấu trừ',5,2000);
       saved=store.put('deposits',{id:id('dep'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,tenantId:row.tenantId,contractId:row.id,type:input.type,amount,date:input.date||today(),note:String(input.note||'').slice(0,2000)});
-      if(input.type==='deduction')store.put('transactions',{id:id('txn'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,type:'income',category:'Khấu trừ tiền cọc',amount,date:saved.date,description:saved.note,source:'deposit',sourceId:saved.id});
       audit(store,user,name,'deposits',saved);return saved;
     }
     case 'issue-transition':{
@@ -413,7 +558,22 @@ export function performAction(store,user,name,input){
       if(saved.type==='move_out'&&saved.landlordConfirmedAt&&saved.tenantAcceptedAt){const contract=reference(store,user,'contracts',row.contractId);completeCheckout(store,user,contract);saved.completedAt=now();}
       saved=store.put('handovers',saved);audit(store,user,name,'handovers',saved);return saved;
     }
-    case 'notification-read':row=getRecord(store,user,'notifications',input.id);saved=store.put('notifications',{...row,readBy:[...new Set([...(row.readBy||[]),user.id])]});return saved;
+    case 'notification-send':{
+      must(user.role==='landlord','Chỉ chủ trọ được gửi thông báo.',403);const property=reference(store,user,'properties',input.propertyId);must(!property.archived,'Cơ sở đã lưu trữ.');
+      const scope=input.scope||'all',roomIds=Array.isArray(input.roomIds)?[...new Set(input.roomIds)]:[],tenantId=input.tenantId||'';
+      must(['all','rooms','tenant'].includes(scope),'Phạm vi người nhận không hợp lệ.');
+      let tenants=store.list('tenants',user.id).filter(item=>item.propertyId===property.id&&item.status==='active'&&item.userId);
+      if(scope==='rooms'){must(roomIds.length>0&&roomIds.length<=200,'Chọn ít nhất một phòng.');for(const roomId of roomIds)must(reference(store,user,'rooms',roomId).propertyId===property.id,'Phòng nhận thông báo không thuộc cơ sở.');tenants=tenants.filter(item=>roomIds.includes(item.roomId));}
+      if(scope==='tenant'){must(tenantId,'Chọn người thuê nhận thông báo.');tenants=tenants.filter(item=>item.id===tenantId);must(tenants.length===1,'Người thuê không thuộc cơ sở hoặc chưa liên kết tài khoản.');}
+      must(tenants.length>0,'Phạm vi đã chọn chưa có người thuê liên kết tài khoản.');
+      const title=text(input.title,'Tiêu đề thông báo',2,150),body=text(input.body,'Nội dung thông báo',5,5000),kind=input.kind||'general';must(['general','invoice','contract','maintenance'].includes(kind),'Loại thông báo không hợp lệ.');
+      if(input.fileId)checkFile(store,user,input.fileId,{propertyId:property.id});
+      const audience=scope==='tenant'?{tenantId}:scope==='rooms'?{roomIds}:{};
+      const row=store.put('notifications',{id:id('not'),ownerId:user.id,propertyId:property.id,...audience,title,body,kind,fileId:input.fileId||'',createdBy:user.id,readBy:[],scope,sentAt:now(),emailStatus:'queued'});
+      const recipients=tenants.map(tenant=>{const account=store.db.prepare("SELECT id,email,notification_preferences FROM users WHERE id=? AND role='tenant'").get(tenant.userId);if(!account)return null;let preferences={};try{preferences=JSON.parse(account.notification_preferences||'{}')}catch{};return {userId:account.id,email:account.email,enabled:preferences.emailNotifications!==false&&preferences.email!==false,tenantId:tenant.id,roomId:tenant.roomId};}).filter(Boolean);
+      audit(store,user,name,'notifications',row,`Gửi ${recipients.length} người nhận.`);return {notification:row,emailRecipients:recipients};
+    }
+    case 'notification-read':row=getRecord(store,user,'notifications',input.id);saved=store.put('notifications',{...row,readBy:[...new Set([...(row.readBy||[]),user.id])],readAtBy:{...(row.readAtBy||{}),[user.id]:now()}});return saved;
     case 'ticket-reply':{
       row=getRecord(store,user,'tickets',input.id);const body=text(input.body,'Nội dung phản hồi',1,5000);checkFile(store,user,input.fileId,row);
       saved=store.put('tickets',{...row,messages:[...(row.messages||[]),{id:id('msg'),authorId:user.id,authorName:user.name,body,createdAt:now(),...(input.fileId?{fileId:input.fileId}:{})}]});audit(store,user,name,'tickets',saved);return saved;
@@ -448,6 +608,13 @@ export function generateReminders(store,user){
     const daysUntil=Math.round((Date.parse(contract.endDate+'T00:00:00Z')-midnight)/86400000);
     if(contract.status!=='active'||daysUntil>days){if(store.get('notifications',key))store.remove('notifications',key);continue;}
     notice(key,contract,daysUntil<0?'Hợp đồng đã đến ngày kết thúc':'Hợp đồng sắp kết thúc','Hợp đồng kết thúc ngày '+contract.endDate+'. Vui lòng trao đổi về gia hạn hoặc kế hoạch bàn giao.','contract',contract.endDate+':'+(daysUntil<0?'expired':'upcoming'));
+  }
+  for(const ticket of store.list('tickets',owner).filter(allowed)){
+    if(!['progress','resolved'].includes(ticket.status))continue;
+    const key='rem_ticket_'+ticket.id,phase=String(ticket.status)+':'+String(ticket.updatedAt||ticket.createdAt||'');
+    const title=ticket.status==='resolved'?'Yêu cầu hỗ trợ đã được xử lý':'Yêu cầu hỗ trợ đang được tiếp nhận';
+    const body=`Yêu cầu “${ticket.title}” của phòng ${ticket.roomId||''} đã chuyển sang trạng thái ${ticket.status==='resolved'?'đã giải quyết':'đang xử lý'}. Vui lòng mở mục Yêu cầu hỗ trợ để xem cập nhật.`;
+    notice(key,ticket,title,body,'general',phase);
   }
 }
 export function importRecords(store,user,collection,rows){
