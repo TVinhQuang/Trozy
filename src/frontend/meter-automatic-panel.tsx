@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { api } from './api';
+import { api, number } from './api';
 import { useApp } from './context';
 import { Field } from './ui';
-import { MeterOCREvidence, meterProposalMatchesUtility, meterReaderEngine, type MeterReaderEngine, type MeterReaderProposal } from './meter-reader-panel';
+import { MeterOCREvidence, meterProposalMatchesUtility, meterReaderEngine, scheduleMeterProposalExpiry, type MeterReaderEngine, type MeterReaderProposal } from './meter-reader-panel';
 import type { RecordData } from './types';
 import './meter-reader.css';
 
@@ -10,11 +10,89 @@ export type MeterProfile = {
   id: string; roomId: string; utility: 'electric' | 'water'; digits: number; decimals: number;
   meterType: 'mechanical'; version: number; confirmed: true; reader: 'visionstate-v2' | 'meter-reader-v3'; engine: MeterReaderEngine;
 };
+export type MeterPipelineStep = {
+  stage: string; label: string; engine: string | null; model: string | null;
+  status: 'ok' | 'miss' | 'skipped' | 'error'; durationMs: number;
+  reading: string | null; summary: string; details: string[];
+};
 export type MeterAutomaticResult = {
   status: string; proposal: MeterReaderProposal | null; reason?: string; profile: MeterProfile | null;
-  fileId: string; submissionVersion: number;
+  fileId: string; submissionVersion: number; usage?: MeterUsagePreview | null;
+  trace?: MeterPipelineStep[] | null;
+};
+export type MeterUsagePreview = {
+  status: 'available' | 'missing_baseline' | 'decreased'; previousValue: number | null;
+  proposedValue: number | null; consumption: number | null; unit: 'kWh' | 'm3';
+  baselineSource: 'previous-reading' | 'handover' | null;
 };
 const pending = (status?: string) => status === 'queued' || status === 'processing';
+
+/** Image-derived layouts can be reviewed without a separately configured meter. */
+export function meterAutomaticResultMatches(result: MeterAutomaticResult, submission: RecordData, fileId: string) {
+  const proposal = result.proposal;
+  if (result.fileId !== fileId || result.submissionVersion !== submission.version || proposal && (proposal.fileId !== fileId || proposal.submissionVersion !== submission.version)) return false;
+  if (result.status !== 'ready') return true;
+  if (!proposal || !meterProposalMatchesUtility(proposal, submission.utility) || proposal.configNeedsConfirmation !== false) return false;
+  if (proposal.engine === 'gemini-vision') {
+    return proposal.visionEvidence?.provider === 'gemini' && proposal.profileSource === 'gemini-vision';
+  }
+  if (submission.utility === 'electric' && proposal.ocrEvidence?.scope !== 'automatic') return false;
+  if (proposal.profileSource === 'image') {
+    const evidence = proposal.layoutEvidence;
+    const profile = result.profile, matchesProfile = profile ? profile.confirmed === true && ['visionstate-v2', 'meter-reader-v3'].includes(profile.reader) && profile.engine === meterReaderEngine(submission.utility) && profile.roomId === submission.roomId && profile.utility === submission.utility && profile.meterType === 'mechanical' && proposal.profileVersion === profile.version && proposal.config.digits === profile.digits && proposal.config.decimals === profile.decimals : proposal.profileVersion == null;
+    return matchesProfile && evidence?.version === 1 && evidence.source === 'image' && evidence.complete === true && ['red-suffix', 'printed-decimal'].includes(evidence.method) && evidence.digits === proposal.config.digits && evidence.decimals === proposal.config.decimals;
+  }
+  const profile = result.profile;
+  return proposal.profileSource === 'confirmed' && profile?.confirmed === true && ['visionstate-v2', 'meter-reader-v3'].includes(profile.reader) && profile.engine === meterReaderEngine(submission.utility) && profile.roomId === submission.roomId && profile.utility === submission.utility && profile.meterType === 'mechanical' && proposal.profileVersion === profile.version && proposal.config.digits === profile.digits && proposal.config.decimals === profile.decimals;
+}
+
+const TRACE_STATUS_LABEL: Record<MeterPipelineStep['status'], string> = {
+  ok: 'Đạt',
+  miss: 'Chưa rõ',
+  skipped: 'Bỏ qua',
+  error: 'Lỗi',
+};
+
+function formatTraceMs(ms: number) {
+  if (!Number.isFinite(ms) || ms <= 0) return '—';
+  return ms >= 1000 ? `${(ms / 1000).toFixed(1)}s` : `${Math.round(ms)}ms`;
+}
+
+export function MeterPipelineTrace({ trace }: { trace?: MeterPipelineStep[] | null }) {
+  if (!Array.isArray(trace) || !trace.length) return null;
+  return <details className="meter-pipeline-trace" open>
+    <summary>Quy trình đọc số từng bước ({trace.length} bước)</summary>
+    <ol className="meter-trace-steps">
+      {trace.map((step, index) => <li className="meter-trace-step" key={`${step.stage}-${index}`}>
+        <div className="meter-trace-head">
+          <div className="meter-trace-title">
+            <span className={`meter-trace-pill ${step.status}`}>{TRACE_STATUS_LABEL[step.status] || step.status}</span>
+            <strong>{step.label}</strong>
+            {step.model && <span className="meter-trace-model">{step.model}</span>}
+          </div>
+          <span className="meter-trace-time">{formatTraceMs(step.durationMs)}</span>
+        </div>
+        <p className="meter-trace-summary">
+          {step.summary}
+          {step.reading ? <> · <span className="meter-trace-reading">{step.reading}</span></> : null}
+        </p>
+        {Array.isArray(step.details) && step.details.length > 0 && <ul className="meter-trace-details">
+          {step.details.map((line, lineIndex) => <li key={lineIndex}>{line}</li>)}
+        </ul>}
+      </li>)}
+    </ol>
+  </details>;
+}
+
+export function MeterUsageSummary({ usage, compact = false }: { usage: MeterUsagePreview | null | undefined; compact?: boolean }) {
+  if (!usage) return null;
+  const unit = usage.unit === 'kWh' ? 'kWh' : 'm³';
+  if (usage.status === 'missing_baseline') return <p className="form-note">Chưa có chỉ số đầu kỳ đã xác minh để tính lượng dùng.</p>;
+  if (usage.status === 'decreased') return <p className="form-error">Chỉ số đề xuất thấp hơn đầu kỳ {usage.previousValue == null ? '' : `${number(usage.previousValue)} ${unit}`}. Cần kiểm tra lại ảnh hoặc công tơ.</p>;
+  if (usage.status !== 'available' || usage.previousValue == null || usage.proposedValue == null || usage.consumption == null || ![usage.previousValue, usage.proposedValue, usage.consumption].every(value => Number.isFinite(value) && value >= 0)) return null;
+  if (compact) return <p className="meter-usage-compact"><b>Dự kiến dùng {number(usage.consumption)} {unit}</b><span>Đầu kỳ {number(usage.previousValue)} → đề xuất ghi {number(usage.proposedValue)}</span></p>;
+  return <div className="meter-usage-preview"><dl><div><dt>Đầu kỳ đã xác minh</dt><dd>{number(usage.previousValue)} {unit}</dd></div><div><dt>Cuối kỳ đề xuất ghi</dt><dd>{number(usage.proposedValue)} {unit}</dd></div><div><dt>Lượng dùng dự kiến</dt><dd>{number(usage.consumption)} {unit}</dd></div></dl><small>Tính theo phần nguyên dùng để ghi sổ. Chờ bạn đối chiếu ảnh và xác minh.</small></div>;
+}
 
 /** Background recognition proposes a reading; applying and verifying it stay explicit. */
 export function MeterAutomaticPanel({ submission, fileId, disabled = false, onApply, onInvalidate }: {
@@ -48,9 +126,7 @@ export function MeterAutomaticPanel({ submission, fileId, disabled = false, onAp
       try {
         const next = await api<MeterAutomaticResult>(`${base}?fileId=${encodeURIComponent(fileId)}`, { signal: controller.signal });
         if (!valid()) return;
-        if (next.fileId !== fileId || next.submissionVersion !== submission.version || next.proposal && (next.proposal.fileId !== fileId || next.proposal.submissionVersion !== submission.version)) throw new Error('Kết quả không còn khớp ảnh đang xem. Hãy tải lại bộ ảnh.');
-        if (next.proposal && next.profile && next.proposal.profileVersion != null && next.proposal.profileVersion !== next.profile.version) throw new Error('Thiết lập công tơ đã thay đổi. Hãy đọc tự động lại.');
-        if (next.status === 'ready' && (!next.profile?.confirmed || !['visionstate-v2', 'meter-reader-v3'].includes(next.profile.reader) || next.profile.engine !== meterReaderEngine(submission.utility) || next.profile.roomId !== submission.roomId || next.profile.utility !== submission.utility || next.profile.meterType !== 'mechanical' || next.proposal?.profileSource !== 'confirmed' || next.proposal.profileVersion !== next.profile.version || next.proposal.configNeedsConfirmation !== false || next.proposal.config.digits !== next.profile.digits || next.proposal.config.decimals !== next.profile.decimals || !meterProposalMatchesUtility(next.proposal, submission.utility) || electric && next.proposal.ocrEvidence?.scope !== 'automatic')) throw new Error('Đề xuất chưa khớp thiết lập hoặc bộ đọc của công tơ đang xem. Hãy kiểm tra thiết lập và đọc lại.');
+        if (!meterAutomaticResultMatches(next, submission, fileId)) throw new Error('Kết quả hoặc bằng chứng nhận dạng không còn khớp công tơ đang xem. Hãy đọc tự động lại.');
         const signature = `${next.status}:${next.proposal?.id || ''}:${next.profile?.version || ''}:${next.profile?.engine || ''}`;
         if (previous.current !== signature) { latestInvalidate.current(); previous.current = signature; }
         const profileSignature = next.profile ? `${next.profile.id}:${next.profile.version}` : '';
@@ -79,12 +155,10 @@ export function MeterAutomaticPanel({ submission, fileId, disabled = false, onAp
 
   useEffect(() => {
     if (!result?.proposal) return;
-    const expires = Date.parse(result.proposal.expiresAt);
-    const timeout = setTimeout(() => {
+    return scheduleMeterProposalExpiry(result.proposal.expiresAt, () => {
       setResult(current => current ? { ...current, status: 'expired', proposal: null } : current);
       latestInvalidate.current();
-    }, Number.isFinite(expires) ? Math.max(0, Math.min(expires - Date.now(), 2147483647)) : 0);
-    return () => clearTimeout(timeout);
+    });
   }, [result?.proposal]);
 
   async function update(mode: 'profile' | 'retry', event?: FormEvent) {
@@ -111,31 +185,31 @@ export function MeterAutomaticPanel({ submission, fileId, disabled = false, onAp
   const proposal = result?.proposal;
   const ready = result?.status === 'ready' && proposal?.status === 'ready' && !!proposal.reading && Date.parse(proposal.expiresAt) > Date.now();
   const needsSetup = result?.status === 'needs_setup';
-  const showSetup = needsSetup || setupOpen;
+  const showSetup = setupOpen;
   const message = !result ? 'Đang kiểm tra kết quả đọc tự động…'
     : result.status === 'queued' ? 'Ảnh đang chờ đọc tự động. Bạn có thể tiếp tục xác minh thủ công bên dưới.'
       : result.status === 'processing' ? 'Đang tự tìm vùng số và đọc ảnh công tơ…'
-        : needsSetup ? 'Xác nhận cấu tạo công tơ một lần cho phòng này. Những ảnh sau sẽ được đọc tự động với thiết lập đã lưu.'
+        : needsSetup ? 'Chưa xác định rõ cách chia phần nguyên và phần lẻ trên ảnh. Bạn có thể đọc lại, chỉnh vùng hoặc xác minh thủ công.'
           : result.status === 'expired' ? 'Đề xuất đã hết hạn. Hãy đọc tự động lại hoặc xác minh thủ công.'
             : result.status === 'retake' ? 'Ảnh chưa đủ rõ. Bạn có thể chỉnh vùng, xác minh thủ công hoặc yêu cầu chụp lại.'
               : 'Chưa có đề xuất đủ rõ. Bạn vẫn có thể xác minh chỉ số thủ công.';
   return <section className="meter-reader-panel meter-automatic-panel stack" aria-label="Đọc công tơ tự động">
-    <div><h3>Đọc công tơ tự động</h3><p className="form-note">{electric ? 'Đọc dãy số điện bằng PaddleOCR.' : 'Tìm vùng số nước bằng YOLO và đọc bánh số bằng VisionState.'} Bạn đối chiếu ảnh rồi xác minh trước khi lưu.</p></div>
+    <div><h3>Kết quả đọc tự động</h3><p className="form-note">Ảnh được xử lý sau khi gửi. Bạn đối chiếu ảnh gốc và xác minh chỉ số trước khi lưu.</p></div>
     {!ready && !error && <p className="form-note" role="status">{message}</p>}
-    {result?.profile && !showSetup && <div className="meter-profile-summary"><small>Thiết lập đã xác nhận: {result.profile.digits} {electric ? 'ô số' : 'bánh số'} · {result.profile.decimals} số lẻ · {unit}</small><button type="button" className="btn btn-warning btn-sm" disabled={disabled || busy} onClick={() => { setSetupOpen(true); setConfirmed(false); }}>Đổi thiết lập công tơ</button></div>}
     {showSetup && <form className="meter-profile-setup stack" onSubmit={event => void update('profile', event)}>
-      <div><h4>Thiết lập công tơ một lần</h4><p className="form-note">Theo đơn vị {unit} trên mặt công tơ. Thiết lập chỉ lưu số {electric ? 'ô số' : 'bánh số'} và phần lẻ cho công tơ {electric ? 'điện' : 'nước'} của phòng này; vùng ảnh được tìm lại ở mỗi lần chụp.</p></div>
+      <div><h4>Bổ sung cách đọc công tơ</h4><p className="form-note">Chỉ cần bổ sung khi hệ thống chưa xác định được cấu tạo từ ảnh. Kiểm tra đơn vị {unit}, toàn bộ hàng số và vị trí phần lẻ trên mặt công tơ.</p></div>
       <div className="form-grid"><Field label={electric ? 'Số ô số trên hàng chỉ số (kể cả phần lẻ)' : 'Số bánh số (kể cả bánh đỏ)'} type="number" min={1} max={12} step={1} value={digits} disabled={disabled || busy} onChange={event => { setDigits(event.target.value); setConfirmed(false); }} /><Field label={`Số chữ số phần lẻ theo ${unit}`} type="number" min={0} max={4} step={1} value={decimals} disabled={disabled || busy} onChange={event => { setDecimals(event.target.value); setConfirmed(false); }} /></div>
       <label className="inline"><input type="checkbox" checked={confirmed} disabled={disabled || busy || !configured} onChange={event => setConfirmed(event.target.checked)} />{electric ? 'Tôi đã kiểm tra số ô số và vị trí phần lẻ trên mặt công tơ' : 'Tôi đã kiểm tra số bánh số và vị trí phần lẻ trên mặt công tơ'}</label>
-      <div className="inline"><button className="btn btn-assistant" disabled={disabled || busy || !configured || !confirmed}>{busy ? 'Đang lưu thiết lập…' : 'Lưu thiết lập & đọc tự động'}</button>{!needsSetup && <button type="button" className="btn" disabled={disabled || busy} onClick={() => setSetupOpen(false)}>Hủy thay đổi</button>}</div>
+      <div className="inline"><button className="btn btn-assistant" disabled={disabled || busy || !configured || !confirmed}>{busy ? 'Đang lưu thiết lập…' : 'Lưu thiết lập & đọc tự động'}</button><button type="button" className="btn" disabled={disabled || busy} onClick={() => setSetupOpen(false)}>Hủy thay đổi</button></div>
       <small className="muted">{electric ? 'Chỉ đếm dãy chỉ số kWh cần ghi, không đếm số sê-ri hoặc thông số khác.' : 'Với LCD/LED hoặc mặt kim, hãy dùng xác minh thủ công bên dưới.'}</small>
     </form>}
-    {ready && proposal?.reading && <div className="meter-reader-proposal" role="status"><span>Chỉ số đề xuất</span><strong>{proposal.reading.displayText} {unit}</strong><p>Ghi sổ phần nguyên <b>{proposal.reading.integerDigits}</b>. Hãy đối chiếu từng ô số và phần lẻ trên ảnh gốc.</p><MeterOCREvidence proposal={proposal} />
+    {ready && proposal?.reading && <div className="meter-reader-proposal" role="status"><span>Chỉ số trên ảnh đề xuất</span><strong>{proposal.reading.displayText} {unit}</strong><MeterUsageSummary usage={result?.usage} /><p>Ghi sổ phần nguyên <b>{proposal.reading.integerDigits}</b>. Hãy đối chiếu từng ô số và phần lẻ trên ảnh gốc.</p><MeterOCREvidence proposal={proposal} />
       {!!proposal.warnings?.length && <ul>{proposal.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul>}
       <button type="button" className="btn btn-assistant" disabled={disabled || busy || showSetup} onClick={() => { if (Date.parse(proposal.expiresAt) > Date.now()) onApply(proposal); }}>Dùng chỉ số đề xuất</button><small>Đề xuất chưa được ghi vào chỉ số hoặc hóa đơn.</small>
     </div>}
     {!ready && result?.reason && !needsSetup && <p className="form-note">{result.reason}</p>}
+    <MeterPipelineTrace trace={result?.trace} />
     {error && <p className="form-error" role="alert">{error} Bạn vẫn có thể nhập và xác minh thủ công.</p>}
-    {!pending(result?.status) && !needsSetup && !showSetup && <button type="button" className="btn btn-assistant btn-sm" disabled={disabled || busy} onClick={() => void update('retry')}>{busy ? 'Đang yêu cầu đọc…' : 'Đọc tự động lại'}</button>}
+    {!pending(result?.status) && !showSetup && <div className="inline meter-automatic-actions"><button type="button" className="btn btn-assistant btn-sm" disabled={disabled || busy} onClick={() => void update('retry')}>{busy ? 'Đang yêu cầu đọc…' : 'Đọc tự động lại'}</button><button type="button" className="btn btn-sm" disabled={disabled || busy} aria-expanded={showSetup} onClick={() => { setSetupOpen(true); setConfirmed(false); }}>{result?.profile ? 'Đổi thiết lập công tơ' : 'Bổ sung cách đọc công tơ'}</button></div>}
   </section>;
 }

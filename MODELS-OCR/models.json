@@ -1,0 +1,113 @@
+{
+    "schemaVersion":  1,
+    "organizedAt":  "2026-11-12T14:42:39.2973817Z",
+    "scope":  "Four active OCR models; canonical files, no duplicate weights",
+    "root":  "D:\\Trozy",
+    "files":  [
+                  {
+                      "utility":  "electric",
+                      "role":  "detection",
+                      "name":  "Paddle DET",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.json",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.json",
+                      "bytes":  229307,
+                      "sha256":  "89240f689a4a77aad75ef55a8df0a15c8e1d4980a327d17e58f24bbadde5aeab"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "detection",
+                      "name":  "Paddle DET",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx",
+                      "bytes":  9880512,
+                      "sha256":  "5269b6bf7ed33c30591a23a3bde495f3a71f25a6a725e48c5f65b85681be58e1"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "detection",
+                      "name":  "Paddle DET",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.yml",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.yml",
+                      "bytes":  885,
+                      "sha256":  "193f435274bf9f0b5f71a929bbfbcf148282df7e633b34e7c373e8f44741b516"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "detection",
+                      "name":  "Paddle DET",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/README.md",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/README.md",
+                      "bytes":  16076,
+                      "sha256":  "e9403667f0f92055d8ce9e73a2beb1002fc489d9342697db74039eb7178bb5fb"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "recognition",
+                      "name":  "Paddle REC",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/inference.json",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.json",
+                      "bytes":  208004,
+                      "sha256":  "f0bf53c853937a917affdd74467472167727f8ab0f0f7bded01c4a16c27e46e6"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "recognition",
+                      "name":  "Paddle REC",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx",
+                      "bytes":  21159378,
+                      "sha256":  "97d8a25dfa5b2feff8ca23c87f05e41948bc04bedcdd97ac4634241a74f93036"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "recognition",
+                      "name":  "Paddle REC",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/inference.yml",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.yml",
+                      "bytes":  150579,
+                      "sha256":  "ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1"
+                  },
+                  {
+                      "utility":  "electric",
+                      "role":  "recognition",
+                      "name":  "Paddle REC",
+                      "originalPath":  ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/README.md",
+                      "path":  ".runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/README.md",
+                      "bytes":  16585,
+                      "sha256":  "7d46dbd183ac09bd5a2e6b4577dcb29240751b1c00eb6813eca308d529f86806"
+                  },
+                  {
+                      "utility":  "water",
+                      "role":  "detection",
+                      "name":  "YOLO OBB",
+                      "originalPath":  ".runtime/meter-digits/visionstate-yolo/models/trozy_water_yolov8_obb.pt",
+                      "path":  ".runtime/meter-digits/visionstate-yolo/models/water/trozy_water_yolov8_obb.pt",
+                      "bytes":  12697883,
+                      "sha256":  "e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16"
+                  },
+                  {
+                      "utility":  "water",
+                      "role":  "recognition",
+                      "name":  "VisionState wheels-v2",
+                      "originalPath":  ".runtime/meter-digits/visionstate-yolo/models/wheels-v2.onnx",
+                      "path":  ".runtime/meter-digits/visionstate-yolo/models/water/wheels-v2.onnx",
+                      "bytes":  6102872,
+                      "sha256":  "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6"
+                  }
+              ],
+    "unchangedReferences":  [
+                                ".runtime/paddleocr/models/PP-OCRv6_small_det_onnx_infer",
+                                ".runtime/paddleocr/models/PP-OCRv6_small_rec_onnx_infer",
+                                ".runtime/meter-digits/visionstate-yolo/models/stage1_meter_window_digits.pt",
+                                ".runtime/paddleocr/runs",
+                                ".runtime/meter-digits/runs"
+                            ],
+    "compatibilityPaths":  [
+                               {
+                                   "path":  ".runtime/meter-digits/visionstate-yolo/models/wheels-v2.onnx",
+                                   "canonicalPath":  ".runtime/meter-digits/visionstate-yolo/models/water/wheels-v2.onnx",
+                                   "type":  "ntfs-hardlink",
+                                   "purpose":  "Preserve frozen historical trial sources without duplicating weight bytes"
+                               }
+                           ]
+}

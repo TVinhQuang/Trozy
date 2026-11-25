@@ -5,6 +5,7 @@ import {fixture,note,status} from './fixtures/manual-meter-fixture.mjs';
 import {dataFor} from '../src/backend/domain.mjs';
 import {createMeterReaderService} from '../src/backend/meter-reader-service.mjs';
 import {createApp} from '../src/backend/server.mjs';
+import {meterReaderModelDigests} from '../src/ai/meter-reader.mjs';
 
 const corners=[[.1,.2],[.9,.2],[.9,.8],[.1,.8]];
 const quality={canRead:true,checks:{resolution:true,exposure:true,contrast:true,sharpness:true},metrics:{width:200,height:60,cellWidth:33.33,meanLuma:120,contrast:50,edgeEnergy:150}};
@@ -12,12 +13,12 @@ const statusResult={available:true,readerAvailable:true,locatorAvailable:true,me
 async function pixels(){return sharp({create:{width:240,height:90,channels:3,background:'#dddddd'}}).png().toBuffer();}
 function ready(input,{integerValue=13010,status='ready',confidence=.91}={}){
  const integerDigits=String(integerValue).padStart(input.digits-input.decimals,'0'),fractionalDigits='4'.repeat(input.decimals),digits=integerDigits+fractionalDigits;
- return {width:240,height:90,status,confidence,warnings:[],quality:structuredClone(quality),model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',...(input.utility==='electric'?{cells:[],ocrEvidence:{scope:'owner-region',observations:['region','crop'].map(pass=>({text:digits,confidence,corners,pass})),selectedObservationIndices:status==='ready'?[0,1]:[],agreement:status==='ready'}}:{cells:Array.from({length:input.digits},(_,index)=>({index,position:1,confidence,alternatives:[{position:1,confidence}]}))}),reading:status==='ready'?{digits,integerDigits,fractionalDigits,displayText:integerDigits+(input.decimals?'.'+fractionalDigits:''),integerValue,unit:input.utility==='electric'?'kWh':'m3'}:null};
+ return {width:240,height:90,status,confidence,warnings:[],quality:structuredClone(quality),model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',modelDigest:meterReaderModelDigests(input.utility).modelDigest,...(input.utility==='electric'?{cells:[],ocrEvidence:{scope:'owner-region',observations:['region','crop'].map(pass=>({text:digits,confidence,corners,pass})),selectedObservationIndices:status==='ready'?[0,1]:[],agreement:status==='ready'}}:{cells:Array.from({length:input.digits},(_,index)=>({index,position:1,confidence,alternatives:[{position:1,confidence}]}))}),reading:status==='ready'?{digits,integerDigits,fractionalDigits,displayText:integerDigits+(input.decimals?'.'+fractionalDigits:''),integerValue,unit:input.utility==='electric'?'kWh':'m3'}:null};
 }
-async function setup(t,run){
- const f=fixture(t),bytes=await pixels(),fileId=f.file({bytes}),receipt=f.service.submitPhotos(f.tenant,f.request('electric',fileId));
+async function setup(t,run,utility='electric'){
+ const f=fixture(t),bytes=await pixels(),fileId=f.file({bytes}),receipt=f.service.submitPhotos(f.tenant,f.request(utility,fileId));
  const input={fileId,version:receipt.status==='pending'?1:0,corners,digits:6,decimals:1,regionConfirmed:true};
- const calls=[],reader=createMeterReaderService(f.store,{status:async()=>statusResult,run:async value=>{calls.push(value);return run?run(value):ready(value,{integerValue:f.prior.electricNew+10});}});
+ const calls=[],reader=createMeterReaderService(f.store,{status:async()=>statusResult,run:async value=>{calls.push(value);return run?run(value):ready(value,{integerValue:f.prior[utility==='electric'?'electricNew':'waterNew']+10});}});
  return {...f,bytes,fileId,receipt,input,calls,reader};
 }
 
@@ -203,4 +204,28 @@ test('legacy electric wheel proposals and stale OCR scope are invalid after the 
  assert.throws(()=>f.service.review(f.owner,f.receipt.id,{decision:'approve',version:1,value:old.reading.integerValue,selectedFileId:f.fileId,note,imageChecked:true,proposalId:old.id,fractionalChecked:true}),status(409));
  const wrongScope={...proposal,ocrEvidence:{...proposal.ocrEvidence,scope:'automatic'}};f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify(wrongScope),proposal.id);
  assert.throws(()=>f.service.review(f.owner,f.receipt.id,{decision:'approve',version:1,value:proposal.reading.integerValue,selectedFileId:f.fileId,note,imageChecked:true,proposalId:proposal.id,fractionalChecked:true}),status(409));
+});
+
+test('manual proposals require the current model digest when created and reviewed',async t=>{
+ for(const utility of ['electric','water'])await t.test(utility,async t=>{
+  const f=await setup(t,undefined,utility),before=JSON.stringify([f.store.list('readings'),f.store.list('invoices')]);
+  for(const modelDigest of [undefined,'0'.repeat(64)]){
+   const reader=createMeterReaderService(f.store,{run:async input=>({...ready(input),modelDigest})});
+   await assert.rejects(()=>reader.read(f.owner,f.receipt.id,f.input),status(502));
+  }
+  assert.equal(f.store.db.prepare('SELECT count(*) AS n FROM meter_reader_proposals').get().n,0);
+  const {proposal}=await f.reader.read(f.owner,f.receipt.id,f.input);
+  assert.equal(proposal.modelDigest,meterReaderModelDigests(utility).modelDigest);
+  assert.equal(proposal.locatorDigest,undefined,'Owner-confirmed geometry does not depend on the locator model.');
+  const approval={decision:'approve',version:1,value:proposal.reading.integerValue,selectedFileId:f.fileId,imageChecked:true,fractionalChecked:true,note,proposalId:proposal.id};
+  for(const modelDigest of [undefined,'0'.repeat(64)]){
+   f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify({...proposal,modelDigest}),proposal.id);
+   assert.throws(()=>f.service.review(f.owner,f.receipt.id,approval),error=>error.status===409&&/đọc lại ảnh/i.test(error.message));
+   assert.equal(f.store.db.prepare('SELECT used_at FROM meter_reader_proposals WHERE id=?').get(proposal.id).used_at,null);
+   assert.equal(JSON.stringify([f.store.list('readings'),f.store.list('invoices')]),before);
+  }
+  f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify(proposal),proposal.id);
+  const reviewed=f.service.review(f.owner,f.receipt.id,approval);
+  assert.equal(reviewed.reading[utility==='electric'?'electricNew':'waterNew'],proposal.reading.integerValue);
+ });
 });

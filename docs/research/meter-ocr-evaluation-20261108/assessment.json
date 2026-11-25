@@ -1,0 +1,373 @@
+{
+  "format_version": 1,
+  "assessment_date": "2026-11-08",
+  "timezone": "Asia/Saigon",
+  "scope": "Meter OCR feasibility research and benchmark specification for Trozy; not an executed comparison of new models.",
+  "evidence_policy": {
+    "new_candidate_inference_executed": false,
+    "new_models_or_dependencies_downloaded": false,
+    "business_database_opened": false,
+    "photos_uploaded_externally": false,
+    "null_means": "Not measured or not yet supplied; never interpret as zero or success.",
+    "historical_results_are_final_benchmark": false,
+    "fit_and_priority_are": "Engineering assessments, not measured accuracy scores."
+  },
+  "current_environment_observation": {
+    "date": "2026-11-08",
+    "method": "Node os module and meterReaderStatus through scripts/run-project.mjs; no model inference",
+    "platform": "Windows",
+    "node_version": "24.19.0",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-13620H",
+    "logical_cpu_count": 16,
+    "ram_gib_rounded": 32,
+    "gpu_and_vram_independently_verified": false,
+    "electric_runtime_available": true,
+    "water_runtime_available": true,
+    "gold_directory_present": false,
+    "source_state": "Working tree contains pre-existing modifications; this assessment does not commit or change application code."
+  },
+  "baselines": [
+    {
+      "id": "B0",
+      "utility": "electric",
+      "name": "Trozy fine-tuned PP-OCRv6 small det + rec",
+      "artifacts": [
+        {
+          "path": ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx",
+          "bytes": 9880512,
+          "sha256": "5269b6bf7ed33c30591a23a3bde495f3a71f25a6a725e48c5f65b85681be58e1"
+        },
+        {
+          "path": ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx",
+          "bytes": 21159378,
+          "sha256": "97d8a25dfa5b2feff8ca23c87f05e41948bc04bedcdd97ac4634241a74f93036"
+        }
+      ],
+      "independent_full_reading_benchmark": null
+    },
+    {
+      "id": "B1",
+      "utility": "water",
+      "name": "Trozy fine-tuned YOLOv8n OBB + VisionState wheels-v2",
+      "artifacts": [
+        {
+          "path": ".runtime/meter-digits/visionstate-yolo/models/trozy_water_yolov8_obb.pt",
+          "bytes": 12697883,
+          "sha256": "e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16"
+        },
+        {
+          "path": ".runtime/meter-digits/visionstate-yolo/models/wheels-v2.onnx",
+          "bytes": 6102872,
+          "sha256": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6"
+        }
+      ],
+      "independent_full_reading_benchmark": null
+    }
+  ],
+  "historical_evidence": [
+    {
+      "path": "docs/test/METER-ZERO-SETUP-LIVE-20261105.json",
+      "created_at": "2026-11-05T16:08:58.952Z",
+      "nature": "Reused development photos and controls over HTTP, not held-out accuracy data",
+      "clear_examples": [
+        {"id": "water-blue", "display_text": "00001.056", "duration_ms": 4891},
+        {"id": "electric-clear", "display_text": "00766.4", "duration_ms": 7682}
+      ],
+      "p95_latency_ms": null,
+      "population_accuracy": null
+    },
+    {
+      "path": ".runtime/meter-digits/runs/water_yolov8n_obb_eval.json",
+      "date": "2026-11-05",
+      "source_images": 109,
+      "real_source_images": 19,
+      "synthetic_source_images": 90,
+      "rotated_views": 436,
+      "window_selected_views": 332,
+      "row_refined_views": 111,
+      "row_test_receives_ground_truth_digit_count": true,
+      "gt_polygon_iou_checked": false,
+      "used_for_checkpoint_selection": true,
+      "ud_end_to_end": {"images": 20, "ready": 2, "integer_correct": 2},
+      "notes": "Geometry selection is not full-string recognition. Rotations are correlated. Historical development evidence only."
+    },
+    {
+      "path": ".runtime/paddleocr/runs/electric_paddle_eval.json",
+      "recognition_exact": 478,
+      "recognition_denominator": 518,
+      "recognition_labels_before_filter": 526,
+      "real_labels_before_filter": 29,
+      "synthetic_labels_before_filter": 497,
+      "digit_only_exact": 207,
+      "digit_only_denominator": 207,
+      "digit_only_all_synthetic": true,
+      "end_to_end": {"images": 80, "exact": 74, "wrong_ready": 0, "abstain": 6, "all_synthetic": true, "known_profile": true},
+      "notes": "Not real-Vietnamese-meter or zero-setup accuracy. Recognition loader filters some labels."
+    }
+  ],
+  "candidates": [
+    {
+      "id": "C01",
+      "name": "OpenOCR RepSVTR mobile",
+      "artifact_selectors_to_pin": ["openocr_repsvtr_ch.pth", "openocr_rec_model.onnx"],
+      "separate_optional_server_checkpoint": "openocr_svtrv2_ch.pth",
+      "role": "crop string recognizer; evaluate larger SVTRv2 separately",
+      "priority": "early_lightweight_trial",
+      "deployment": "Official mobile ONNX and CPU inference documentation",
+      "training": "Official fine-tuning and ONNX export documentation",
+      "license": {"code": "Apache-2.0", "weights": "separate checkpoint-specific terms not verified in reviewed sources"},
+      "main_risk": "Requires correct crop, layout and calibrated rejection; not a wheel-carry decoder",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://github.com/Topdu/OpenOCR/releases/tag/develop0.0.1",
+        "https://github.com/Topdu/OpenOCR/blob/main/docs/openocr.md",
+        "https://github.com/Topdu/OpenOCR/blob/main/docs/finetune_rec.md",
+        "https://github.com/Topdu/OpenOCR/blob/main/LICENSE",
+        "https://huggingface.co/topdu/OpenOCR"
+      ]
+    },
+    {
+      "id": "C02",
+      "name": "baudm/parseq-tiny",
+      "role": "crop string recognizer; NAR and AR decoding are separate runs",
+      "priority": "early_lightweight_trial",
+      "deployment": "Author checkpoint; validate custom ONNX export/decoder parity before CPU deployment",
+      "training": "Custom dataset and character-set training/fine-tuning documented",
+      "license": {"code": "Apache-2.0 for PARSeq; reproduced third-party components have separate notices", "weights": "Apache-2.0 on author model card"},
+      "main_risk": "No detector or wheel-carry model; meter strings may not benefit from language context",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/baudm/parseq-tiny",
+        "https://github.com/baudm/parseq",
+        "https://github.com/baudm/parseq/issues/12"
+      ]
+    },
+    {
+      "id": "C03",
+      "name": "PP-OCRv6 medium rec / det + rec",
+      "role": "same-family upgrade control; recognition-only and full-pipeline variants",
+      "priority": "early_same_family_trial",
+      "deployment": "Official ONNX detection and recognition artifacts",
+      "training": "Paddle training workflow; separate zero-shot from equal-data fine-tuning",
+      "license": {"code": "Apache-2.0", "weights": "Apache-2.0 on official model cards"},
+      "main_risk": "More capacity does not establish better layout or full meter-reading accuracy",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/PaddlePaddle/PP-OCRv6_medium_rec_onnx",
+        "https://huggingface.co/PaddlePaddle/PP-OCRv6_medium_det_onnx"
+      ]
+    },
+    {
+      "id": "C04",
+      "name": "microsoft/Florence-2-base-ft",
+      "role": "generative OCR and OCR-with-region challenger",
+      "priority": "optional_compact_vlm_trial",
+      "deployment": "Official checkpoint; community multi-graph ONNX conversion, not a drop-in single recognizer",
+      "training": "Possible research path; no Trozy fine-tuning performed",
+      "license": {"code_and_official_weights": "MIT", "conversion": "Verify pinned converter artifact and runtime terms separately"},
+      "main_risk": "Full-photo resize can lose tiny digits; output text and region require independent verification",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/microsoft/Florence-2-base-ft",
+        "https://huggingface.co/microsoft/Florence-2-base-ft/blob/main/preprocessor_config.json",
+        "https://huggingface.co/onnx-community/Florence-2-base-ft"
+      ]
+    },
+    {
+      "id": "C05",
+      "name": "Qwen/Qwen3-VL-2B-Instruct",
+      "role": "local VLM context and independent proposal challenger",
+      "priority": "optional_vlm_with_official_cpu_path",
+      "deployment": "Official GGUF; llama.cpp/Ollama CPU path; requires vision projector",
+      "training": "Not assessed through a Trozy training experiment",
+      "license": {"code": "Apache-2.0", "weights": "Apache-2.0"},
+      "main_risk": "Generated digits/confidence can be wrong; higher integration and runtime cost",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct",
+        "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF",
+        "https://github.com/QwenLM/Qwen3-VL"
+      ]
+    },
+    {
+      "id": "C06",
+      "name": "Qwen/Qwen3.5-2B",
+      "role": "newer small multimodal challenger",
+      "priority": "optional_vlm_alternative_to_C05",
+      "deployment": "Official multimodal Transformers checkpoint; converted CPU artifacts need separate parity/runtime checks",
+      "training": "Not assessed through a Trozy training experiment",
+      "license": {"official_weights": "Apache-2.0", "converted_weights": "Check exact conversion and runtime independently"},
+      "main_risk": "General OCR results do not prove meter-reading superiority or adequate local latency",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.5-2B",
+        "https://huggingface.co/Qwen/Qwen3.5-2B/tree/main"
+      ]
+    },
+    {
+      "id": "C07",
+      "name": "HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
+      "role": "low-footprint general VLM research control",
+      "priority": "reserve",
+      "deployment": "Official ONNX inventory; GGUF available under ggml-org",
+      "training": "Not assessed through a Trozy training experiment",
+      "license": {"official_weights": "Apache-2.0"},
+      "main_risk": "General image/video emphasis; no verified meter benchmark or calibrated confidence",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct",
+        "https://huggingface.co/HuggingFaceTB/SmolVLM2-500M-Video-Instruct/tree/main/onnx",
+        "https://huggingface.co/ggml-org/SmolVLM2-500M-Video-Instruct-GGUF"
+      ]
+    },
+    {
+      "id": "C08",
+      "name": "EasyOCR English generation-2 CRNN",
+      "artifact_selector_to_pin": "english_g2.pth",
+      "role": "independent crop OCR or full CRAFT + CRNN baseline",
+      "priority": "secondary_control",
+      "deployment": "Documented native PyTorch CPU; official ONNX path not verified",
+      "training": "Custom recognition training documented",
+      "license": {"code": "Apache-2.0; CRAFT upstream MIT", "weights": "separate checkpoint-specific terms not verified in reviewed sources"},
+      "main_risk": "General detector and recognizer do not directly model fractional wheel carry",
+      "status": "not_run_on_trozy",
+      "sources": [
+        "https://www.jaided.ai/easyocr/documentation/",
+        "https://www.jaided.ai/easyocr/modelhub/",
+        "https://github.com/JaidedAI/EasyOCR/blob/master/custom_model.md",
+        "https://github.com/JaidedAI/EasyOCR/blob/master/LICENSE"
+      ]
+    },
+    {
+      "id": "C09",
+      "name": "Tesseract 5 + tessdata_fast English",
+      "artifact_selector_to_pin": "tessdata_fast/eng.traineddata",
+      "separate_training_start_artifact": "tessdata_best/eng.traineddata",
+      "role": "CPU clean-crop baseline",
+      "priority": "secondary_control",
+      "deployment": "CPU-native engine; Tesseract.js is a separate runtime choice",
+      "training": "Integerized fast weights cannot be fine-tuned; start from tessdata_best for training",
+      "license": {"engine": "Apache-2.0", "fast_weights": "Apache-2.0"},
+      "main_risk": "Needs deskew and suitable segmentation; no specialized rolling-wheel decoder",
+      "status": "not_run_in_this_assessment",
+      "sources": [
+        "https://tesseract-ocr.github.io/tessdoc/Data-Files.html",
+        "https://tesseract-ocr.github.io/tessdoc/ImproveQuality.html",
+        "https://github.com/tesseract-ocr/tessdata_fast"
+      ]
+    },
+    {
+      "id": "C10",
+      "name": "nliaudat digit_recognizer_v16 10-class / 100-class",
+      "role": "individual wheel classifier; separate detector and decoder required",
+      "priority": "historical_specialist_revisit_only",
+      "deployment": "Historical ONNX trials; artifacts/scripts not found inside the current project",
+      "training": "Historical upstream source; data rights and phase semantics require review",
+      "license": {"historical_repository_declaration": "Apache-2.0 at 3f11e197d3111ec7e7fb5daae3f58a4b98f80268", "training_data": "not independently established"},
+      "main_risk": "Only two manually cropped development images tested; 100-class phase-to-digit mapping unverified",
+      "status": "historical_observations_only_no_new_run",
+      "local_evidence": "docs/test/METER-DIGIT-MODEL-TRIAL.md",
+      "sources": [
+        "https://github.com/nliaudat/digit_recognizer/tree/3f11e197d3111ec7e7fb5daae3f58a4b98f80268"
+      ]
+    }
+  ],
+  "run_template": {
+    "status": "not_run",
+    "run_id": null,
+    "candidate_id": null,
+    "baseline_id": null,
+    "mode": null,
+    "allowed_modes": ["crop_reader", "full_profiled", "full_zero_setup", "negative_rejection", "runtime_and_queue"],
+    "utility": null,
+    "split": null,
+    "training_condition": null,
+    "allowed_training_conditions": ["existing_production_checkpoint", "zero_shot", "fine_tuned_equal_data"],
+    "metric_applicability": {
+      "oracle_profile_supplied": null,
+      "raw_transcription_available": null,
+      "full_reading_metrics_applicable": null,
+      "not_applicable_reasons": []
+    },
+    "frozen_inputs": {
+      "manifest_sha256": null,
+      "annotation_revision": null,
+      "code_snapshot_sha256": null,
+      "model_artifact_sha256": [],
+      "config_tokenizer_dictionary_sha256": [],
+      "runtime_versions": null,
+      "preprocessing": null,
+      "decoder_and_threshold": null,
+      "prompt_sha256": null,
+      "quantization": null,
+      "max_pixels": null,
+      "max_output_tokens": null,
+      "seed": null,
+      "threads": null,
+      "concurrency": null,
+      "timeout_ms": null
+    },
+    "counts": {
+      "images": null,
+      "physical_meter_groups": null,
+      "readable_with_full_label": null,
+      "must_reject": null,
+      "ready": null,
+      "strict_correct_ready": null,
+      "wrong_ready": null,
+      "review": null,
+      "errors": null,
+      "timeouts": null
+    },
+    "metrics": {
+      "strict_exact_rate": null,
+      "crop_string_exact_rate": null,
+      "accepted_coverage": null,
+      "precision_when_ready": null,
+      "wrong_ready_rate": null,
+      "readable_abstention_rate": null,
+      "unsafe_on_negative_rate": null,
+      "integer_exact_rate": null,
+      "decimal_position_accuracy": null,
+      "leading_zero_exact_rate": null,
+      "raw_digit_CER": null,
+      "accepted_digit_CER": null,
+      "locator_recall": null,
+      "grouped_ci95": null,
+      "cold_start_ms": null,
+      "inference_p50_ms": null,
+      "inference_p95_ms": null,
+      "http_wall_p50_ms": null,
+      "http_wall_p95_ms": null,
+      "queue_wait_p95_ms": null,
+      "peak_process_tree_rss_bytes": null,
+      "peak_vram_bytes": null,
+      "artifact_bytes": null,
+      "added_dependency_bytes": null
+    },
+    "by_slice": [],
+    "prediction_records_path": null,
+    "notes": [],
+    "decision": "pending_measurement"
+  },
+  "prediction_template": {
+    "image_id": null,
+    "image_sha256": null,
+    "meter_group_id": null,
+    "run_id": null,
+    "status": null,
+    "allowed_statuses": ["ready", "needs_review", "error", "timeout"],
+    "raw_output": null,
+    "raw_digits_string": null,
+    "digits_string": null,
+    "decimals": null,
+    "unit": null,
+    "register_quad": null,
+    "digit_quads": null,
+    "raw_confidence": null,
+    "confidence_semantics": null,
+    "rejection_reason": null,
+    "duration_ms": null,
+    "outcome_after_separate_ground_truth_comparison": null
+  }
+}

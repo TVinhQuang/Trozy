@@ -45,7 +45,20 @@ if(-not (Test-Path -LiteralPath (Join-Path $site 'pip'))){
  [IO.Compression.ZipFile]::ExtractToDirectory($wheelFile,$site)
 }
 $models=Join-Path $runtimeRoot 'models'
-Get-VerifiedFile 'https://huggingface.co/oleost/visionstate-wheel-reader/resolve/563f365a5b377c10c7248517ef2576ac5cee3cbf/wheels-v2.onnx' (Join-Path $models 'wheels-v2.onnx') '5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6'
+New-Item -ItemType Directory -Path (Join-Path $models 'water') -Force | Out-Null
+$waterWheel=Join-Path $models 'water\wheels-v2.onnx'
+$legacyWheel=Join-Path $models 'wheels-v2.onnx'
+$wheelHash='5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6'
+# Reuse an existing legacy weight without copying bytes or changing frozen trials.
+if(-not (Test-Path -LiteralPath $waterWheel) -and (Test-Path -LiteralPath $legacyWheel)){
+ if((Get-FileHash -LiteralPath $legacyWheel -Algorithm SHA256).Hash.ToLowerInvariant() -ne $wheelHash){throw 'Existing legacy wheel hash differs; preserved for inspection.'}
+ New-Item -ItemType HardLink -Path $waterWheel -Value $legacyWheel | Out-Null
+}
+Get-VerifiedFile 'https://huggingface.co/oleost/visionstate-wheel-reader/resolve/563f365a5b377c10c7248517ef2576ac5cee3cbf/wheels-v2.onnx' (Join-Path $models 'water\wheels-v2.onnx') '5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6'
+# The historical trial sources pin their original path as well as their hashes.
+if(-not (Test-Path -LiteralPath $legacyWheel)){
+ New-Item -ItemType HardLink -Path $legacyWheel -Value $waterWheel | Out-Null
+}elseif((Get-FileHash -LiteralPath $legacyWheel -Algorithm SHA256).Hash.ToLowerInvariant() -ne $wheelHash){throw 'Existing legacy wheel hash differs; preserved for inspection.'}
 Get-VerifiedFile 'https://huggingface.co/ntarekp/watermeter-yolov8-obb/resolve/c00b2752e3ad762eb269a05e1dceb28f48c1f27b/stage1_meter_window_digits.pt' (Join-Path $models 'stage1_meter_window_digits.pt') 'f2882a477bc12ecc5526cf73438d254945271c3e1b2b4214aa8e4deb637c3be9'
 # Explicit CPU wheels avoid downloading GPU runtimes. All installs remain in pythonRoot.
 & $python -m pip install --only-binary=:all: --index-url 'https://download.pytorch.org/whl/cpu' 'torch==2.8.0' 'torchvision==0.23.0'

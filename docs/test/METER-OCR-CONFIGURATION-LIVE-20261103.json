@@ -1,0 +1,501 @@
+{
+  "createdAt": "2026-11-03T14:52:58.935Z",
+  "scope": "Real CPU HTTP utility split against isolated SQLite RAM; no application database opened.",
+  "referencePolicy": "Reused locked agent visual annotations are not user-verified billing truth or a held-out accuracy benchmark. Synthetic SVG is a deterministic plumbing control, not accuracy evidence.",
+  "runtimeStatus": {
+    "electric": {
+      "available": true,
+      "readerAvailable": true,
+      "locatorAvailable": true,
+      "automaticAvailable": true,
+      "engine": "paddleocr",
+      "model": "paddleocr-ppocrv6",
+      "mechanicalOnly": true,
+      "message": "Bộ đọc ảnh điện PaddleOCR sẵn sàng. Đối chiếu đề xuất với ảnh trước khi lưu."
+    },
+    "water": {
+      "available": true,
+      "readerAvailable": true,
+      "locatorAvailable": true,
+      "automaticAvailable": true,
+      "engine": "visionstate",
+      "model": "wheels-v2",
+      "mechanicalOnly": true,
+      "message": "Bộ đọc ảnh nước YOLO + VisionState sẵn sàng. Đối chiếu đề xuất với ảnh trước khi lưu."
+    }
+  },
+  "modelSha256": {
+    "electricDetection": "5269b6bf7ed33c30591a23a3bde495f3a71f25a6a725e48c5f65b85681be58e1",
+    "electricRecognition": "97d8a25dfa5b2feff8ca23c87f05e41948bc04bedcdd97ac4634241a74f93036",
+    "waterWindow": "d104a8b975a00d7f2b96cd4972ad166e9826b080bfdba307d2cf3c0fd6eec023",
+    "waterWheels": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6"
+  },
+  "sources": {
+    "electric": {
+      "sample": "electric-clear",
+      "sha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33"
+    },
+    "water": {
+      "sample": "water-blue",
+      "sha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf"
+    },
+    "synthetic": {
+      "source": "tests/fixtures/electric-paddle-synthetic.svg",
+      "svgSha256": "31ee6835b84686415629809ec2293dd26a6b479f6a7ae341168c3de874108cf6",
+      "renderedPngSha256": "3d8c09fe65f0a6f999257964a762a06914399474035761b9ffab39086dc711f0",
+      "synthetic": true
+    }
+  },
+  "realElectric": {
+    "automatic": {
+      "status": "needs_review",
+      "states": [
+        "processing",
+        "needs_review"
+      ],
+      "durationMs": 4733,
+      "reason": "PaddleOCR chưa đọc chắc toàn bộ hàng số điện. Hãy kiểm tra vùng hoặc ảnh gốc.",
+      "proposal": null
+    },
+    "manual": {
+      "status": 200,
+      "engine": "paddleocr",
+      "model": "paddleocr-ppocrv6",
+      "reading": {
+        "digits": "007664",
+        "displayText": "00766.4",
+        "integerDigits": "00766",
+        "fractionalDigits": "4",
+        "integerValue": 766,
+        "unit": "kWh"
+      },
+      "confidence": 0.8966939449310303,
+      "quality": {
+        "canRead": true,
+        "checks": {
+          "resolution": true,
+          "exposure": true,
+          "contrast": true,
+          "sharpness": true
+        },
+        "metrics": {
+          "width": 147,
+          "height": 35,
+          "cellWidth": 24.5,
+          "meanLuma": 86.75549076773567,
+          "contrast": 31.552798416737485,
+          "edgeEnergy": 467.05571481761734
+        }
+      },
+      "cells": [],
+      "ocrEvidence": {
+        "observations": [
+          {
+            "text": "007664",
+            "confidence": 0.8966939449310303,
+            "corners": [
+              [
+                0.28833046471600693,
+                0.36926164241068554
+              ],
+              [
+                0.7051979345955252,
+                0.35333646313735234
+              ],
+              [
+                0.7136660929432015,
+                0.4088168420277448
+              ],
+              [
+                0.29617900172117045,
+                0.42068248138226877
+              ]
+            ],
+            "pass": "region"
+          },
+          {
+            "text": "007664",
+            "confidence": 0.9975593090057373,
+            "corners": [
+              [
+                0.3204819277108434,
+                0.37347767253044656
+              ],
+              [
+                0.6746987951807228,
+                0.3599458728010825
+              ],
+              [
+                0.6819277108433734,
+                0.40730717185385656
+              ],
+              [
+                0.327710843373494,
+                0.4208389715832206
+              ]
+            ],
+            "pass": "crop"
+          }
+        ],
+        "selectedObservationIndices": [
+          0,
+          1
+        ],
+        "agreement": true,
+        "scope": "owner-region"
+      }
+    },
+    "review": {
+      "missingImageConsent": 400,
+      "missingFractionalConsent": 400,
+      "explicitReview": 200,
+      "electricValue": 766,
+      "verificationSource": "paddleocr-and-human",
+      "periodConfirmed": false,
+      "invoicesUnchanged": true
+    },
+    "reference": {
+      "visibleDigits": "007664",
+      "exactDigits": "007664",
+      "integerDigits": "00766",
+      "fractionalDigits": "4",
+      "displayText": "00766.4",
+      "uncertainIndices": [],
+      "boundaryEvidence": "Five black wheels followed by one red wheel; printed weights end at 1 and 1/10; kWh is printed beside the register.",
+      "quality": "Readable row, mild tilt; original photo rather than a calibrated camera frame.",
+      "userVerified": false
+    }
+  },
+  "realWater": {
+    "status": "ready",
+    "states": [
+      "processing",
+      "ready"
+    ],
+    "durationMs": 3152,
+    "engine": "visionstate",
+    "model": "wheels-v2",
+    "reading": {
+      "digits": "00001056",
+      "displayText": "00001.056",
+      "integerDigits": "00001",
+      "fractionalDigits": "056",
+      "integerValue": 1,
+      "unit": "m3"
+    },
+    "confidence": 0.9536506295910626,
+    "quality": {
+      "canRead": true,
+      "checks": {
+        "resolution": true,
+        "exposure": true,
+        "contrast": true,
+        "sharpness": true
+      },
+      "metrics": {
+        "width": 745,
+        "height": 183,
+        "cellWidth": 93.125,
+        "meanLuma": 76.570506473026,
+        "contrast": 55.47029785728747,
+        "edgeEnergy": 892.8870202856463
+      }
+    },
+    "cells": [
+      {
+        "index": 0,
+        "position": 0,
+        "confidence": 0.9951457859000432,
+        "alternatives": [
+          {
+            "position": 0,
+            "confidence": 0.913499959887108
+          },
+          {
+            "position": 9.9,
+            "confidence": 0.08027996956809691
+          },
+          {
+            "position": 0.1,
+            "confidence": 0.0011927821621923987
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "position": 0,
+        "confidence": 0.9955012062148048,
+        "alternatives": [
+          {
+            "position": 0,
+            "confidence": 0.9489049628801404
+          },
+          {
+            "position": 9.9,
+            "confidence": 0.03354882665892925
+          },
+          {
+            "position": 0.1,
+            "confidence": 0.01287647510934707
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "position": 0,
+        "confidence": 0.9933284391843656,
+        "alternatives": [
+          {
+            "position": 0,
+            "confidence": 0.8381942042839746
+          },
+          {
+            "position": 9.9,
+            "confidence": 0.15180188525376032
+          },
+          {
+            "position": 0.1,
+            "confidence": 0.0024438287382814883
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "position": 0,
+        "confidence": 0.96945627481846,
+        "alternatives": [
+          {
+            "position": 0.1,
+            "confidence": 0.4806932441796165
+          },
+          {
+            "position": 0,
+            "confidence": 0.47919167448289335
+          },
+          {
+            "position": 0.2,
+            "confidence": 0.004618354834633172
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "position": 1,
+        "confidence": 0.9536506295910626,
+        "alternatives": [
+          {
+            "position": 0.9,
+            "confidence": 0.5061688932200924
+          },
+          {
+            "position": 1,
+            "confidence": 0.4232996926320271
+          },
+          {
+            "position": 0.8,
+            "confidence": 0.018042863637933303
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "position": 0,
+        "confidence": 0.99150517765955,
+        "alternatives": [
+          {
+            "position": 0,
+            "confidence": 0.8946990570031943
+          },
+          {
+            "position": 9.9,
+            "confidence": 0.08869073319452338
+          },
+          {
+            "position": 0.1,
+            "confidence": 0.007585393127471832
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "position": 5,
+        "confidence": 0.9844294637281843,
+        "alternatives": [
+          {
+            "position": 5,
+            "confidence": 0.5808081504750129
+          },
+          {
+            "position": 5.1,
+            "confidence": 0.39672612083192105
+          },
+          {
+            "position": 4.9,
+            "confidence": 0.0039968835222576205
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "position": 6,
+        "confidence": 0.9845871396592031,
+        "alternatives": [
+          {
+            "position": 6,
+            "confidence": 0.8774534603577239
+          },
+          {
+            "position": 6.1,
+            "confidence": 0.08435907425705863
+          },
+          {
+            "position": 5.9,
+            "confidence": 0.02210415360719745
+          }
+        ]
+      }
+    ],
+    "hasOCREvidence": false,
+    "approved": false,
+    "readingsAndInvoicesUnchanged": true,
+    "reference": {
+      "visibleDigits": "00001056",
+      "exactDigits": "00001056",
+      "integerDigits": "00001",
+      "fractionalDigits": "056",
+      "displayText": "00001.056",
+      "uncertainIndices": [],
+      "boundaryEvidence": "Five black wheels followed by three red wheels beside m3; downstream dial is marked x0.0001. Decimal placement is an explicit trial configuration.",
+      "quality": "Readable black and red wheels with noticeable diagonal row and perspective. Intermediate wheel geometry must remain observable.",
+      "userVerified": false
+    }
+  },
+  "syntheticElectric": {
+    "synthetic": true,
+    "accuracyBenchmark": false,
+    "submissionStatus": 201,
+    "status": "ready",
+    "states": [
+      "processing",
+      "ready"
+    ],
+    "durationMs": 3993,
+    "engine": "paddleocr",
+    "model": "paddleocr-ppocrv6",
+    "reading": {
+      "digits": "012345",
+      "displayText": "01234.5",
+      "integerDigits": "01234",
+      "fractionalDigits": "5",
+      "integerValue": 1234,
+      "unit": "kWh"
+    },
+    "confidence": 0.9996013045310974,
+    "ocrEvidence": {
+      "observations": [
+        {
+          "text": "012345",
+          "confidence": 0.9998200535774231,
+          "corners": [
+            [
+              0.102,
+              0.36
+            ],
+            [
+              0.52,
+              0.36
+            ],
+            [
+              0.52,
+              0.538
+            ],
+            [
+              0.102,
+              0.538
+            ]
+          ],
+          "pass": "full"
+        },
+        {
+          "text": "012345",
+          "confidence": 0.9996013045310974,
+          "corners": [
+            [
+              0.06700000000000002,
+              0.35999999999999993
+            ],
+            [
+              0.518,
+              0.348
+            ],
+            [
+              0.519,
+              0.542
+            ],
+            [
+              0.06700000000000002,
+              0.5539999999999999
+            ]
+          ],
+          "pass": "crop"
+        }
+      ],
+      "selectedObservationIndices": [
+        0,
+        1
+      ],
+      "agreement": true,
+      "scope": "automatic"
+    },
+    "approved": false,
+    "readingsAndInvoicesUnchanged": true
+  },
+  "authorization": {
+    "tenantReaderStatus": 403,
+    "tenantAutomatic": 403,
+    "otherOwnerAutomatic": 404,
+    "tenantManualRead": 403,
+    "otherOwnerManualRead": 404,
+    "tenantBootstrapAndExportHaveMachineEvidence": false
+  },
+  "proposalModelDigests": {
+    "realElectric": {
+      "modelDigest": "5144bf48cf947ca43cd241256252877d8acd7a5b6f88fd91743c5700e30d1ef6"
+    },
+    "realWater": {
+      "modelDigest": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6",
+      "locatorDigest": "d104a8b975a00d7f2b96cd4972ad166e9826b080bfdba307d2cf3c0fd6eec023"
+    },
+    "syntheticElectric": {
+      "modelDigest": "5144bf48cf947ca43cd241256252877d8acd7a5b6f88fd91743c5700e30d1ef6",
+      "locatorDigest": "5144bf48cf947ca43cd241256252877d8acd7a5b6f88fd91743c5700e30d1ef6"
+    }
+  },
+  "sourceSha256": {
+    "src/ai/meter-reader.mjs": "cb9dc16da3dbd9246fafbb2b48d0712cd23080105382558ab5432618d3619ffc",
+    "src/ai/meter_reader_worker.py": "9964bf3c14fbd8f73c1874d7262c326d013789883bca9bdf017debf16ad81295",
+    "src/ai/meter_paddle.py": "fe07d5e4a7beceeb0ebb4c243d42671a691e32649d0b8b98e851cea2c2293e69",
+    "src/ai/meter_wheels.py": "796323311d61bdb1f142d628ba357ee2ae9b4a4c78dbf0a1213e281eb44ea922",
+    "src/ai/meter_geometry.py": "cac8cd5d6ca46b5a77223f3eac8085aee0b499bd21131ad7c3a3bd9f69c2181a",
+    "src/ai/meter_row_geometry.py": "b035af3819994a9e0d6bfd4309437960183847566254f02c4b64a7064bb42ed2",
+    "src/backend/meter-reader-service.mjs": "b9ad7d9255a474c6acc14f199ce4c2e914f5ebaba35015bb52d49cac091ef844",
+    "src/backend/meter-automatic.mjs": "a3f76469f6bacb3f272ad68a46aaf7150e153f7c35884a90ebfe598e999aa11c",
+    "src/backend/meter-profile.mjs": "c25b402c39828c12e2d1f393e42ff18313c6064383866257ab18c6453f5dafd1",
+    "src/backend/meter-submissions.mjs": "09009fe241bc9e170e812871d794f85e6d3f628fd299e2f43f1dd0d6c666d273",
+    "src/backend/meter-visibility.mjs": "4067441e09345dab69c6075c365d4af668c162c549c4dfb4cdc4bccad2251ea2",
+    "src/backend/server.mjs": "91ea603c8cb7c76e03f913d58aef5ab10923fd6ea18c47d0dcc25d3c839002ff",
+    "src/frontend/meter-reader-panel.tsx": "9c6d373e715ad898ec0b3339246b06e5880e452443fb53ca5d65be02b834daa0",
+    "src/frontend/meter-automatic-panel.tsx": "dab1b9a91ba52df924e20fe5555f32a379f9fda00006f386b8e0b772d4c3ede3",
+    "src/frontend/meter-submissions-panel.tsx": "0a61d0a6f9ddd7f58c35feae3d289ee485febc29a66590e2300c66de582852ff",
+    "src/frontend/meter-evidence-capture.tsx": "d56860ea9fa3f76a6023c0d2f35a4be19a0c002cb84012c8bbdb0b85b173399d",
+    "src/frontend/api.ts": "df3f54bacca85cd30909551047859f7d320d19f31cae3120eca2256e3a040697",
+    "scripts/check-meter-utility-split-live.mjs": "dd724ba249f04d628610f74892f2e20d7735023638af939e810a4b169d5e834e",
+    "docs/test/fixtures/visionstate-yolo-samples.json": "49d5698c3de3c4504abc5ba162107727dc7b59df573400dee76d0e117d184af5",
+    "tests/fixtures/electric-paddle-synthetic.svg": "31ee6835b84686415629809ec2293dd26a6b479f6a7ae341168c3de874108cf6",
+    ".runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx": "5269b6bf7ed33c30591a23a3bde495f3a71f25a6a725e48c5f65b85681be58e1",
+    ".runtime/paddleocr/models/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx": "97d8a25dfa5b2feff8ca23c87f05e41948bc04bedcdd97ac4634241a74f93036",
+    ".runtime/meter-digits/visionstate-yolo/models/trozy_water_yolov8_obb.pt": "d104a8b975a00d7f2b96cd4972ad166e9826b080bfdba307d2cf3c0fd6eec023",
+    ".runtime/meter-digits/visionstate-yolo/models/wheels-v2.onnx": "5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6"
+  },
+  "sourcesStable": true
+}

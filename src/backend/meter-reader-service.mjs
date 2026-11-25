@@ -4,8 +4,10 @@ import sharp from 'sharp';
 import {id,now} from './db.mjs';
 import {audit,fail} from './domain.mjs';
 import {rasterMimeFromBytes} from '../shared/raster-image.mjs';
-import {meterReaderStatus,runMeterReader} from '../ai/meter-reader.mjs';
+import {meterReaderModelDigests,meterReaderStatus,runMeterReader} from '../ai/meter-reader.mjs';
+import {GEMINI_VISION_DIGEST,geminiVisionEnabled,geminiVisionMeter} from '../ai/gemini.mjs';
 import {confirmedMeterProfile,meterEngine,meterModel,validMeterLayout} from './meter-profile.mjs';
+import {imageLayoutEvidence} from '../shared/meter-layout-evidence.mjs';
 
 const must=(condition,message,status=400)=>{if(!condition)fail(status,message);};
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
@@ -15,6 +17,7 @@ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 const unit=utility=>utility==='electric'?'kWh':'m3';
 const probability=value=>Number.isFinite(value)&&value>=0&&value<=1;
 const MAX_IMAGE_BYTES=5*1024*1024,MAX_PIXELS=12_000_000,PROPOSAL_TTL_MS=30*60*1000;
+const AUTO_PROPOSAL_TTL_MS=31*24*60*60*1000;
 
 export function initializeMeterReader(store){
  store.db.exec(`CREATE TABLE IF NOT EXISTS meter_reader_proposals(
@@ -64,9 +67,24 @@ function polygonIntersection(subject,clip){
  }
  return points;
 }
+function validateWaterEvidence(result,configuration){
+ const evidence=result.waterEvidence;
+ must(object(evidence)&&evidence.agreement===true&&Array.isArray(evidence.observations)&&evidence.observations.length===2,'Cần hai quan sát bánh số nước khớp toàn bộ dãy số.',502);
+ const observations=evidence.observations.map(row=>{
+  must(object(row)&&row.digits===result.reading?.digits&&probability(row.confidence)&&row.confidence>=.7,'Hai lần đọc nước chưa khớp hoặc chưa đủ rõ.',502);
+  let corners;try{corners=validCorners(row.corners);}catch{fail(502,'Vùng bằng chứng nước không hợp lệ.');}
+  const observation={digits:row.digits,confidence:row.confidence,corners};
+  must(observationInsideConfiguration(observation,configuration)&&polygonArea(polygonIntersection(corners,configuration.corners))>=.5*polygonArea(corners)-1e-9,'Hai quan sát nước phải cùng chỉ hàng số nguồn.',502);
+  return observation;
+ });
+ const polygons=observations.map(row=>row.corners);
+ must(polygonArea(polygonIntersection(polygons[0],polygons[1]))>=.5*Math.min(...polygons.map(polygonArea))-1e-9,'Hai vùng đọc nước không cùng bao phủ hàng số.',502);
+ return {agreement:true,observations};
+}
 function validateResult(result,configuration,utility,dimensions,expectedScope='owner-region'){
  must(object(result)&&['ready','needs_review','retake'].includes(result.status)&&probability(result.confidence)&&result.width===dimensions.width&&result.height===dimensions.height,'Kết quả bộ đọc ảnh không hợp lệ.',502);
  must(result.engine===meterEngine(utility)&&result.model===meterModel(utility),'Kết quả không thuộc bộ đọc đã chọn cho loại công tơ này.',502);
+ must(result.modelDigest===meterReaderModelDigests(utility).modelDigest,'Kết quả không thuộc phiên bản mô hình công tơ hiện tại. Hãy đọc lại ảnh.',502);
  const resultWarnings=warnings(result.warnings||[]);
  const quality=result.quality,checks=quality?.checks,metrics=quality?.metrics;
  const checkKeys=['resolution','exposure','contrast','sharpness'];
@@ -88,7 +106,8 @@ function validateResult(result,configuration,utility,dimensions,expectedScope='o
   must(value.integerDigits===integerDigits&&value.fractionalDigits===fractionalDigits&&value.displayText===displayText&&value.integerValue===Number(integerDigits)&&value.unit===unit(utility),'Đề xuất không khớp cấu hình số bánh và phần thập phân.',502);
   reading={digits:value.digits,displayText,integerDigits,fractionalDigits,integerValue:Number(integerDigits),unit:unit(utility)};
  }else must(result.reading===null||result.reading===undefined,'Ảnh chưa rõ không được trả đề xuất chỉ số.',502);
- return {status:result.status,reading,confidence:result.confidence,warnings:resultWarnings,model:meterModel(utility),engine:meterEngine(utility),quality:{canRead:quality.canRead,checks:Object.fromEntries(checkKeys.map(key=>[key,checks[key]])),metrics:{width:metrics.width,height:metrics.height,cellWidth:metrics.cellWidth,meanLuma:metrics.meanLuma,contrast:metrics.contrast,edgeEnergy:metrics.edgeEnergy}},cells:cells.map(cell=>({index:cell.index,position:cell.position,confidence:cell.confidence,alternatives:cell.alternatives.map(alternative=>({position:alternative.position,confidence:alternative.confidence}))})),...(ocrEvidence?{ocrEvidence}:{})};
+ const waterEvidence=utility==='water'&&result.status==='ready'&&result.profileSource==='image'?validateWaterEvidence(result,configuration):null;
+ return {status:result.status,reading,confidence:result.confidence,warnings:resultWarnings,model:meterModel(utility),engine:meterEngine(utility),modelDigest:result.modelDigest,quality:{canRead:quality.canRead,checks:Object.fromEntries(checkKeys.map(key=>[key,checks[key]])),metrics:{width:metrics.width,height:metrics.height,cellWidth:metrics.cellWidth,meanLuma:metrics.meanLuma,contrast:metrics.contrast,edgeEnergy:metrics.edgeEnergy}},cells:cells.map(cell=>({index:cell.index,position:cell.position,confidence:cell.confidence,alternatives:cell.alternatives.map(alternative=>({position:alternative.position,confidence:alternative.confidence}))})),...(ocrEvidence?{ocrEvidence}:{}),...(waterEvidence?{waterEvidence}:{})};
 }
 
 function validateOCREvidence(result,configuration,expectedScope){
@@ -103,7 +122,8 @@ function validateOCREvidence(result,configuration,expectedScope){
  must(new Set(selected).size===selected.length&&selected.every(index=>Number.isSafeInteger(index)&&index>=0&&index<observations.length),'Tham chiếu quan sát OCR không hợp lệ.',502);
  if(result.status==='ready'){
   const passes=selected.map(index=>observations[index].pass),firstPass=expectedScope==='owner-region'?'region':'full';
-  must(evidence.agreement&&selected.length===2&&passes.includes(firstPass)&&passes.includes('crop'),'Cần hai lần đọc cùng phạm vi ảnh hoặc vùng số khớp nhau.',502);
+  const contextualAutomatic=expectedScope==='automatic'&&result.profileSource==='image'&&passes.includes('region')&&imageLayoutEvidence(result.layoutEvidence,configuration,result.reading,'electric',result.ocrEvidence);
+  must(evidence.agreement&&selected.length===2&&(passes.includes(firstPass)||contextualAutomatic)&&passes.includes('crop'),'Cần hai lần đọc cùng phạm vi ảnh hoặc vùng số khớp nhau.',502);
   must(selected.every(index=>observationInsideConfiguration(observations[index],configuration)),'Hai quan sát OCR phải nằm trong vùng chỉ số đang đọc.',502);
   const polygons=selected.map(index=>observations[index].corners),areas=polygons.map(polygonArea);
   must(polygons.every((polygon,index)=>polygonArea(polygonIntersection(polygon,configuration.corners))>=.5*areas[index]-1e-9)&&polygonArea(polygonIntersection(polygons[0],polygons[1]))>=.5*Math.min(...areas)-1e-9,'Hai quan sát OCR phải cùng bao phủ vùng chữ số đã chọn.',502);
@@ -115,6 +135,80 @@ function validateOCREvidence(result,configuration,expectedScope){
  return {observations,selectedObservationIndices:[...selected],agreement:evidence.agreement,scope:expectedScope};
 }
 
+function validateGeminiVisionEvidence(result){
+ const evidence=result.visionEvidence;
+ must(object(evidence)&&evidence.provider==='gemini'&&typeof evidence.model==='string'&&evidence.model.length>0&&evidence.model.length<=120&&typeof evidence.reason==='string'&&evidence.reason.length<=300,'Bằng chứng Gemini Vision không hợp lệ.',502);
+ const rotatedFrom=Array.isArray(evidence.rotatedFrom)?evidence.rotatedFrom.filter(item=>typeof item==='string'&&item.length<=120).slice(0,16):undefined;
+ const attemptLog=Array.isArray(evidence.attemptLog)?evidence.attemptLog.filter(item=>object(item)&&typeof item.model==='string'&&typeof item.outcome==='string').slice(0,16).map(item=>({model:String(item.model).slice(0,80),keySlot:String(item.keySlot||'').slice(0,16),outcome:String(item.outcome).slice(0,40),durationMs:Math.max(0,Math.round(Number(item.durationMs)||0)),detail:String(item.detail||'').slice(0,180)})):undefined;
+ return {provider:'gemini',model:evidence.model,reason:evidence.reason,...(Number.isSafeInteger(evidence.attempts)&&evidence.attempts>=1?{attempts:evidence.attempts}:{}),...(rotatedFrom?.length?{rotatedFrom}:{}),...(attemptLog?.length?{attemptLog}:{})};
+}
+function formatQualityDetails(quality){
+ if(!quality?.checks)return null;
+ const labels={resolution:'độ phân giải',exposure:'ánh sáng',contrast:'tương phản',sharpness:'độ nét'};
+ const failed=Object.entries(labels).filter(([key])=>quality.checks[key]===false).map(([,text])=>text);
+ const m=quality.metrics;
+ const metrics=m?` (sáng ${Math.round(m.meanLuma)}, tương phản ${Math.round(m.contrast)}, nét ${Math.round(m.edgeEnergy)})`:'';
+ return failed.length?`Chất lượng vùng số chưa đạt: ${failed.join(', ')}${metrics}`:`Chất lượng vùng số đạt cả 4 tiêu chí${metrics}`;
+}
+function buildLocalTraceStep(result,utility,profile,durationMs){
+ const isElectric=utility==='electric',unitLabel=isElectric?'kWh':'m³';
+ const details=[profile?`Chế độ: dùng cấu hình phòng (${profile.digits} ô, ${profile.decimals} lẻ)`:'Chế độ: tự suy bố cục từ ảnh (zero-setup)'];
+ if(isElectric){
+  const obs=result.ocrEvidence?.observations||[];
+  if(obs.length){
+   const preview=obs.slice(0,8).map(row=>`"${row.text}" (${Math.round(row.confidence*100)}%, ${row.pass})`).join(' · ');
+   details.push(`Văn bản PaddleOCR thấy (${obs.length}): ${preview}`);
+  }else{
+   details.push('PaddleOCR không nhận ra dòng chữ rõ nào trên ảnh.');
+  }
+  if(result.ocrEvidence?.agreement)details.push('Hai lượt đọc (toàn ảnh/vùng và crop) khớp hoàn toàn.');
+ }else{
+  const auto=result.automation;
+  if(auto)details.push(`Định vị YOLO: ${auto.locatorStatus||'—'} · Lưới hàng số: ${auto.geometryStatus||'—'}${auto.orientation!=null?` · Chiều đọc ${auto.orientation}°`:''}${auto.agreement?' · Khớp 2 vùng':''}`);
+  if(Array.isArray(result.cells)&&result.cells.length){
+   const wheelText=result.cells.map(c=>`${Math.round(c.position)}(${Math.round(c.confidence*100)}%)`).join(' ');
+   details.push(`Từng bánh số VisionState: ${wheelText}`);
+  }
+ }
+ const qualityLine=formatQualityDetails(result.quality);
+ if(qualityLine)details.push(qualityLine);
+ if(result.status!=='ready'&&result.warnings?.[0])details.push(`Lý do dừng: ${result.warnings[0]}`);
+ return {
+  stage:'local_ocr',
+  label:isElectric?'Tầng 1 · PaddleOCR (Điện)':'Tầng 1 · YOLO + VisionState (Nước)',
+  engine:meterEngine(utility),
+  model:isElectric?'paddleocr-ppocrv6':'yolov8-obb + wheels-v2',
+  status:result.status==='ready'?'ok':'miss',
+  durationMs,
+  reading:result.reading?`${result.reading.displayText} ${unitLabel}`:null,
+  summary:result.status==='ready'?`Đọc được ${result.reading.displayText} ${unitLabel} (tin cậy ${Math.round(result.confidence*100)}%)`:`Chưa ra đề xuất (${result.status})`,
+  details:details.slice(0,8),
+ };
+}
+function formatGeminiAttemptLines(attemptLog){
+ if(!Array.isArray(attemptLog)||!attemptLog.length)return [];
+ return attemptLog.slice(0,10).map((item,index)=>`Lượt ${index+1}: ${item.model}${item.keySlot?` (key ${item.keySlot})`:''} → ${item.detail||item.outcome}${item.durationMs?` (${item.durationMs}ms)`:''}`);
+}
+function validateGeminiVisionResult(result,utility,dimensions){
+ must(object(result)&&['ready','needs_review'].includes(result.status)&&probability(result.confidence)&&result.width===dimensions.width&&result.height===dimensions.height,'Kết quả Gemini Vision không hợp lệ.',502);
+ must(result.engine==='gemini-vision'&&typeof result.model==='string'&&result.model.length>0&&result.model.length<=120&&result.modelDigest===GEMINI_VISION_DIGEST,'Phiên bản kết quả Gemini Vision không hợp lệ.',502);
+ must(result.configNeedsConfirmation===false&&['gemini-vision',null].includes(result.profileSource),'Nguồn cấu hình Gemini Vision không hợp lệ.',502);
+ const resultWarnings=warnings(result.warnings||[]),visionEvidence=validateGeminiVisionEvidence(result);
+ if(result.status!=='ready'){
+  must(result.reading===null||result.reading===undefined,'Kết quả Gemini Vision chưa rõ không được chứa chỉ số.',502);
+  return {status:'needs_review',accepted:null,configuration:null,warnings:resultWarnings,visionEvidence};
+ }
+ must(result.profileSource==='gemini-vision'&&object(result.config),'Cấu hình đề xuất Gemini Vision không hợp lệ.',502);
+ let configuration;try{configuration=config({...result.config,regionConfirmed:true});}catch{fail(502,'Cấu hình chữ số Gemini Vision không hợp lệ.');}
+ must(configuration.decimals===0,'Gemini Vision chỉ đề xuất trực tiếp chỉ số phần nguyên.',502);
+ const value=result.reading;
+ must(object(value)&&Number.isSafeInteger(value.integerValue)&&value.integerValue>=0&&value.integerValue<=999_999_999&&value.unit===unit(utility),'Chỉ số Gemini Vision không hợp lệ hoặc sai đơn vị.',502);
+ const text=String(value.integerValue);
+ must(value.digits===text&&value.integerDigits===text&&value.fractionalDigits===''&&value.displayText===text&&configuration.digits===text.length,'Đề xuất Gemini Vision không khớp chỉ số nguyên.',502);
+ const reading={digits:text,displayText:text,integerDigits:text,fractionalDigits:'',integerValue:value.integerValue,unit:unit(utility)};
+ return {status:'ready',configuration,warnings:resultWarnings,visionEvidence,accepted:{status:'ready',reading,confidence:result.confidence,warnings:resultWarnings,model:result.model,engine:'gemini-vision',modelDigest:GEMINI_VISION_DIGEST,quality:null,cells:[],visionEvidence}};
+}
+
 /** Called inside the existing atomic landlord-review transaction. */
 export function validateReaderProposalForReview(store,user,row,input,selectedFileId){
  if(input.proposalId===undefined)return null;
@@ -124,12 +218,22 @@ export function validateReaderProposalForReview(store,user,row,input,selectedFil
  const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=?').get(selectedFileId,user.id);
  must(file&&hash(file.bytes)===record.file_hash,'Ảnh nguồn của đề xuất đã thay đổi. Hãy đọc lại ảnh.',409);
  const proposal=JSON.parse(record.result);
- must(proposal.engine===meterEngine(row.utility)&&proposal.model===meterModel(row.utility),'Bộ đọc công tơ đã thay đổi. Hãy đọc lại ảnh.',409);
- if(row.utility==='electric')try{validateOCREvidence(proposal,proposal.config,proposal.source==='automatic'?'automatic':'owner-region');}catch{fail(409,'Bằng chứng hoặc phạm vi OCR không còn hợp lệ. Hãy đọc lại ảnh.');}
- if(proposal.profileVersion!==undefined&&proposal.profileVersion!==null){
-  const profile=confirmedMeterProfile(store,user.id,row.roomId,row.utility);
-  must(profile?.version===proposal.profileVersion&&profile.digits===proposal.config?.digits&&profile.decimals===proposal.config?.decimals,'Cấu hình công tơ đã thay đổi. Hãy đọc lại ảnh.',409);
+ const isGemini=proposal.engine==='gemini-vision';
+ if(isGemini){
+  must(proposal.source==='automatic'&&proposal.modelDigest===GEMINI_VISION_DIGEST&&proposal.locatorDigest===GEMINI_VISION_DIGEST&&typeof proposal.model==='string'&&proposal.model.length>0&&proposal.profileSource==='gemini-vision','Đề xuất Gemini Vision không còn hợp lệ. Hãy đọc lại ảnh.',409);
+  try{validateGeminiVisionEvidence(proposal);}catch{fail(409,'Bằng chứng Gemini Vision không còn hợp lệ. Hãy đọc lại ảnh.');}
+ }else{
+  must(proposal.engine===meterEngine(row.utility)&&proposal.model===meterModel(row.utility),'Bộ đọc công tơ đã thay đổi. Hãy đọc lại ảnh.',409);
+  const digests=meterReaderModelDigests(row.utility);
+  must(proposal.modelDigest===digests.modelDigest&&(proposal.source!=='automatic'||proposal.locatorDigest===digests.locatorDigest),'Phiên bản mô hình công tơ đã thay đổi hoặc thiếu thông tin kiểm chứng. Hãy đọc lại ảnh.',409);
+  if(row.utility==='electric')try{validateOCREvidence(proposal,proposal.config,proposal.source==='automatic'?'automatic':'owner-region');}catch{fail(409,'Bằng chứng hoặc phạm vi OCR không còn hợp lệ. Hãy đọc lại ảnh.');}
+  if(row.utility==='water'&&proposal.profileSource==='image')try{validateWaterEvidence(proposal,proposal.config);}catch{fail(409,'Bằng chứng hai lần đọc nước không còn hợp lệ. Hãy đọc lại ảnh.');}
  }
+ if(!isGemini&&(proposal.profileVersion!==undefined&&proposal.profileVersion!==null||proposal.source==='automatic')){
+  const profile=confirmedMeterProfile(store,user.id,row.roomId,row.utility);
+  must((profile?.version??null)===(proposal.profileVersion??null)&&(!profile||profile.digits===proposal.config?.digits&&profile.decimals===proposal.config?.decimals),'Cấu hình công tơ đã thay đổi. Hãy đọc lại ảnh.',409);
+ }
+ if(proposal.profileSource==='image')must(imageLayoutEvidence(proposal.layoutEvidence,proposal.config,proposal.reading,row.utility,proposal.ocrEvidence),'Bằng chứng bố cục công tơ không còn hợp lệ. Hãy đọc lại ảnh.',409);
  must(proposal.status==='ready'&&proposal.reading&&proposal.reading.integerValue===input.value&&proposal.reading.unit===unit(row.utility),'Chỉ số đã sửa khác đề xuất; hãy xác minh như chỉ số nhập tay.');
  if(proposal.config.decimals>0)must(input.fractionalChecked===true,'Hãy đối chiếu phần lẻ và xác nhận chỉ ghi phần nguyên vào kỳ này.');
  store.db.prepare('UPDATE meter_reader_proposals SET used_at=? WHERE id=?').run(now(),record.id);
@@ -139,6 +243,7 @@ export function validateReaderProposalForReview(store,user,row,input,selectedFil
 export function createMeterReaderService(store,options={}){
  initializeMeterReader(store);
  const run=options.run||runMeterReader,status=options.status||meterReaderStatus;
+ const visionFallback=options.visionFallback||geminiVisionMeter,visionEnabled=options.visionEnabled||geminiVisionEnabled;
  function scope(user,key,fileId,version,{image=false}={}){
   owner(user);must(stringId(key)&&stringId(fileId),'Ảnh hoặc bộ gửi không hợp lệ.');
   const row=store.get('meterSubmissions',key);
@@ -198,35 +303,105 @@ export function createMeterReaderService(store,options={}){
   });
  }
  async function automatic(user,key,input,profile,{signal,guard=()=>{},onPersist=()=>{}}={}){
-  const scoped=scope(user,key,input.fileId,input.version),decoded=await normalize(scoped.file);
-  const result=await run({bytes:decoded.bytes,mime:'image/png',mode:'auto',utility:scoped.row.utility,profile:{digits:profile.digits,decimals:profile.decimals}},{signal});
-  must(!signal?.aborted,'Yêu cầu đọc ảnh đã được hủy.',499);
-  must(object(result)&&['ready','needs_review','retake','needs_setup'].includes(result.status)&&result.width===decoded.width&&result.height===decoded.height&&probability(result.confidence)&&result.engine===meterEngine(scoped.row.utility)&&result.model===meterModel(scoped.row.utility),'Kết quả đọc tự động không hợp lệ.',502);
-  must(result.configNeedsConfirmation===false&&['confirmed',null].includes(result.profileSource),'Nguồn cấu hình tự động không hợp lệ.',502);
-  if(scoped.row.utility==='electric'&&result.status!=='ready')validateOCREvidence(result,profile,'automatic');
-  const resultWarnings=warnings(result.warnings||[]);
-  let configuration=null,accepted=null;
-  if(result.config!==null&&result.config!==undefined){
-   must(object(result.config)&&result.config.digits===profile.digits&&result.config.decimals===profile.decimals,'Cấu hình tự động không khớp công tơ đã xác nhận.',502);
-   try{configuration=config({...result.config,regionConfirmed:true});}catch{fail(502,'Vùng số tự động không hợp lệ.');}
+  const totalStart=performance.now(),trace=[];
+  const scoped=scope(user,key,input.fileId,input.version);
+  const normStart=performance.now(),decoded=await normalize(scoped.file);
+  const photoEntry=(scoped.row.photos||[]).find(photo=>photo.fileId===input.fileId);
+  trace.push({stage:'normalize',label:'Bước 1 · Chuẩn hóa ảnh đầu vào',engine:null,model:null,status:'ok',durationMs:Math.round(performance.now()-normStart),reading:null,summary:`${decoded.width}×${decoded.height} px · PNG sRGB${photoEntry?.guideBox?' · có khung camera ROI':''}`,details:photoEntry?.guideBox?[`Khung gợi ý camera: x=${Math.round(photoEntry.guideBox.left*100)}%, y=${Math.round(photoEntry.guideBox.top*100)}%, rộng ${Math.round(photoEntry.guideBox.width*100)}%, cao ${Math.round(photoEntry.guideBox.height*100)}%`]:[]});
+  const localStatus=status(scoped.row.utility),allowVision=Boolean(visionEnabled());
+  const shouldRunLocal=Boolean(options.run)||localStatus.automaticAvailable||!allowVision;
+  const isElectric=scoped.row.utility==='electric',unitLabel=isElectric?'kWh':'m³';
+  let result=null,resultWarnings=[],configuration=null,accepted=null,layoutEvidence=null,localUnavailableError=null;
+  if(shouldRunLocal){
+   const localStart=performance.now();
+   try{
+    result=await run({bytes:decoded.bytes,mime:'image/png',mode:'auto',utility:scoped.row.utility,profile:profile?{digits:profile.digits,decimals:profile.decimals}:null,...(photoEntry?.guideBox?{guideBox:photoEntry.guideBox}:{})},{signal});
+   }catch(error){
+    const localMs=Math.round(performance.now()-localStart);
+    trace.push({stage:'local_ocr',label:isElectric?'Tầng 1 · PaddleOCR (Điện)':'Tầng 1 · YOLO + VisionState (Nước)',engine:meterEngine(scoped.row.utility),model:isElectric?'paddleocr-ppocrv6':'yolov8-obb + wheels-v2',status:'error',durationMs:localMs,reading:null,summary:error?.message||'Lỗi chạy bộ đọc cục bộ.',details:[]});
+    if(!allowVision||[400,403,404,409,413,415,422,429,499].includes(error?.status))throw Object.assign(error,{trace});
+    localUnavailableError=error;
+   }
+   if(result){
+    must(!signal?.aborted,'Yêu cầu đọc ảnh đã được hủy.',499);
+    must(object(result)&&['ready','needs_review','retake','needs_setup'].includes(result.status)&&result.width===decoded.width&&result.height===decoded.height&&probability(result.confidence)&&result.engine===meterEngine(scoped.row.utility)&&result.model===meterModel(scoped.row.utility),'Kết quả đọc tự động không hợp lệ.',502);
+    must(result.configNeedsConfirmation===false&&['confirmed','image',null].includes(result.profileSource),'Nguồn cấu hình tự động không hợp lệ.',502);
+    if(scoped.row.utility==='electric'&&result.status!=='ready')validateOCREvidence(result,profile,'automatic');
+    resultWarnings=warnings(result.warnings||[]);
+    if(result.config!==null&&result.config!==undefined){
+     must(object(result.config)&&(!profile||result.config.digits===profile.digits&&result.config.decimals===profile.decimals),'Cấu hình tự động không khớp công tơ đã xác nhận.',502);
+     try{configuration=config({...result.config,regionConfirmed:true});}catch{fail(502,'Vùng số tự động không hợp lệ.');}
+    }
+    if(result.profileSource==='image'&&configuration)layoutEvidence=imageLayoutEvidence(result.layoutEvidence,configuration,result.reading,scoped.row.utility,result.ocrEvidence);
+    if(result.status==='ready')must(configuration&&(result.profileSource==='confirmed'&&profile||result.profileSource==='image'&&layoutEvidence),'Chưa đủ bằng chứng vùng số và bố cục trên ảnh để đề xuất.',502);
+    if(configuration&&result.quality&&result.status!=='needs_setup')accepted=validateResult(result,configuration,scoped.row.utility,decoded,'automatic');
+    else must(result.status!=='ready'&&(result.reading===null||result.reading===undefined)&&Array.isArray(result.cells)&&result.cells.length===0,'Kết quả chưa rõ không được chứa chỉ số.',502);
+    trace.push(buildLocalTraceStep(result,scoped.row.utility,profile,Math.round(performance.now()-localStart)));
+   }
+  }else{
+   trace.push({stage:'local_ocr',label:isElectric?'Tầng 1 · PaddleOCR (Điện)':'Tầng 1 · YOLO + VisionState (Nước)',engine:meterEngine(scoped.row.utility),model:isElectric?'paddleocr-ppocrv6':'yolov8-obb + wheels-v2',status:'skipped',durationMs:0,reading:null,summary:'Bỏ qua (runtime OCR cục bộ đang tắt hoặc chưa cài đặt).',details:[]});
   }
-  if(result.status==='ready')must(configuration&&result.profileSource==='confirmed','Chưa đủ bằng chứng vùng số và cấu hình để đề xuất.',502);
-  if(configuration&&result.quality&&result.status!=='needs_setup')accepted=validateResult(result,configuration,scoped.row.utility,decoded,'automatic');
-  else must(result.status!=='ready'&&(result.reading===null||result.reading===undefined)&&Array.isArray(result.cells)&&result.cells.length===0,'Kết quả chưa rõ không được chứa chỉ số.',502);
+  must(!signal?.aborted,'Yêu cầu đọc ảnh đã được hủy.',499);
+  let usedVision=false,visionOutcome=null,fallbackFrom=null;
+  if(result&&result.status==='ready'){
+   trace.push({stage:'gemini_vision',label:'Tầng 2 · Gemini Vision (xoay vòng miễn phí)',engine:'gemini-vision',model:null,status:'skipped',durationMs:0,reading:null,summary:'Không cần gọi — Tầng 1 cục bộ đã đọc thành công (tiết kiệm 0 token).',details:[]});
+  }else if(!allowVision){
+   trace.push({stage:'gemini_vision',label:'Tầng 2 · Gemini Vision (xoay vòng miễn phí)',engine:'gemini-vision',model:null,status:'skipped',durationMs:0,reading:null,summary:'Chưa bật (thiếu GEMINI_API_KEY hoặc TROZY_METER_VISION_FALLBACK=off).',details:[]});
+  }else{
+   const visionStart=performance.now();
+   try{
+    const visionRaw=await visionFallback({bytes:decoded.bytes,mime:'image/png',width:decoded.width,height:decoded.height,utility:scoped.row.utility,signal});
+    const visionMs=Math.round(performance.now()-visionStart);
+    must(!signal?.aborted,'Yêu cầu đọc ảnh đã được hủy.',499);
+    visionOutcome=validateGeminiVisionResult(visionRaw,scoped.row.utility,decoded);
+    const attemptLines=formatGeminiAttemptLines(visionOutcome.visionEvidence.attemptLog);
+    const reasonLine=visionOutcome.visionEvidence.reason?[`Ghi chú Gemini: ${visionOutcome.visionEvidence.reason}`]:[];
+    if(visionOutcome.status==='ready'&&visionOutcome.accepted){
+     usedVision=true;
+     fallbackFrom=result?result.status:'local_unavailable';
+     accepted=visionOutcome.accepted;
+     configuration=visionOutcome.configuration;
+     layoutEvidence=null;
+     result={status:'ready',profileSource:'gemini-vision'};
+     resultWarnings=visionOutcome.warnings;
+     trace.push({stage:'gemini_vision',label:'Tầng 2 · Gemini Vision (xoay vòng miễn phí)',engine:'gemini-vision',model:visionOutcome.accepted.model,status:'ok',durationMs:visionMs,reading:`${visionOutcome.accepted.reading.displayText} ${unitLabel}`,summary:`Đọc thẳng phần nguyên: ${visionOutcome.accepted.reading.displayText} ${unitLabel} (${visionOutcome.accepted.model})`,details:[...attemptLines,...reasonLine].slice(0,12)});
+    }else{
+     trace.push({stage:'gemini_vision',label:'Tầng 2 · Gemini Vision (xoay vòng miễn phí)',engine:'gemini-vision',model:visionOutcome.visionEvidence.model,status:'miss',durationMs:visionMs,reading:null,summary:visionOutcome.warnings[0]||'Gemini Vision từ chối vì ảnh chưa đủ chắc chắn.',details:[...attemptLines,...reasonLine].slice(0,12)});
+     if(!result){
+      result={status:'needs_review',profileSource:null};
+      resultWarnings=visionOutcome.warnings;
+     }else if(visionOutcome.warnings.length){
+      resultWarnings=[...resultWarnings,visionOutcome.warnings[0]].slice(0,12);
+     }
+    }
+   }catch(error){
+    const visionMs=Math.round(performance.now()-visionStart);
+    if(signal?.aborted||error?.status===499)fail(499,'Yêu cầu đọc ảnh đã được hủy.');
+    const detail=error?.name==='GeminiError'&&typeof error.message==='string'&&error.message.length<=240?error.message:'Dự phòng Gemini Vision hiện chưa khả dụng; bạn có thể kiểm tra ảnh hoặc nhập tay.';
+    const attemptLines=formatGeminiAttemptLines(error?.attemptLog);
+    trace.push({stage:'gemini_vision',label:'Tầng 2 · Gemini Vision (xoay vòng miễn phí)',engine:'gemini-vision',model:null,status:'error',durationMs:visionMs,reading:null,summary:detail,details:attemptLines.slice(0,12)});
+    if(!result)throw Object.assign(localUnavailableError||new Error(error?.message||'Bộ đọc tự động và dự phòng Gemini Vision đều chưa sẵn sàng.'),{status:503,trace});
+    resultWarnings=[...resultWarnings,detail].slice(0,12);
+   }
+  }
+  if(!result)throw Object.assign(localUnavailableError||new Error('Bộ đọc tự động chưa sẵn sàng.'),{status:503,trace});
+  const totalMs=Math.round(performance.now()-totalStart);
+  trace.push({stage:'final',label:'Kết luận quy trình',engine:accepted?.engine||null,model:accepted?.model||null,status:result.status==='ready'?'ok':'miss',durationMs:totalMs,reading:accepted?.reading?`${accepted.reading.displayText} ${unitLabel}`:null,summary:result.status==='ready'&&accepted?.reading?`Đề xuất ${accepted.reading.displayText} ${unitLabel} từ ${usedVision?`Gemini Vision (${accepted.model})`:`${accepted.engine} (${accepted.model})`}. Chờ chủ nhà đối chiếu ảnh gốc.`:'Chưa có đề xuất tự động — cần chủ nhà đối chiếu ảnh gốc hoặc nhập tay.',details:[]});
   return store.transaction(()=>{
    guard();
    const current=scope(user,key,input.fileId,input.version),latest=confirmedMeterProfile(store,user.id,current.row.roomId,current.row.utility);
-   must(current.fileHash===scoped.fileHash&&latest?.version===profile.version&&latest.digits===profile.digits&&latest.decimals===profile.decimals,'Ảnh hoặc cấu hình đã thay đổi trong lúc đọc tự động.',409);
+   must(current.fileHash===scoped.fileHash&&(latest?.version??null)===(profile?.version??null)&&(!profile||latest?.digits===profile.digits&&latest?.decimals===profile.decimals),'Ảnh hoặc cấu hình đã thay đổi trong lúc đọc tự động.',409);
    let proposal=null;
    if(accepted){
-    const created=now(),expires=Date.now()+PROPOSAL_TTL_MS;
-    proposal={...accepted,id:id('meter_prop'),fileId:input.fileId,submissionVersion:input.version,createdAt:created,expiresAt:new Date(expires).toISOString(),config:configuration,requiresConfirmation:true,profileSource:'confirmed',profileVersion:profile.version,configNeedsConfirmation:false,source:'automatic'};
+    const created=now(),expires=Date.now()+AUTO_PROPOSAL_TTL_MS;
+    const locatorDigest=usedVision?GEMINI_VISION_DIGEST:meterReaderModelDigests(current.row.utility).locatorDigest;
+    proposal={...accepted,locatorDigest,id:id('meter_prop'),fileId:input.fileId,submissionVersion:input.version,createdAt:created,expiresAt:new Date(expires).toISOString(),config:configuration,requiresConfirmation:true,profileSource:result.profileSource,profileVersion:profile?.version??null,configNeedsConfirmation:false,source:'automatic',...(layoutEvidence?{layoutEvidence}:{}),...(fallbackFrom?{fallbackFrom}:{})};
     store.db.prepare('INSERT INTO meter_reader_proposals(id,owner_id,submission_id,file_id,submission_version,file_hash,result,created_at,expires_at) VALUES(?,?,?,?,?,?,?,?,?)').run(proposal.id,user.id,key,input.fileId,input.version,scoped.fileHash,JSON.stringify(proposal),created,expires);
-    audit(store,user,'meter-auto-proposal','meterSubmissions',current.row,`${proposal.id}; ${proposal.status}; chỉ đề xuất, chưa đổi chỉ số`);
+    audit(store,user,'meter-auto-proposal','meterSubmissions',current.row,`${proposal.id}; ${proposal.status}; ${usedVision?`dự phòng Gemini Vision (${proposal.model})`:'cục bộ'}; chỉ đề xuất, chưa đổi chỉ số`);
    }
-   const outcome={status:result.status,proposal,reason:resultWarnings.join(' ')|| (result.status==='ready'?'Đã có chỉ số đề xuất. Hãy đối chiếu ảnh trước khi xác minh.':'Chưa đủ bằng chứng để đọc tự động. Hãy kiểm tra ảnh hoặc dùng chọn vùng thủ công.')};
+   const outcome={status:result.status,proposal,reason:resultWarnings.join(' ')||(result.status==='ready'?'Đã có chỉ số đề xuất. Hãy đối chiếu ảnh trước khi xác minh.':'Chưa đủ bằng chứng để đọc tự động. Hãy kiểm tra ảnh hoặc dùng chọn vùng thủ công.'),trace};
    onPersist(outcome,current.row);return outcome;
   });
  }
- return {status:async(user,utility)=>{owner(user);must(utility===undefined||['electric','water'].includes(utility),'Loại công tơ không hợp lệ.');return status(utility);},preview,locate,read,automatic,scope};
+ return {status:async(user,utility)=>{owner(user);must(utility===undefined||['electric','water'].includes(utility),'Loại công tơ không hợp lệ.');const local=status(utility),visionFallbackAvailable=Boolean(visionEnabled());return {...local,visionFallbackAvailable,automaticAvailable:local.automaticAvailable||visionFallbackAvailable,message:local.automaticAvailable?(visionFallbackAvailable?`${local.message} Có dự phòng Gemini Vision tự xoay model miễn phí.`:local.message):visionFallbackAvailable?'Bộ đọc cục bộ đang tắt; đọc tự động dự phòng bằng Gemini Vision (tự xoay model miễn phí) đã sẵn sàng.':local.message};},preview,locate,read,automatic,scope};
 }

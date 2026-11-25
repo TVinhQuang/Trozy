@@ -31,7 +31,7 @@ const { AIStatusPanel } = await vite.ssrLoadModule('/src/frontend/ai-ui.tsx');
 const { MeterCamera } = await vite.ssrLoadModule('/src/frontend/meter-camera.tsx');
 const { MeterEvidenceCapture } = await vite.ssrLoadModule('/src/frontend/meter-evidence-capture.tsx');
 const { MeterSubmissionReview, MeterSubmissionsPanel, OwnerMeterEvidenceEntry } = await vite.ssrLoadModule('/src/frontend/meter-submissions-panel.tsx');
-const { MeterReaderPanel } = await vite.ssrLoadModule('/src/frontend/meter-reader-panel.tsx');
+const { MeterReaderPanel, scheduleMeterProposalExpiry } = await vite.ssrLoadModule('/src/frontend/meter-reader-panel.tsx');
 const { MeterAutomaticPanel } = await vite.ssrLoadModule('/src/frontend/meter-automatic-panel.tsx');
 const { cameraReadiness, cameraMotion, cameraCounterRectangle, emptyCameraReadiness } = await vite.ssrLoadModule('/src/frontend/meter-capture-quality.ts');
 const { useMeterOwnerUpdates } = await vite.ssrLoadModule('/src/frontend/meter-owner-updates.ts');
@@ -80,6 +80,13 @@ function automaticReady(submission = readerSubmission(), changes = {}) {
     proposal.cells = Array.from({ length: proposal.config.digits }, (_, index) => ({ index, position: Number(proposal.reading.digits[index]), confidence: .95, alternatives: [] }));
   }
   return { ...result, status: 'ready', reason: '', proposal, ...changes };
+}
+function imageAutomaticReady(submission = readerSubmission(), changes = {}) {
+  const result = automaticReady(submission), { digits, decimals } = result.proposal.config;
+  result.profile = null;
+  Object.assign(result.proposal, { profileSource: 'image', profileVersion: null, layoutEvidence: { version: 1, source: 'image', method: 'red-suffix', digits, decimals, complete: true, countSource: submission.utility === 'water' ? 'detected-wheel-grid' : 'ocr-line', cells: Array.from({ length: digits }, (_, index) => ({ index, redShare: index < digits - decimals ? 0 : .2, neutralShare: .4 })), separatorTexts: [] } });
+  result.usage = { status: 'available', previousValue: 700, proposedValue: 766, consumption: 66, unit: submission.utility === 'electric' ? 'kWh' : 'm3', baselineSource: 'previous-reading' };
+  return { ...result, ...changes };
 }
 async function loadReaderPreview() {
   const image = await waitFor(() => { const image = [...document.querySelectorAll('img')].find(item => item.getAttribute('src')?.includes('/image/')); assert(image, 'The reader must show the server-normalized preview'); return image; });
@@ -260,7 +267,51 @@ try {
     pass('Changing the period cancels old uploads and clears the previous photo selection'); cleanup();
   }
 
-  // A confirmed profile is saved once; later photos enter background recognition directly.
+  {
+    const savedTimeout = globalThis.setTimeout, savedClear = globalThis.clearTimeout, savedNow = Date.now;
+    let currentTime = 1000000000000, expired = 0, next = 0; const timers = new Map();
+    try {
+      Date.now = () => currentTime;
+      globalThis.setTimeout = (callback, delay) => { const id = ++next; timers.set(id, { callback, delay }); return id; };
+      globalThis.clearTimeout = id => timers.delete(id);
+      const expiry = currentTime + 31 * 86400000, cancel = scheduleMeterProposalExpiry(new Date(expiry).toISOString(), () => { expired++; });
+      let entry = [...timers.entries()][0]; assert.equal(entry[1].delay, 2147483647);
+      timers.delete(entry[0]); currentTime += entry[1].delay; entry[1].callback(); assert.equal(expired, 0);
+      entry = [...timers.entries()][0]; assert.equal(entry[1].delay, expiry - currentTime);
+      timers.delete(entry[0]); currentTime = expiry; entry[1].callback(); assert.equal(expired, 1); cancel(); assert.equal(timers.size, 0);
+      const stop = scheduleMeterProposalExpiry(new Date(currentTime + 1000).toISOString(), () => { expired++; }); stop(); assert.equal(timers.size, 0);
+    } finally { globalThis.setTimeout = savedTimeout; globalThis.clearTimeout = savedClear; Date.now = savedNow; }
+    pass('Thirty-one-day proposals re-arm past the browser timer limit and expire only at their actual expiry, with cancellable timers');
+  }
+
+  // Image-derived layouts need no setup; saved profiles remain an optional fallback.
+  {
+    const fixture = context('readings'), submission = readerSubmission(), applied = [];
+    const requests = mockAPI(path => { assert(path.includes('/automatic?')); return imageAutomaticReady(submission); });
+    mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply: proposal => applied.push(proposal), onInvalidate() {} }, fixture);
+    const apply = await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' });
+    assert.equal(screen.queryByRole('spinbutton'), null); assert.equal(screen.queryByRole('checkbox'), null);
+    assert(screen.getByText('Lượng dùng dự kiến')); assert(screen.getByText('66 kWh')); assert(screen.getByText('700 kWh')); assert(screen.getByText('766 kWh'));
+    assert.equal(applied.length, 0); assert.equal(requests.length, 1); assert.equal(requests[0].method, 'GET');
+    fireEvent.click(apply); assert.equal(applied.length, 1); assert.equal(applied[0].profileSource, 'image');
+    pass('A first photo with image-derived layout shows the proposed reading and period usage without setup or writes, retaining explicit Apply'); cleanup();
+    const profiledImage = imageAutomaticReady(submission, { profile: confirmedProfile }); profiledImage.proposal.profileVersion = confirmedProfile.version;
+    profiledImage.proposal.ocrEvidence.observations[0].pass = 'region';
+    mockAPI(() => profiledImage); mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply() {}, onInvalidate() {} }, fixture);
+    await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' }); assert(screen.getByText('Vùng có ngữ cảnh: 00766.4')); cleanup();
+    for (const changes of [{ layoutEvidence: undefined }, { profileVersion: 2 }, { layoutEvidence: { ...imageAutomaticReady(submission).proposal.layoutEvidence, decimals: 2 } }, { layoutEvidence: { ...imageAutomaticReady(submission).proposal.layoutEvidence, complete: false } }]) {
+      mockAPI(() => imageAutomaticReady(submission, { proposal: { ...imageAutomaticReady(submission).proposal, ...changes } }));
+      mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply: proposal => applied.push(proposal), onInvalidate() {} }, fixture);
+      await screen.findByRole('alert'); assert.equal(screen.queryByRole('button', { name: 'Dùng chỉ số đề xuất' }), null); cleanup();
+    }
+    for (const [status, message] of [['missing_baseline', 'Chưa có chỉ số đầu kỳ đã xác minh để tính lượng dùng.'], ['decreased', /Chỉ số đề xuất thấp hơn đầu kỳ/]]) {
+      mockAPI(() => imageAutomaticReady(submission, { usage: { status, previousValue: status === 'decreased' ? 800 : null, proposedValue: 766, consumption: null, unit: 'kWh', baselineSource: null } }));
+      mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply() {}, onInvalidate() {} }, fixture);
+      await screen.findByText(message); assert.equal(screen.queryByText('0 kWh'), null); assert.equal(screen.queryByText('Lượng dùng dự kiến'), null); cleanup();
+    }
+    pass('Incomplete or mismatched inferred layouts cannot be applied, and missing/decreased baselines never become zero usage');
+  }
+
   {
     const fixture = context('readings'), submission = readerSubmission(), applied = []; let profileSaved = false, resolveProfile;
     const requests = mockAPI((path, body, options) => {
@@ -276,7 +327,10 @@ try {
     });
     const props = { submission, fileId: 'guided-photo-1', onApply: proposal => applied.push(proposal), onInvalidate() {} };
     const view = mount(MeterAutomaticPanel, props, fixture);
-    await screen.findByText('Thiết lập công tơ một lần');
+    await screen.findByText(/Chưa xác định rõ cách chia phần nguyên/);
+    assert.equal(screen.queryByRole('spinbutton'), null);
+    fireEvent.click(screen.getByRole('button', { name: 'Bổ sung cách đọc công tơ' }));
+    await screen.findByRole('heading', { name: 'Bổ sung cách đọc công tơ' });
     const count = screen.getByLabelText('Số ô số trên hàng chỉ số (kể cả phần lẻ)'), fraction = screen.getByLabelText('Số chữ số phần lẻ theo kWh'), save = screen.getByRole('button', { name: 'Lưu thiết lập & đọc tự động' }), consent = screen.getByRole('checkbox', { name: 'Tôi đã kiểm tra số ô số và vị trí phần lẻ trên mặt công tơ' });
     assert.equal(count.value, ''); assert.equal(fraction.value, ''); assert.equal(consent.disabled, true); assert.equal(save.disabled, true); assert.equal(requests.length, 1);
     fireEvent.change(count, { target: { value: '6' } }); fireEvent.change(fraction, { target: { value: '1' } }); assert.equal(save.disabled, true);
@@ -289,7 +343,7 @@ try {
     view.rerender(h(AppContext.Provider, { value: fixture.value }, h(MeterAutomaticPanel, { ...props, fileId: 'guided-photo-2', submission: { ...submission, selectedFileId: 'guided-photo-2' } })));
     await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' });
     assert.equal(screen.queryByLabelText('Số ô số trên hàng chỉ số (kể cả phần lẻ)'), null); assert.equal(requests.filter(request => request.method === 'PUT').length, 1); assert.equal(requests.filter(request => /\/(locate|read)$/.test(request.path)).length, 0); assert.equal(applied.length, 0);
-    pass('First-time setup requires explicit valid wheel/fraction counts and consent, saves before retry, then later photos reuse the profile without per-photo setup or crop/read clicks'); cleanup();
+    pass('Optional fallback setup opens only on request, validates wheel/fraction counts and consent, saves before retry, then later photos reuse it'); cleanup();
   }
 
   {
@@ -408,7 +462,7 @@ try {
       pass('Unchanged terminal polling retains the applied value and review consents; another device changing profile/job clears them, while hidden/closed reviews cancel the 15-second poll');
       next = automaticResult(submission, { status: 'needs_setup', profile: null });
       const setupView = mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply() { assert.fail('External setup cannot apply a reading'); }, onInvalidate() {} }, fixture);
-      await screen.findByText('Thiết lập công tơ một lần'); assert.equal([...clock.timers.values()][0].delay, 15000);
+      await screen.findByText(/Chưa xác định rõ cách chia phần nguyên/); assert.equal(screen.queryByRole('spinbutton'), null); assert.equal([...clock.timers.values()][0].delay, 15000);
       next = automaticResult(submission, { status: 'queued' }); await clock.tick(15000); await screen.findByText(/Ảnh đang chờ đọc tự động/);
       assert.equal(screen.queryByLabelText('Số ô số trên hàng chỉ số (kể cả phần lẻ)'), null); assert.equal([...clock.timers.values()][0].delay, 2500); assert.equal(requests.every(request => request.method === 'GET'), true);
       setupView.unmount(); assert.equal(clock.timers.size, 0);
@@ -423,7 +477,7 @@ try {
     const requests = mockAPI(path => { assert.equal(path, '/api/meter/submissions/guided-review/automatic?fileId=guided-photo-1'); return result; });
     mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply: proposal => applied.push(proposal), onInvalidate() {} }, fixture);
     const apply = await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' });
-    assert(screen.getByText(/Đọc dãy số điện bằng PaddleOCR/)); assert(screen.getByText('Ảnh toàn cảnh: 00766.4')); assert(screen.getByText('Vùng chỉ số: 00766.4'));
+    assert(screen.getByText('Kết quả đọc tự động')); assert(screen.getByText('Ảnh toàn cảnh: 00766.4')); assert(screen.getByText('Vùng chỉ số: 00766.4'));
     assert.equal(screen.queryByText(/VisionState|xác suất bánh số|độ tin cậy từng bánh số/i), null); assert.equal(screen.queryByLabelText('Số ô số trên hàng chỉ số (kể cả phần lẻ)'), null);
     assert.equal(applied.length, 0); assert.equal(requests.length, 1); fireEvent.click(apply); assert.equal(applied.length, 1); assert.equal(applied[0].engine, 'paddleocr'); assert.deepEqual(applied[0].cells, []);
     assert.equal(fixture.mutations.length, 0); assert.equal(fixture.actions.length, 0);
@@ -436,7 +490,7 @@ try {
     const requests = mockAPI(() => result);
     mount(MeterAutomaticPanel, { submission, fileId: 'guided-photo-1', onApply: proposal => applied.push(proposal), onInvalidate() {} }, fixture);
     const apply = await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' });
-    assert(screen.getByText(/Tìm vùng số nước bằng YOLO và đọc bánh số bằng VisionState/)); assert(screen.getByText('00766.4 m³'));
+    assert(screen.getByText('Kết quả đọc tự động')); assert(screen.getByText('00766.4 m³'));
     assert.equal(screen.queryByText(/PaddleOCR/), null); assert.equal(screen.queryByText('Văn bản đã nhận dạng'), null); assert.equal(applied.length, 0); assert.equal(requests.length, 1);
     fireEvent.click(apply); assert.equal(applied[0].engine, 'visionstate'); assert.equal(applied[0].reading.unit, 'm3'); assert.equal(fixture.mutations.length, 0);
     pass('Water retains YOLO plus VisionState wheel evidence and confirmed layouts, uses m³ and never shows PaddleOCR observations'); cleanup();
@@ -562,6 +616,7 @@ try {
     assert.equal(requests.length, 1); assert.equal(value.value, ''); assert.equal(screen.queryByLabelText('Số ô số trên hàng chỉ số'), null);
     assert.equal(value.value, ''); assert.equal(saved, 0); assert.equal(requests.some(request => request.path.endsWith('/review')), false);
     fireEvent.click(apply); assert.equal(value.value, '766'); assert.equal(approve.disabled, true);
+    assert.equal(screen.getByLabelText(/Ghi chú xác minh hoặc lý do yêu cầu chụp lại/).value, 'Xác minh chỉ số từ ảnh công tơ và đề xuất nhận dạng.');
     const imageConsent = screen.getByRole('checkbox', { name: 'Tôi đã đối chiếu từng ô số, đơn vị và cách chia phần nguyên/phần lẻ trên ảnh gốc' }), fractionConsent = screen.getByRole('checkbox', { name: 'Tôi đã kiểm tra phần lẻ và chỉ dùng phần nguyên để ghi chỉ số' });
     assert.equal(imageConsent.checked, false); assert.equal(fractionConsent.checked, false);
     fireEvent.change(screen.getByLabelText(/Ghi chú xác minh hoặc lý do yêu cầu chụp lại/), { target: { value: 'Đã đối chiếu dãy số và phần lẻ trên ảnh gốc.' } });
@@ -569,7 +624,7 @@ try {
     fireEvent.click(approve); await waitFor(() => assert.equal(saved, 1)); assert.equal(requests.filter(request => request.path.endsWith('/review')).length, 1);
     assert.equal(fixture.mutations.length, 0); assert.equal(fixture.actions.length, 0);
     assert.equal(requests.some(request => /\/(locate|read)$/.test(request.path)), false);
-    pass('An automatic proposal starts without crop or read clicks, fills only after Apply, and requires separate image/fractional consent and a proposal-bound review note to save'); cleanup();
+    pass('An automatic proposal starts without crop/read clicks; Apply fills value and an editable note while image/fraction consents and saving remain explicit'); cleanup();
   }
 
   {
@@ -630,6 +685,43 @@ try {
     assert(screen.getByRole('img', { name: 'Ảnh công tơ điện đã gửi 1' })); assert.equal(screen.queryByRole('spinbutton'), null); assert.equal(screen.queryByRole('checkbox'), null); assert.equal(screen.queryByText('PRIVATE-MACHINE'), null);
     assert.equal(requests.length, requestsBeforeTenant); assert.equal(screen.queryByRole('button', { name: 'Dùng chỉ số đề xuất' }), null); assert.equal(screen.queryByRole('button', { name: 'Chỉnh vùng / đọc thủ công' }), null);
     pass('Tenant receipts show photos and status without readings, recognition requests, proposals or owner review controls'); cleanup();
+  }
+
+  {
+    const fixture = context('readings'), submission = { ...readerSubmission(), createdAt: '2026-11-05T09:00:00.000Z' };
+    fixture.value.data = { ...data, meterSubmissions: [submission] };
+    const requests = mockAPI(path => { assert.equal(path, '/api/meter/submissions/guided-review/automatic?fileId=guided-photo-1'); return imageAutomaticReady(submission); });
+    mount(MeterSubmissionsPanel, {}, fixture);
+    await screen.findByText('Dự kiến dùng 66 kWh'); assert(screen.getByText('Đầu kỳ 700 → đề xuất ghi 766'));
+    assert.equal(screen.queryByRole('dialog'), null); assert.equal(requests.length, 1); assert.equal(requests[0].method, 'GET');
+    assert.equal(fixture.mutations.length, 0); assert.equal(fixture.actions.length, 0); cleanup();
+    const rawTenant = store.db.prepare('SELECT * FROM users WHERE email=?').get('thue@trozy.vn'), tenantFixture = context('readings');
+    tenantFixture.value.user = safeUser(rawTenant); tenantFixture.value.data = { ...dataFor(store, rawTenant), meterSubmissions: [submission] };
+    const before = requests.length; mount(MeterSubmissionsPanel, {}, tenantFixture);
+    assert.equal(requests.length, before); assert.equal(screen.queryByText('Dự kiến dùng 66 kWh'), null); assert.equal(screen.queryByText(/Chỉ số đề xuất/), null);
+    pass('Owners see prepared reading and usage in the room submission list before opening an image; tenant lists never fetch or reveal automatic proposals'); cleanup();
+  }
+
+  {
+    const fixture = context('readings'), submissions = Array.from({ length: 32 }, (_, index) => ({ ...readerSubmission(), id: `bounded-${index}`, selectedFileId: `bounded-file-${index}`, photos: [{ fileId: `bounded-file-${index}` }], createdAt: '2026-11-05T09:00:00.000Z' }));
+    fixture.value.data = { ...data, meterSubmissions: submissions };
+    let active = 0, maximum = 0; const responses = [];
+    const requests = mockAPI(path => {
+      const id = path.match(/submissions\/([^/]+)\/automatic/)[1], row = submissions.find(item => item.id === id);
+      active++; maximum = Math.max(maximum, active);
+      return new Promise(resolve => responses.push(() => { active--; resolve(imageAutomaticReady(row)); }));
+    });
+    const view = mount(MeterSubmissionsPanel, {}, fixture); await waitFor(() => assert.equal(requests.length, 3));
+    for (let batch = 0; batch < 12 && (requests.length < 30 || active); batch++) {
+      await act(async () => { responses.splice(0).forEach(resolve => resolve()); await Promise.resolve(); });
+    }
+    await waitFor(() => assert.equal(requests.length, 30)); assert.equal(maximum, 3); assert.equal(active, 0);
+    assert(screen.getByText('Trang 1/2 · 32 bộ ảnh')); assert.equal(screen.getByRole('button', { name: 'Trang trước' }).disabled, true);
+    fireEvent.click(screen.getByRole('button', { name: 'Trang sau' })); await waitFor(() => assert.equal(requests.length, 32));
+    await act(async () => { responses.splice(0).forEach(resolve => resolve()); await Promise.resolve(); });
+    assert(screen.getByText('Trang 2/2 · 32 bộ ảnh')); assert.equal(screen.getByRole('button', { name: 'Trang sau' }).disabled, true); assert.equal(screen.getAllByRole('button', { name: 'Xem ảnh & xác minh' }).length, 2);
+    assert(requests.some(request => request.path.includes('bounded-31/')));
+    view.unmount(); pass('List previews use at most three concurrent requests per thirty-row page and older submissions remain reachable through pagination'); cleanup();
   }
 
   {
@@ -778,6 +870,49 @@ try {
     await screen.findByText('Hôm nay bạn muốn biết điều gì?');
     assert.equal(requests.filter(request => request.path === '/api/ai/history/clear').length, 1);
     pass('B01 clearing history requires its own explicit confirmation');
+    cleanup();
+  }
+  {
+    const submission = readerSubmission();
+    const geminiProposal = readyReaderProposal({ fileId: submission.selectedFileId, version: submission.version, digits: 3, decimals: 0 }, {
+      engine: 'gemini-vision',
+      model: 'gemini-3.1-flash-lite',
+      profileSource: 'gemini-vision',
+      profileVersion: null,
+      configNeedsConfirmation: false,
+      reading: { digits: '766', displayText: '766', integerDigits: '766', fractionalDigits: '', integerValue: 766, unit: 'kWh' },
+      ocrEvidence: undefined,
+      visionEvidence: { provider: 'gemini', model: 'gemini-3.1-flash-lite', reason: 'Đọc trực tiếp phần nguyên 766 kWh', rotatedFrom: ['gemini-3.5-flash:429'] },
+    });
+    mockAPI(path => {
+      if (path === '/api/ai/status') return { provider: 'gemini', available: true, model: 'gemini-3.1-flash-lite', modelInstalled: true, models: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'], rotationPool: ['gemini-3.5-flash', 'gemini-3.1-flash-lite'], availableModels: 1, keyCount: 1, message: 'Gemini API sẵn sàng (gemini-3.1-flash-lite · xoay vòng 1/2 model miễn phí).' };
+      if (path.includes('/automatic?fileId=')) return {
+        status: 'ready', proposal: geminiProposal, reason: '', profile: null, fileId: submission.selectedFileId, submissionVersion: submission.version,
+        usage: { status: 'available', previousValue: 700, proposedValue: 766, consumption: 66, unit: 'kWh', baselineSource: 'previous-reading' },
+        trace: [
+          { stage: 'normalize', label: 'Bước 1 · Chuẩn hóa ảnh đầu vào', engine: null, model: null, status: 'ok', durationMs: 32, reading: null, summary: '1000×700 px · PNG sRGB', details: [] },
+          { stage: 'local_ocr', label: 'Tầng 1 · PaddleOCR (Điện)', engine: 'paddleocr', model: 'paddleocr-ppocrv6', status: 'miss', durationMs: 1200, reading: null, summary: 'Chưa ra đề xuất (needs_review)', details: ['Văn bản PaddleOCR thấy (1): "766" (91%, full)'] },
+          { stage: 'gemini_vision', label: 'Tầng 2 · Gemini Vision (xoay vòng miễn phí)', engine: 'gemini-vision', model: 'gemini-3.1-flash-lite', status: 'ok', durationMs: 2100, reading: '766 kWh', summary: 'Đọc thẳng phần nguyên: 766 kWh (gemini-3.1-flash-lite)', details: ['Lượt 1: gemini-3.5-flash (key #1) → Hết hạn mức token/RPM → xoay model', 'Lượt 2: gemini-3.1-flash-lite (key #1) → HTTP 200 OK (2100ms)'] },
+        ],
+      };
+    });
+    const fixture = context('assistant');
+    mount(AIStatusPanel, {}, fixture);
+    await screen.findByText('Trợ lý AI Gemini');
+    assert(screen.getAllByText(/gemini-3.1-flash-lite.*1\/2 model miễn phí/).length >= 1);
+    cleanup();
+    const applied = [];
+    mount(MeterAutomaticPanel, { submission, fileId: submission.selectedFileId, onApply: p => applied.push(p), onInvalidate() {} }, context('readings'));
+    await screen.findByText(/Nguồn đề xuất dự phòng · Gemini Vision \(gemini-3.1-flash-lite\)/);
+    assert(screen.getByText(/Đã tự xoay model khi chạm hạn mức: gemini-3.5-flash:429/));
+    assert(screen.getByText(/Quy trình đọc số từng bước \(3 bước\)/));
+    assert(screen.getByText(/Tầng 1 · PaddleOCR \(Điện\)/));
+    assert(screen.getByText(/Lượt 1: gemini-3.5-flash/));
+    assert.equal(applied.length, 0);
+    fireEvent.click(screen.getByRole('button', { name: 'Dùng chỉ số đề xuất' }));
+    assert.equal(applied.length, 1);
+    assert.equal(applied[0].engine, 'gemini-vision');
+    pass('Gemini status panel shows free-model rotation pool and Gemini Vision fallback proposals display provenance while requiring explicit Apply');
     cleanup();
   }
   console.log(`PASS: ${checks} AI interaction checks in an isolated in-memory DOM. No real browser, Ollama, file persistence or messages were used.`);

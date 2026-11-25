@@ -2,8 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {existsSync,readFileSync,readdirSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import sharp from 'sharp';
-import {createMeterReader,meterReaderStatus,runMeterReader} from '../src/ai/meter-reader.mjs';
+import {createMeterReader,meterReaderModelDigests,meterReaderStatus,runMeterReader} from '../src/ai/meter-reader.mjs';
 
 const png=await sharp({create:{width:100,height:50,channels:3,background:'#888'}}).png().toBuffer();
 const request={mode:'read',bytes:png,mime:'image/png',digits:3,decimals:0,utility:'water',corners:[[.1,.1],[.9,.1],[.9,.9],[.1,.9]]};
@@ -20,25 +21,63 @@ test('meter bridge rejects paths/unsupported bytes/config before spawning and di
  await assert.rejects(runMeterReader(request),error=>error.status===503);
 });
 
-test('automatic worker uses only confirmed layout and fresh geometry, preserves zeros and resolves a half turn',{
+test('automatic worker uses confirmed layout and fresh geometry, preserves zeros at all four rotations',{
  skip:!meterReaderStatus().automaticAvailable||!existsSync(new URL('../.runtime/datasets/meter/water-blue.jpg',import.meta.url)),
  timeout:90000,
 },async()=>{
  const blank=await runMeterReader({mode:'auto',bytes:png,mime:'image/png',utility:'water'});
- assert.equal(blank.status,'needs_setup');assert.equal(blank.reading,null);assert.equal(blank.config,null);
+ assert.ok(['needs_review','retake'].includes(blank.status));assert.equal(blank.reading,null);assert.equal(blank.config,null);
  const manifest=JSON.parse(readFileSync(new URL('../docs/test/fixtures/visionstate-yolo-samples.json',import.meta.url),'utf8'));
  const sample=manifest.samples.find(row=>row.id==='water-blue');
  const photo=readFileSync(new URL('../'+sample.file,import.meta.url));
- for(const angle of [0,180]){
+ for(const angle of [0,90,180,270]){
   const bytes=await sharp(photo).rotate(angle).flatten({background:'#fff'}).toColourspace('srgb').png().toBuffer();
   // No sample.manualRegion or reference digits enter this inference request.
   const result=await runMeterReader({mode:'auto',bytes,mime:'image/png',utility:'water',profile:{digits:8,decimals:3}});
   assert.equal(result.status,'ready',JSON.stringify({angle,status:result.status,warnings:result.warnings}));
   assert.equal(result.reading.displayText,'00001.056');assert.equal(result.reading.digits,'00001056');
+  assert.equal(result.modelDigest,meterReaderModelDigests('water').modelDigest);
   assert.equal(result.profileSource,'confirmed');assert.equal(result.configNeedsConfirmation,false);
   assert.equal(result.config.digits,8);assert.equal(result.config.decimals,3);assert.equal(result.config.corners.length,4);
   assert.equal(result.quality.canRead,true);assert.equal(result.cells.length,8);
  }
+});
+
+test('automatic water reading derives wheel count and fractional boundary from the image without a profile',{
+ skip:!meterReaderStatus('water').automaticAvailable||!existsSync(new URL('../.runtime/datasets/meter/water-blue.jpg',import.meta.url)),
+ timeout:90000,
+},async()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../docs/test/fixtures/visionstate-yolo-samples.json',import.meta.url),'utf8'));
+ const sample=manifest.samples.find(row=>row.id==='water-blue'),photo=readFileSync(new URL('../'+sample.file,import.meta.url));
+ const bytes=await sharp(photo).flatten({background:'#fff'}).toColourspace('srgb').png().toBuffer();
+ const result=await runMeterReader({mode:'auto',bytes,mime:'image/png',utility:'water'});
+ assert.equal(result.status,'ready',JSON.stringify({status:result.status,warnings:result.warnings}));assert.equal(result.profileSource,'image');assert.equal(result.configNeedsConfirmation,false);
+ assert.equal(result.config.digits,8);assert.equal(result.config.decimals,3);assert.equal(result.reading.displayText,'00001.056');
+ assert.equal(result.layoutEvidence.source,'image');assert.equal(result.layoutEvidence.complete,true);assert.equal(result.layoutEvidence.countSource,'detected-wheel-grid');
+});
+
+test('production worker ignores inherited GPU training paths and loads project CPU torch',{
+ skip:!meterReaderStatus('water').automaticAvailable,
+ timeout:30000,
+},async t=>{
+ const values={TROZY_USE_TRAIN_GPU:'1',TROZY_TRAIN_GPU_SITE:fileURLToPath(new URL('../.runtime/meter-digits/train-gpu-packages',import.meta.url))};
+ const previous=Object.fromEntries(Object.keys(values).map(key=>[key,process.env[key]]));
+ t.after(()=>{for(const [key,value] of Object.entries(previous)){if(value===undefined)delete process.env[key];else process.env[key]=value;}});
+ Object.assign(process.env,values);
+ let observed,output='';
+ const reader=createMeterReader({spawnImpl:(python,_args,options)=>{
+  observed=options.env;
+  const script='import json, pathlib, torch; print(json.dumps({"version":torch.__version__,"cuda":torch.version.cuda,"file":str(pathlib.Path(torch.__file__).resolve())}))';
+  const child=spawn(python,['-I','-B','-c',script],options);
+  child.stdout.on('data',chunk=>{output+=chunk;});return child;
+ }});
+ // Capture the child output before the normal JSON envelope rejects this diagnostic.
+ await assert.rejects(reader.run(request),error=>error.status===503);
+ assert.equal(observed.TROZY_USE_TRAIN_GPU,undefined);assert.equal(observed.TROZY_TRAIN_GPU_SITE,undefined);
+ const runtime=JSON.parse(output.trim());
+ assert.match(runtime.version,/\+cpu$/);assert.equal(runtime.cuda,null);
+ assert.match(runtime.file.replaceAll('\\','/'),/\/\.runtime\/meter-digits\/visionstate-yolo\/python\/Lib\/site-packages\/torch\/__init__\.py$/);
+ assert.equal(process.env.TROZY_USE_TRAIN_GPU,'1');
 });
 
 test('meter bridge bounds concurrency, kills timed-out workers and removes only its own temp',{skip:!meterReaderStatus().readerAvailable},async()=>{

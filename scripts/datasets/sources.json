@@ -1,0 +1,81 @@
+{
+  "description": "Registry of public meter datasets for Trozy",
+  "version": "1.0.0",
+  "sources": [
+    {
+      "id": "scut_wmn",
+      "name": "SCUT-WMN (Water Meter Number DataSet)",
+      "utility": "water",
+      "organization": "HCIILAB / South China University of Technology",
+      "repo_url": "https://github.com/HCIILAB/Water-Meter-Number-DataSet",
+      "type": "github_direct",
+      "license": "Non-commercial Research",
+      "commercial_ok": false,
+      "format": "images_and_labels",
+      "target": "water_wheels_and_rec"
+    },
+    {
+      "id": "wmeter5k",
+      "name": "WMeter5K Dataset (Towards Accurate Readings by Eliminating Transition Error)",
+      "utility": "water",
+      "organization": "ZZZHANG-jx (TIM 2025)",
+      "repo_url": "https://github.com/ZZZHANG-jx/WMeter-Reader",
+      "type": "github_direct",
+      "license": "Open Research",
+      "commercial_ok": false,
+      "format": "images_and_annotations",
+      "target": "water_yolo_obb"
+    },
+    {
+      "id": "dl7981_water_meter",
+      "name": "DL7981 Water Meter Image Dataset",
+      "utility": "water",
+      "organization": "Hugging Face DL7981",
+      "repo_url": "https://huggingface.co/datasets/DL7981/water_meter",
+      "hf_id": "DL7981/water_meter",
+      "type": "huggingface",
+      "license": "Open Access / Community",
+      "commercial_ok": false,
+      "format": "imagefolder",
+      "target": "water_eval_and_rec"
+    },
+    {
+      "id": "saarthak_meter_ocr",
+      "name": "Saarthak Meter OCR Dataset (Electric Mechanical & Digital Meters)",
+      "utility": "electric",
+      "organization": "saarthak-s",
+      "repo_url": "https://github.com/saarthak-s/Meter_Ocr",
+      "type": "github_direct",
+      "license": "MIT",
+      "commercial_ok": true,
+      "format": "yolo_and_crops",
+      "target": "electric_paddle_det_rec"
+    },
+    {
+      "id": "henrik_energy_meter",
+      "name": "Henrik Energy Meter (Electric Register Photos)",
+      "utility": "electric",
+      "organization": "henrik-dra",
+      "repo_url": "https://huggingface.co/datasets/henrik-dra/energy-meter",
+      "hf_id": "henrik-dra/energy-meter",
+      "type": "huggingface",
+      "license": "Open Access",
+      "commercial_ok": false,
+      "format": "parquet_image_text",
+      "target": "electric_eval"
+    },
+    {
+      "id": "ud_smart_city_water_meter",
+      "name": "UD Smart City Mechanical Roller Meter Dataset (Photos, Window Masks & Readings)",
+      "utility": "both",
+      "organization": "ud-smart-city",
+      "repo_url": "https://huggingface.co/datasets/ud-smart-city/water-meter-image",
+      "hf_id": "ud-smart-city/water-meter-image",
+      "type": "huggingface",
+      "license": "Open Access / CC0-1.0",
+      "commercial_ok": true,
+      "format": "images_masks_csv",
+      "target": "water_yolo_obb_and_mechanical_roller_rec"
+    }
+  ]
+}

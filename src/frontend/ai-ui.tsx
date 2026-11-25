@@ -5,9 +5,9 @@ import { useApp } from './context';
 import { Badge, EmptyState, Field, Modal } from './ui';
 
 export type AISource = { collection: string; id: string; label: string; page: string; excerpt?: string };
-export type CopilotResult = { feature: 'B01'; engine: 'local' | 'ollama'; answer: string; sources: AISource[]; suggestions: string[]; draft?: { title: string; body: string; kind: string; roomIds?: string[] }; warnings: string[]; model?: string };
-export type MaintenanceSuggestion = { feature: 'B04'; engine: 'rules' | 'ollama'; category: string; priority: 'low' | 'normal' | 'urgent'; confidence: number; reasons: string[]; suggestedTitle: string; safetyAdvice: string[]; suggestedSteps: string[]; requiresConfirmation: true; model?: string; warnings: string[] };
-type AIStatus = { available: boolean; model: string; modelInstalled: boolean; models: string[]; message: string };
+export type CopilotResult = { feature: 'B01'; engine: 'local' | 'ollama' | 'gemini'; answer: string; sources: AISource[]; suggestions: string[]; draft?: { title: string; body: string; kind: string; roomIds?: string[] }; warnings: string[]; model?: string };
+export type MaintenanceSuggestion = { feature: 'B04'; engine: 'rules' | 'ollama' | 'gemini'; category: string; priority: 'low' | 'normal' | 'urgent'; confidence: number; reasons: string[]; suggestedTitle: string; safetyAdvice: string[]; suggestedSteps: string[]; requiresConfirmation: true; model?: string; warnings: string[] };
+type AIStatus = { provider?: 'ollama' | 'gemini'; available: boolean; model: string; modelInstalled: boolean; models: string[]; rotationPool?: string[]; availableModels?: number; keyCount?: number; message: string };
 type UtilityAlert = { id: string; propertyId: string; roomId: string; roomCode: string; period: string; utility: 'electric' | 'water'; kind: string; severity: 'warning' | 'critical'; currentUsage: number; baseline: number; changePercent: number | null; threshold: number; explanation: string; recommendation: string; readingId: string; reviewed: boolean; reviewNote?: string; history: { period: string; usage: number }[] };
 type UtilityResult = { feature: 'B02'; alerts: UtilityAlert[]; summary: { roomsAnalyzed: number; readingsAnalyzed: number; alertCount: number; criticalCount: number; insufficientHistory: number }; generatedAt: string };
 
@@ -16,7 +16,7 @@ export async function runAI<T>(feature: 'B01' | 'B02' | 'B04', input: Record<str
   return response.result;
 }
 export function AIEngine({ engine, model }: { engine: string; model?: string }) {
-  const label = engine === 'ollama' ? `Ollama${model ? ` · ${model}` : ''}` : engine === 'statistics' ? 'Phân tích thống kê' : engine === 'rules' ? 'Phân loại theo quy tắc' : 'Tra cứu dữ liệu cục bộ';
+  const label = engine === 'gemini' ? `Gemini${model ? ` · ${model}` : ''}` : engine === 'ollama' ? `Ollama${model ? ` · ${model}` : ''}` : engine === 'statistics' ? 'Phân tích thống kê' : engine === 'rules' ? 'Phân loại theo quy tắc' : 'Tra cứu dữ liệu cục bộ';
   return <span className="ai-engine"><Cpu size={13} />{label}</span>;
 }
 export function AIWarnings({ warnings }: { warnings?: string[] }) {
@@ -26,20 +26,25 @@ export function AIWarnings({ warnings }: { warnings?: string[] }) {
 export function AIStatusBadge() {
   const [status, setStatus] = useState<AIStatus | null>(null), [error, setError] = useState('');
   useEffect(() => { const controller = new AbortController(); api<AIStatus>('/ai/status', { signal: controller.signal }).then(setStatus).catch(reason => { if (!controller.signal.aborted) setError(reason.message); }); return () => controller.abort(); }, []);
-  return <span className={`ai-status ${status?.available && status.modelInstalled ? 'connected' : ''}`} title={status?.message || error || 'Đang kiểm tra kết nối AI'}><span className="live-dot" /><span>{!status && !error ? 'Đang kiểm tra Ollama…' : status?.available && status.modelInstalled ? `Ollama · ${status.model}` : 'Chế độ cục bộ'}</span></span>;
+  const gemini = status?.provider === 'gemini';
+  const ready = Boolean(status?.available && status.modelInstalled);
+  const label = !status && !error ? 'Đang kiểm tra kết nối AI…' : ready ? `${gemini ? 'Gemini' : 'Ollama'} · ${status!.model}` : 'Chế độ cục bộ';
+  return <span className={`ai-status ${ready ? 'connected' : ''}`} title={status?.message || error || 'Đang kiểm tra kết nối AI'}><span className="live-dot" /><span>{label}</span></span>;
 }
 export function AIStatusPanel() {
   const [status, setStatus] = useState<AIStatus | null>(null), [error, setError] = useState(''), [busy, setBusy] = useState(false);
   const alive = useRef(true);
   const load = useCallback(async () => { setBusy(true); setError(''); try { const response = await api<AIStatus>('/ai/status'); if (alive.current) setStatus(response); } catch (reason) { if (alive.current) setError((reason as Error).message); } finally { if (alive.current) setBusy(false); } }, []);
   useEffect(() => { alive.current = true; void load(); return () => { alive.current = false; }; }, [load]);
+  const gemini = status?.provider === 'gemini';
+  const ready = Boolean(status?.available && status.modelInstalled);
   return <section className="card ai-status-panel">
-    <div className="card-header"><div className="inline"><span className="stat-icon"><Cpu size={20} /></span><div><h2>AI trên máy của bạn</h2><p>Trợ lý Ollama cục bộ, không cần API trả phí</p></div></div><button className="btn btn-sm" onClick={load} disabled={busy}><RefreshCw size={14} className={busy ? 'spin' : ''} />Kiểm tra</button></div>
+    <div className="card-header"><div className="inline"><span className="stat-icon"><Cpu size={20} /></span><div><h2>{gemini ? 'Trợ lý AI Gemini' : 'AI trên máy của bạn'}</h2><p>{gemini ? 'Tự động xoay vòng các model Gemini miễn phí khi chạm hạn mức token' : 'Trợ lý Ollama cục bộ, không cần API trả phí'}</p></div></div><button className="btn btn-sm" onClick={load} disabled={busy}><RefreshCw size={14} className={busy ? 'spin' : ''} />Kiểm tra</button></div>
     <div className="card-body stack">
-      <div className="inline"><Badge value={status?.available && status.modelInstalled ? 'active' : 'draft'} label={busy && !status ? 'Đang kiểm tra' : status?.available && status.modelInstalled ? 'Trợ lý đã sẵn sàng' : 'Tra cứu cục bộ sẵn sàng'} />{status?.model && <span className="muted small">{status.model}</span>}</div>
-      <p className="muted">{error || status?.message || 'Đang kiểm tra kết nối Ollama…'}</p>
+      <div className="inline"><Badge value={ready ? 'active' : 'draft'} label={busy && !status ? 'Đang kiểm tra' : ready ? 'Trợ lý đã sẵn sàng' : 'Tra cứu cục bộ sẵn sàng'} />{status?.model && <span className="muted small">{status.model}{gemini && status.rotationPool?.length ? ` · ${status.availableModels ?? status.rotationPool.length}/${status.rotationPool.length} model miễn phí` : ''}</span>}</div>
+      <p className="muted">{error || status?.message || 'Đang kiểm tra kết nối AI…'}</p>
       <div className="inline small"><ShieldCheck size={16} /><span>Trợ lý chỉ đọc dữ liệu bạn được phép xem. Mọi thay đổi cần bạn xác nhận.</span></div>
-      {status && (!status.available || !status.modelInstalled) && <p className="form-note">Các câu hỏi tra cứu thông dụng và phân loại theo quy tắc vẫn dùng được. Để trò chuyện bằng mô hình, khởi động Ollama với model hiển thị ở trên rồi nhấn Kiểm tra.</p>}
+      {status && !ready && <p className="form-note">{gemini ? 'Các câu hỏi tra cứu thông dụng và phân loại theo quy tắc vẫn dùng được. Khi hết hạn mức token tạm thời, hệ thống tự xoay model dự phòng hoặc chờ hồi hạn mức rồi thử lại.' : 'Các câu hỏi tra cứu thông dụng và phân loại theo quy tắc vẫn dùng được. Để trò chuyện bằng mô hình, khởi động Ollama với model hiển thị ở trên rồi nhấn Kiểm tra.'}</p>}
     </div>
   </section>;
 }

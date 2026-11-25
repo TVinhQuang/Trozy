@@ -16,6 +16,13 @@ const hash=value=>createHash('sha256').update(value).digest('hex');
 const utilityKey=utility=>utility==='electric'?'electricNew':'waterNew';
 const oldKey=utility=>utility==='electric'?'electricOld':'waterOld';
 const safeReading=value=>Number.isSafeInteger(value)&&value>=0&&value<=999999999;
+function parseGuideBox(value){
+  if(value===undefined||value===null)return null;
+  only(value,['left','top','width','height']);
+  const {left,top,width,height}=value;
+  must([left,top,width,height].every(n=>typeof n==='number'&&Number.isFinite(n))&&left>=0&&left<1&&top>=0&&top<1&&width>=.08&&width<=1&&height>=.04&&height<=1&&left+width<=1.001&&top+height<=1.001,'Khung căn vùng số trên ảnh không hợp lệ.');
+  return {left:Number(left.toFixed(4)),top:Number(top.toFixed(4)),width:Number(width.toFixed(4)),height:Number(height.toFixed(4))};
+}
 
 function roomScope(store,user,input){
   must(object(input)&&stringId(input.roomId)&&period(input.period)&&['electric','water'].includes(input.utility),'Chọn phòng, kỳ YYYY-MM và công tơ điện hoặc nước.');
@@ -37,7 +44,18 @@ function baseline(store,owner,roomId,targetPeriod){
   const handover=store.list('handovers',owner).filter(row=>row.roomId===roomId&&row.type==='move_in'&&row.status==='confirmed'&&row.date.slice(0,7)<=targetPeriod).sort((a,b)=>b.date.localeCompare(a.date))[0];
   const electricOld=previous?.electricNew??current?.electricOld??handover?.electricReading??0;
   const waterOld=previous?.waterNew??current?.waterOld??handover?.waterReading??0;
-  return {previous,current,electricOld,waterOld,previousFingerprint:hash(JSON.stringify([previous?.id??null,previous?.period??null,electricOld,waterOld]))};
+  return {previous,current,handover,electricOld,waterOld,previousFingerprint:hash(JSON.stringify([previous?.id??null,previous?.period??null,electricOld,waterOld]))};
+}
+
+/** Preview follows integer billing precision and never treats an absent baseline as zero. */
+export function meterSubmissionUsage(store,row,proposal){
+ if(!proposal?.reading||proposal.status!=='ready')return null;
+ const base=baseline(store,row.ownerId,row.roomId,row.period),proposedValue=proposal.reading.integerValue;
+ const prior=base.previous?.[utilityKey(row.utility)],handover=base.handover?.[row.utility==='electric'?'electricReading':'waterReading'];
+ const previousValue=safeReading(prior)?prior:safeReading(handover)&&handover===base[oldKey(row.utility)]?handover:null;
+ const baselineSource=previousValue===null?null:safeReading(prior)?'previous-reading':'handover';
+ return {status:previousValue===null?'missing_baseline':proposedValue<previousValue?'decreased':'available',previousValue,proposedValue,
+  consumption:previousValue===null||proposedValue<previousValue?null:proposedValue-previousValue,unit:row.utility==='electric'?'kWh':'m3',baselineSource};
 }
 
 function assertOpenPeriod(store,owner,roomId,targetPeriod,current){
@@ -54,7 +72,7 @@ export function assertMeterSubmissionBaseline(store,row){
  must(row.previousFingerprint===base.previousFingerprint&&row.targetBaseline===target,'Chỉ số hoặc kỳ trước đã thay đổi. Hãy tải lại bộ ảnh để xác minh.',409);
 }
 
-export function createMeterSubmissionService(store,{onCreated=()=>{}}={}){
+export function createMeterSubmissionService(store,{onCreated=()=>{},onReviewed=()=>{}}={}){
   initializeMeterReader(store);
   // Previously queued photos now enter manual review without running a model.
   store.transaction(()=>{for(const row of store.list('meterSubmissions').filter(row=>row.status==='processing')){
@@ -64,22 +82,24 @@ export function createMeterSubmissionService(store,{onCreated=()=>{}}={}){
     only(value,['roomId','period','utility','photos','note']);
     const {room,tenant,owner}=roomScope(store,user,value);
     must(Array.isArray(value.photos)&&value.photos.length>=1&&value.photos.length<=3,'Gửi từ 1 đến 3 ảnh công tơ.');
-    const files=value.photos.map(photo=>{
-      only(photo,['fileId']);must(stringId(photo.fileId),'Chọn ảnh đã tải lên.');
+    const items=value.photos.map(photo=>{
+      only(photo,['fileId','guideBox']);must(stringId(photo.fileId),'Chọn ảnh đã tải lên.');
+      const guideBox=parseGuideBox(photo.guideBox);
       const file=store.db.prepare('SELECT * FROM files WHERE id=?').get(photo.fileId);
       must(file&&file.owner_id===owner&&file.property_id===room.propertyId&&file.room_id===room.id&&file.uploader_id===user.id&&file.tenant_id===tenant.id,'Ảnh chưa được gắn đúng phòng hoặc không thuộc quyền của bạn. Hãy tải lại ảnh cho phòng này.',403);
       must(['image/png','image/jpeg','image/webp'].includes(rasterMimeFromBytes(file.bytes)),'Chọn ảnh công tơ PNG, JPEG hoặc WebP.');
-      return file;
+      return {file,guideBox};
     });
+    const files=items.map(item=>item.file);
     must(new Set(files.map(file=>file.id)).size===files.length&&new Set(files.map(file=>hash(file.bytes))).size===files.length,'Các ảnh trùng nội dung; hãy giữ một ảnh hoặc chụp thêm ảnh khác.');
     const base=baseline(store,owner,room.id,value.period);assertOpenPeriod(store,owner,room.id,value.period,base.current);
     must(!store.list('meterSubmissions',owner).some(row=>row.roomId===room.id&&row.period===value.period&&row.utility===value.utility&&['processing','pending','approved'].includes(row.status)),'Đã có bộ ảnh đang chờ xác minh hoặc đã được duyệt trong kỳ này.',409);
-    return {files,input:{roomId:room.id,period:value.period,utility:value.utility,photos:files.map(file=>({fileId:file.id})),note:cleanNote(value.note)},tenant,base};
+    return {files,input:{roomId:room.id,period:value.period,utility:value.utility,photos:items.map(({file,guideBox})=>({fileId:file.id,...(guideBox?{guideBox}:{})})),note:cleanNote(value.note)},tenant,base};
   }
   function submitPhotos(user,value){
     return store.transaction(()=>{
       const {input,base,tenant}=authorizePhotos(user,value);
-      const photos=input.photos.map(photo=>({fileId:photo.fileId,createdAt:now()}));
+      const photos=input.photos.map(photo=>({fileId:photo.fileId,createdAt:now(),...(photo.guideBox?{guideBox:photo.guideBox}:{})}));
       const submission=store.put('meterSubmissions',{id:id('meter_sub'),ownerId:ownerId(user),propertyId:tenant.propertyId,roomId:input.roomId,tenantId:tenant.id,submittedBy:user.id,submittedByName:user.name,period:input.period,utility:input.utility,photos,selectedFileId:photos[0].fileId,status:'pending',version:1,targetBaseline:base.current?.[utilityKey(input.utility)]??base[oldKey(input.utility)],previousFingerprint:base.previousFingerprint,note:input.note});
       store.put('notifications',{id:id('not'),ownerId:submission.ownerId,propertyId:submission.propertyId,roomId:submission.roomId,recipientUserId:submission.ownerId,meterSubmissionId:submission.id,title:`Ảnh công tơ ${input.utility==='electric'?'điện':'nước'} kỳ ${input.period} cần xác minh`,body:'Người thuê đã gửi ảnh công tơ. Vui lòng mở ảnh gốc, nhập chỉ số và xác minh.',kind:'general',readBy:[]});
       audit(store,user,'meter-photo-submit','meterSubmissions',submission,`${photos.length} ảnh ${input.utility} kỳ ${input.period}; chờ chủ nhà xác minh`);
@@ -96,17 +116,19 @@ export function createMeterSubmissionService(store,{onCreated=()=>{}}={}){
       must(visible(store,user,'rooms',room),'Phòng không thuộc quyền quản lý.',403);
       must(!store.get('properties',room.propertyId)?.archived,'Cơ sở đã lưu trữ không nhận ảnh công tơ mới.',409);
       must(Array.isArray(value.photos)&&value.photos.length>=1&&value.photos.length<=3,'Chọn từ 1 đến 3 ảnh công tơ.');
-      const files=value.photos.map(photo=>{
-        only(photo,['fileId']);must(stringId(photo.fileId),'Chọn ảnh đã tải lên.');
+      const items=value.photos.map(photo=>{
+        only(photo,['fileId','guideBox']);must(stringId(photo.fileId),'Chọn ảnh đã tải lên.');
+        const guideBox=parseGuideBox(photo.guideBox);
         const file=store.db.prepare('SELECT * FROM files WHERE id=?').get(photo.fileId);
         must(file&&file.owner_id===user.id&&file.uploader_id===user.id&&file.property_id===room.propertyId&&file.room_id===room.id&&!file.tenant_id,'Ảnh cần do chính bạn tải lên cho đúng phòng và không gắn hồ sơ người thuê.',403);
         must(file.bytes.length<=3*1024*1024,'Ảnh để đọc công tơ tối đa 3 MB.',413);
-        must(['image/png','image/jpeg','image/webp'].includes(rasterMimeFromBytes(file.bytes)),'Chọn ảnh PNG, JPEG hoặc WebP.');return file;
+        must(['image/png','image/jpeg','image/webp'].includes(rasterMimeFromBytes(file.bytes)),'Chọn ảnh PNG, JPEG hoặc WebP.');return {file,guideBox};
       });
+      const files=items.map(item=>item.file);
       must(new Set(files.map(file=>file.id)).size===files.length&&new Set(files.map(file=>hash(file.bytes))).size===files.length,'Các ảnh trùng nội dung; hãy giữ một ảnh hoặc chọn ảnh khác.');
       const base=baseline(store,user.id,room.id,value.period);assertOpenPeriod(store,user.id,room.id,value.period,base.current);
       must(!store.list('meterSubmissions',user.id).some(row=>row.roomId===room.id&&row.period===value.period&&row.utility===value.utility&&['processing','pending','approved'].includes(row.status)),'Đã có bộ ảnh đang chờ xác minh hoặc đã duyệt cho công tơ trong kỳ này.',409);
-      const photos=files.map(file=>({fileId:file.id,createdAt:now()}));
+      const photos=items.map(({file,guideBox})=>({fileId:file.id,createdAt:now(),...(guideBox?{guideBox}:{})}));
       const submission=store.put('meterSubmissions',{id:id('meter_sub'),ownerId:user.id,propertyId:room.propertyId,roomId:room.id,tenantId:null,source:'owner',submittedBy:user.id,submittedByName:user.name,period:value.period,utility:value.utility,photos,selectedFileId:photos[0].fileId,status:'pending',version:1,targetBaseline:base.current?.[utilityKey(value.utility)]??base[oldKey(value.utility)],previousFingerprint:base.previousFingerprint,note:cleanNote(value.note)});
       audit(store,user,'meter-owner-evidence','meterSubmissions',submission,`${photos.length} ảnh ${value.utility} kỳ ${value.period}; chờ xác minh`);
       onCreated(submission);
@@ -145,9 +167,10 @@ export function createMeterSubmissionService(store,{onCreated=()=>{}}={}){
       must(value.value>=base[keyOld],'Chỉ số mới không được nhỏ hơn chỉ số chốt kỳ trước.');
       const checked=new Set(base.current?.reviewedUtilities||[]);checked.add(row.utility);
       const reading=store.put('readings',{...base.current,id:base.current?.id||id('read'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,period:row.period,electricOld:base.electricOld,waterOld:base.waterOld,electricNew:base.current?.electricNew??base.electricOld,waterNew:base.current?.waterNew??base.waterOld,[keyNew]:value.value,[row.utility==='electric'?'electricPhotoFileId':'waterPhotoFileId']:photo.fileId,reviewedUtilities:[...checked].sort(),meterSubmissionIds:{...(base.current?.meterSubmissionIds||{}),[row.utility]:row.id},confirmed:checked.has('electric')&&checked.has('water')});
-      const saved=store.put('meterSubmissions',{...row,status:'approved',version:row.version+1,selectedFileId:photo.fileId,reviewedBy:user.id,reviewedAt:now(),reviewNote:note,verifiedValue:value.value,verificationSource:proposal?(proposal.engine==='paddleocr'?'paddleocr-and-human':'wheel-reader-and-human'):'manual',...(proposal?{readerProposalId:proposal.id}:{}),readingId:reading.id});
-      audit(store,user,'meter-approve','meterSubmissions',saved,`${row.utility}: ${value.value}; ${proposal?(proposal.engine==='paddleocr'?'đề xuất PaddleOCR + đối chiếu ảnh':'đề xuất Wheel Reader + đối chiếu ảnh'):'nhập tay'}; ${note}`);
+      const saved=store.put('meterSubmissions',{...row,status:'approved',version:row.version+1,selectedFileId:photo.fileId,reviewedBy:user.id,reviewedAt:now(),reviewNote:note,verifiedValue:value.value,verificationSource:proposal?(proposal.engine==='gemini-vision'?'gemini-vision-and-human':proposal.engine==='paddleocr'?'paddleocr-and-human':'wheel-reader-and-human'):'manual',...(proposal?{readerProposalId:proposal.id}:{}),readingId:reading.id});
+      audit(store,user,'meter-approve','meterSubmissions',saved,`${row.utility}: ${value.value}; ${proposal?(proposal.engine==='gemini-vision'?`đề xuất Gemini Vision (${proposal.model||''}) + đối chiếu ảnh`:proposal.engine==='paddleocr'?'đề xuất PaddleOCR + đối chiếu ảnh':'đề xuất Wheel Reader + đối chiếu ảnh'):'nhập tay'}; ${note}`);
       audit(store,user,'meter-reading-verify','readings',reading,`Ảnh ${photo.fileId}; bộ gửi ${row.id}`);
+      onReviewed(user,saved,proposal);
       return {submission:ownerMeterSubmission(saved),reading};
     });
   }

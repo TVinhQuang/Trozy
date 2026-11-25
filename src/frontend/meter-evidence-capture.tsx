@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, LoaderCircle, RefreshCw, Trash2, Upload } from 'lucide-react';
 import { api } from './api';
 import { useApp } from './context';
-import { MeterCamera } from './meter-camera';
+import { MeterCamera, type MeterGuideBox } from './meter-camera';
 
-export type MeterCapturedEvidence = { fileId: string; pending?: boolean };
+export type MeterCapturedEvidence = { fileId: string; pending?: boolean; guideBox?: MeterGuideBox };
 type CapturePhoto = MeterCapturedEvidence & { localId: number; file: File; preview: string; status: 'queued' | 'uploading' | 'done' | 'error'; error?: string; revision: number };
 let nextPhoto = 0;
 
@@ -23,7 +23,7 @@ export function MeterEvidenceCapture({ roomId, period, utility, onChange, disabl
   function update(change: (old: CapturePhoto[]) => CapturePhoto[]) {
     if (!mounted.current) return;
     const next = change(current.current); current.current = next; setPhotos(next);
-    callback.current(next.map(({ fileId, status }) => ({ fileId, pending: status === 'queued' || status === 'uploading' })));
+    callback.current(next.map(({ fileId, status, guideBox }) => ({ fileId, pending: status === 'queued' || status === 'uploading', ...(guideBox ? { guideBox } : {}) })));
   }
   function clear() {
     scope.current++; requests.current.forEach(controller => controller.abort()); requests.current.clear();
@@ -49,20 +49,20 @@ export function MeterEvidenceCapture({ roomId, period, utility, onChange, disabl
     }).catch(() => {});
   }
 
-  function add(file: File) {
+  function add(file: File, guideBox?: MeterGuideBox) {
     if (disabled) return;
     setError('');
     if (current.current.length >= 3) { setError('Mỗi lần gửi tối đa 3 ảnh. Xóa một ảnh để chụp lại.'); return; }
     const limit = owner ? 3 : 5;
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || !file.size || file.size > limit * 1024 * 1024) { setError(`Chọn JPG, PNG hoặc WebP có dữ liệu, tối đa ${limit} MB mỗi ảnh.`); return; }
     const localId = ++nextPhoto;
-    update(rows => [...rows, { localId, file, preview: URL.createObjectURL(file), fileId: '', status: 'queued', revision: 0 }]);
+    update(rows => [...rows, { localId, file, preview: URL.createObjectURL(file), fileId: '', status: 'queued', revision: 0, ...(guideBox ? { guideBox } : {}) }]);
     enqueue(localId);
   }
 
   return <section className="meter-evidence-capture stack" aria-label={`Chụp và gửi ảnh công tơ ${utility === 'electric' ? 'điện' : 'nước'}`}>
     <p className="form-note">{owner ? 'Chụp rõ cả hàng số và đơn vị. Sau khi tạo bộ ảnh, hệ thống tự đọc với thiết lập công tơ đã xác nhận; bạn đối chiếu ảnh và xác minh chỉ số.' : 'Chụp rõ cả hàng số và đơn vị trên công tơ. Bạn chỉ gửi ảnh; chủ nhà sẽ xem ảnh gốc và xác minh chỉ số.'}</p>
-    <MeterCamera key={`${roomId}:${period}:${utility}`} disabled={disabled || photos.length >= 3} onCapture={add} />
+    <MeterCamera key={`${roomId}:${period}:${utility}`} utility={utility} disabled={disabled || photos.length >= 3} onCapture={(file, _rectangle, guideBox) => add(file, guideBox)} />
     <label className="upload-box"><Upload size={20} /><strong>Chọn ảnh có sẵn</strong><span className="muted">Tối đa 3 ảnh · JPG, PNG, WebP · mỗi ảnh tối đa {owner ? 3 : 5} MB</span><input type="file" className="sr-only" aria-label={owner ? 'Ảnh công tơ chủ nhà cần xác minh' : 'Ảnh công tơ để gửi chủ nhà'} accept="image/jpeg,image/png,image/webp" multiple disabled={disabled || photos.length >= 3} onChange={event => { Array.from(event.target.files || []).forEach(file => add(file)); event.target.value = ''; }} /></label>
     {error && <p className="form-error" role="alert">{error}</p>}
     <div className="meter-capture-photos">{photos.map((photo, index) => <article key={photo.localId} className="meter-capture-photo" aria-label={`Ảnh công tơ ${index + 1}`}>

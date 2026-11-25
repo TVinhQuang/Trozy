@@ -33,7 +33,19 @@
     "ai:setup-paddle-meter": "node scripts/run-project.mjs --powershell scripts/setup-paddle-meter.ps1",
     "ai:meter-reader-check": "node scripts/run-project.mjs scripts/check-meter-reader-live.mjs",
     "ai:meter-auto-check": "node scripts/run-project.mjs scripts/check-meter-automatic-live.mjs",
-    "ai:meter-split-check": "node scripts/run-project.mjs scripts/check-meter-utility-split-live.mjs"
+    "ai:meter-split-check": "node scripts/run-project.mjs scripts/check-meter-utility-split-live.mjs",
+    "ai:meter-zero-setup-check": "node scripts/run-project.mjs scripts/check-meter-zero-setup-live.mjs",
+    "ai:dataset-fetch": "node scripts/run-project.mjs scripts/dataset-manager.mjs fetch",
+    "ai:dataset-build": "node scripts/run-project.mjs scripts/dataset-manager.mjs build-water && node scripts/run-project.mjs scripts/dataset-manager.mjs build-electric",
+    "ai:dataset-audit": "node scripts/run-project.mjs scripts/dataset-manager.mjs audit",
+    "ai:train-water": "node scripts/run-project.mjs --python scripts/train/train_water_yolo.py",
+    "ai:train-electric": "node scripts/run-project.mjs --python scripts/train/train_electric_paddle.py",
+    "ai:gold-stats": "node scripts/run-project.mjs scripts/meter-gold.mjs stats",
+    "ai:gold-import": "node scripts/run-project.mjs scripts/meter-gold.mjs import",
+    "ai:gold-export": "node scripts/run-project.mjs scripts/meter-gold.mjs export-verified",
+    "ai:gold-label": "node scripts/run-project.mjs --external scripts/meter-gold.mjs label",
+    "ai:gold-label-ollama": "node scripts/run-project.mjs --external scripts/meter-gold.mjs label --suggest ollama",
+    "ai:gold-eval": "node scripts/run-project.mjs scripts/meter-gold.mjs evaluate"
   },
   "dependencies": {
     "exceljs": "^4.4.0",

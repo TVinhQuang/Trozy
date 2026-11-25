@@ -7,12 +7,14 @@ import {createMeterSubmissionService} from '../src/backend/meter-submissions.mjs
 import {createMeterReaderService} from '../src/backend/meter-reader-service.mjs';
 import {createMeterAutomaticService} from '../src/backend/meter-automatic.mjs';
 import {dataFor} from '../src/backend/domain.mjs';
+import {meterReaderModelDigests} from '../src/ai/meter-reader.mjs';
 
 const corners=[[.1,.2],[.9,.2],[.9,.8],[.1,.8]];
 const profile={roomId:'room_101',utility:'electric',digits:6,decimals:1,meterType:'mechanical',confirmed:true};
 function ready(input){
- const {digits,decimals}=input.profile,integerDigits='13010'.padStart(digits-decimals,'0'),fractionalDigits='4'.repeat(decimals);
- return {width:240,height:90,status:'ready',confidence:.91,warnings:[],model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',config:{digits,decimals,corners},profileSource:'confirmed',configNeedsConfirmation:false,
+ const {digits,decimals}=input.profile||{digits:6,decimals:1},integerDigits='13010'.padStart(digits-decimals,'0'),fractionalDigits='4'.repeat(decimals);
+ return {width:240,height:90,status:'ready',confidence:.91,warnings:[],model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',modelDigest:meterReaderModelDigests(input.utility).modelDigest,config:{digits,decimals,corners},profileSource:input.profile?'confirmed':'image',configNeedsConfirmation:false,
+ ...(!input.profile?{layoutEvidence:{version:1,source:'image',method:'red-suffix',digits,decimals,cells:Array.from({length:digits},(_,index)=>({index,redShare:index>=digits-decimals ? .25 : .001,neutralShare:.5})),separatorTexts:[],countSource:input.utility==='electric'?'ocr-line':'detected-wheel-grid',complete:true},...(input.utility==='water'?{waterEvidence:{agreement:true,observations:[0,1].map(()=>({digits:integerDigits+fractionalDigits,corners,confidence:.91}))}}:{})}:{}),
  quality:{canRead:true,checks:{resolution:true,exposure:true,contrast:true,sharpness:true},metrics:{width:200,height:60,cellWidth:33,meanLuma:120,contrast:50,edgeEnergy:150}},
  ...(input.utility==='electric'?{cells:[],ocrEvidence:{scope:input.mode==='read'?'owner-region':'automatic',observations:[input.mode==='read'?'region':'full','crop'].map(pass=>({text:integerDigits+fractionalDigits,confidence:.91,corners,pass})),selectedObservationIndices:[0,1],agreement:true}}:{cells:Array.from({length:digits},(_,index)=>({index,position:1,confidence:.91,alternatives:[{position:1,confidence:.91}]}))}),
  reading:{digits:integerDigits+fractionalDigits,integerDigits,fractionalDigits,displayText:integerDigits+(decimals?'.'+fractionalDigits:''),integerValue:Number(integerDigits),unit:input.utility==='electric'?'kWh':'m3'}};
@@ -31,15 +33,25 @@ async function setup(t,run=async input=>ready(input),options={}){
  return {store,owner,tenant,service,reader,bytes,get auto(){return auto;},submit,async restart(){await auto.close();auto=createMeterAutomaticService(store,reader,{retryMs:5,...options});return auto;}};
 }
 
-test('new jobs require explicit current profiles; old submissions and historical profiles are never silently processed',async t=>{
+test('new jobs infer layout without setup; old submissions are not scanned and historical profiles are ignored',async t=>{
  let calls=0;const f=await setup(t,async input=>{calls++;return ready(input);});
  f.store.put('meterProfiles',{id:'old_profile',ownerId:f.owner.id,propertyId:'property_01',roomId:'room_101',utility:'electric',digits:6,decimals:1,confirmed:true,version:9});
  const {receipt,fileId}=f.submit();await f.restart();await new Promise(resolve=>setTimeout(resolve,15));
  assert.equal(f.store.db.prepare('SELECT count(*) AS n FROM meter_reader_jobs').get().n,0);assert.equal(calls,0);
- f.auto.enqueue(receipt.id);assert.equal(f.auto.get(f.owner,receipt.id,fileId).status,'needs_setup');assert.equal(f.auto.getProfile(f.owner,'room_101','electric').profile,null);
+ f.auto.enqueue(receipt.id);assert.equal(f.auto.get(f.owner,receipt.id,fileId).status,'queued');assert.equal(f.auto.getProfile(f.owner,'room_101','electric').profile,null);
+ const inferred=await until(()=>{const result=f.auto.get(f.owner,receipt.id,fileId);return result.status==='ready'&&result;});
+ assert.equal(inferred.proposal.profileSource,'image');assert.equal(inferred.proposal.profileVersion,null);assert.equal(inferred.profile,null);assert.equal(calls,1);
  const saved=f.auto.saveProfile(f.owner,profile).profile;assert.equal(saved.version,1);assert.equal(saved.reader,'meter-reader-v3');
  const result=await until(()=>{const result=f.auto.get(f.owner,receipt.id,fileId);return result.status==='ready'&&result;});
- assert.equal(calls,1);assert.equal(result.proposal.profileVersion,1);assert.equal(result.proposal.profileSource,'confirmed');assert.equal(result.proposal.configNeedsConfirmation,false);
+ assert.equal(calls,2);assert.equal(result.proposal.profileVersion,1);assert.equal(result.proposal.profileSource,'confirmed');assert.equal(result.proposal.configNeedsConfirmation,false);
+});
+
+test('restart resumes a persisted legacy setup-blocked job without scanning old photos or requiring a profile',async t=>{
+ let calls=0;const f=await setup(t,async input=>{calls++;return ready(input);}),{receipt,fileId}=f.submit();
+ f.auto.enqueue(receipt.id);await f.auto.close();assert.equal(calls,0);
+ f.store.db.prepare("UPDATE meter_reader_jobs SET status='needs_setup',reason='legacy configuration required' WHERE submission_id=?").run(receipt.id);
+ await f.restart();const result=await until(()=>{const value=f.auto.get(f.owner,receipt.id,fileId);return value.status==='ready'&&value;});
+ assert.equal(calls,1);assert.equal(result.profile,null);assert.equal(result.proposal.profileSource,'image');assert.equal(f.store.list('meterProfiles',f.owner.id).length,0);
 });
 
 test('automatic ready results remain private proposals and preserve all financial data until image review',async t=>{
@@ -112,7 +124,7 @@ test('a profile change and source/version races discard late results and invalid
 });
 
 test('malformed automatic configurations and fabricated ready evidence fail closed',async t=>{
- for(const change of [value=>({...value,config:null}),value=>({...value,profileSource:null}),value=>({...value,config:{...value.config,decimals:0}}),value=>({...value,quality:null}),value=>({...value,reading:{...value.reading,integerValue:8}})])await t.test('reject worker mismatch',async t=>{
+ for(const change of [value=>({...value,config:null}),value=>({...value,profileSource:null}),value=>({...value,config:{...value.config,decimals:0}}),value=>({...value,quality:null}),value=>({...value,reading:{...value.reading,integerValue:8}}),value=>({...value,modelDigest:undefined}),value=>({...value,modelDigest:'0'.repeat(64)})])await t.test('reject worker mismatch',async t=>{
   const f=await setup(t,async input=>change(ready(input)),{maxAttempts:1});f.auto.saveProfile(f.owner,profile);const {receipt,fileId}=f.submit();f.auto.enqueue(receipt.id);
   await until(()=>f.auto.get(f.owner,receipt.id,fileId).status==='unavailable');assert.equal(f.store.db.prepare('SELECT count(*) AS n FROM meter_reader_proposals').get().n,0);
  });
@@ -153,4 +165,24 @@ test('explicit layout profiles survive the engine split while stale jobs/proposa
  const record=f.store.db.prepare('SELECT result FROM meter_reader_proposals WHERE id=?').get(retried.proposal.id),tampered=JSON.parse(record.result);tampered.engine='visionstate';tampered.model='wheels-v2';
  f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify(tampered),retried.proposal.id);
  assert.equal(f.auto.get(f.owner,receipt.id,fileId).proposal,null);
+});
+
+test('automatic proposals from missing or replaced reader and locator models are hidden and cannot be reviewed',async t=>{
+ for(const utility of ['electric','water'])await t.test(utility,async t=>{
+  const f=await setup(t);f.auto.saveProfile(f.owner,{...profile,utility});const {receipt,fileId}=f.submit(utility);
+  const before=JSON.stringify([f.store.list('readings'),f.store.list('invoices')]);
+  f.auto.enqueue(receipt.id);const current=await until(()=>{const value=f.auto.get(f.owner,receipt.id,fileId);return value.status==='ready'&&value;});
+  const {proposal}=current;assert.equal(proposal.modelDigest,meterReaderModelDigests(utility).modelDigest);assert.equal(proposal.locatorDigest,meterReaderModelDigests(utility).locatorDigest);
+  const approval={decision:'approve',version:1,value:proposal.reading.integerValue,note:'Đã đối chiếu ảnh gốc và kiểm tra chỉ số.',imageChecked:true,selectedFileId:fileId,proposalId:proposal.id,fractionalChecked:true};
+  for(const key of ['modelDigest','locatorDigest'])for(const digest of [undefined,'0'.repeat(64)]){
+   f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify({...proposal,[key]:digest}),proposal.id);
+   const stale=f.auto.get(f.owner,receipt.id,fileId);assert.equal(stale.status,'needs_review');assert.equal(stale.proposal,null);assert.match(stale.reason,/đọc lại ảnh/i);
+   assert.throws(()=>f.service.review(f.owner,receipt.id,approval),error=>error.status===409&&/đọc lại ảnh/i.test(error.message));
+   assert.equal(f.store.db.prepare('SELECT used_at FROM meter_reader_proposals WHERE id=?').get(proposal.id).used_at,null);
+   assert.equal(JSON.stringify([f.store.list('readings'),f.store.list('invoices')]),before);
+  }
+  f.store.db.prepare('UPDATE meter_reader_proposals SET result=? WHERE id=?').run(JSON.stringify(proposal),proposal.id);
+  assert.equal(f.auto.get(f.owner,receipt.id,fileId).proposal.id,proposal.id);
+  assert.equal(f.service.review(f.owner,receipt.id,approval).reading[utility==='electric'?'electricNew':'waterNew'],proposal.reading.integerValue);
+ });
 });

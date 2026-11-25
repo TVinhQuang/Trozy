@@ -4,8 +4,8 @@ import { api, date, today } from './api';
 import { useApp } from './context';
 import { Badge, Field, Modal } from './ui';
 import { MeterEvidenceCapture, type MeterCapturedEvidence } from './meter-evidence-capture';
-import { MeterReaderPanel, meterProposalMatchesUtility, type MeterReaderProposal } from './meter-reader-panel';
-import { MeterAutomaticPanel } from './meter-automatic-panel';
+import { MeterReaderPanel, meterProposalMatchesUtility, scheduleMeterProposalExpiry, type MeterReaderProposal } from './meter-reader-panel';
+import { MeterAutomaticPanel, MeterUsageSummary, meterAutomaticResultMatches, type MeterAutomaticResult } from './meter-automatic-panel';
 import type { RecordData } from './types';
 
 const label = (utility: string) => utility === 'electric' ? 'điện' : 'nước';
@@ -22,19 +22,54 @@ export function MeterSubmissionsPanel() {
   const defaultPeriod = last?.period >= today().slice(0, 7) ? nextPeriod(last.period) : today().slice(0, 7);
   const [capture, setCapture] = useState<'electric' | 'water' | null>(null), [period, setPeriod] = useState(defaultPeriod), [photos, setPhotos] = useState<MeterCapturedEvidence[]>([]), [note, setNote] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState(''), [selected, setSelected] = useState<RecordData | null>(null), [filter, setFilter] = useState('pending');
   const [ownerCapture, setOwnerCapture] = useState(false);
+  const [automatic, setAutomatic] = useState<Record<string, MeterAutomaticResult | null>>({});
+  const [page, setPage] = useState(0);
   const rows = (data.meterSubmissions || []).filter(row => !propertyId || row.propertyId === propertyId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const filteredRows = rows.filter(row => filter === 'all' || waiting(row)), pageCount = Math.max(1, Math.ceil(filteredRows.length / 30)), currentPage = Math.min(page, pageCount - 1), visibleRows = filteredRows.slice(currentPage * 30, (currentPage + 1) * 30);
+  const automaticRows = visibleRows.filter(waiting), automaticKey = JSON.stringify(automaticRows.map(row => [row.id, row.version, row.selectedFileId || row.photos[0]?.fileId]));
+  const latestRows = useRef(automaticRows); latestRows.current = automaticRows;
   const eligible = photos.filter(photo => photo.fileId && !photo.pending), uploading = photos.some(photo => photo.pending);
   useEffect(() => { setCapture(null); setOwnerCapture(false); setSelected(null); setPhotos([]); setError(''); }, [user.id, propertyId, room?.id]);
+  useEffect(() => { setPage(0); }, [user.id, propertyId, filter]);
+  useEffect(() => {
+    setAutomatic({});
+    if (!landlord || !latestRows.current.length) return;
+    let stopped = false, loading = false, active: AbortController | null = null, timer: ReturnType<typeof setTimeout> | undefined;
+    const visible = () => !document.hidden;
+    const clearTimer = () => { if (timer) clearTimeout(timer); timer = undefined; };
+    async function load() {
+      if (stopped || loading || !visible()) return;
+      loading = true; const controller = new AbortController(); active = controller;
+      const currentRows = latestRows.current.slice(0, 30); let index = 0;
+      const valid = () => !stopped && !controller.signal.aborted && active === controller;
+      async function worker() {
+        while (valid() && index < currentRows.length) {
+          const row = currentRows[index++], fileId = row.selectedFileId || row.photos[0]?.fileId;
+          if (!fileId) continue;
+          try {
+            const result = await api<MeterAutomaticResult>(`/meter/submissions/${encodeURIComponent(row.id)}/automatic?fileId=${encodeURIComponent(fileId)}`, { signal: controller.signal });
+            if (valid()) setAutomatic(previous => ({ ...previous, [row.id]: meterAutomaticResultMatches(result, row, fileId) ? result : null }));
+          } catch { if (valid()) setAutomatic(previous => ({ ...previous, [row.id]: null })); }
+        }
+      }
+      try { await Promise.all(Array.from({ length: Math.min(3, currentRows.length) }, () => worker())); }
+      finally { loading = false; if (active === controller) active = null; if (!stopped && visible()) timer = setTimeout(() => void load(), 15000); }
+    }
+    function visibility() { clearTimer(); if (!visible()) active?.abort(); else void load(); }
+    void load(); document.addEventListener('visibilitychange', visibility);
+    return () => { stopped = true; clearTimer(); active?.abort(); document.removeEventListener('visibilitychange', visibility); };
+  }, [landlord, user.id, propertyId, automaticKey]);
   async function send(event: FormEvent) {
     event.preventDefault(); if (!room || !capture || !eligible.length || !period || uploading) return; setBusy(true); setError('');
     try {
-      await api('/meter/submissions', { method: 'POST', body: JSON.stringify({ roomId: room.id, period, utility: capture, photos: eligible.map(photo => ({ fileId: photo.fileId })), note }) });
+      await api('/meter/submissions', { method: 'POST', body: JSON.stringify({ roomId: room.id, period, utility: capture, photos: eligible.map(photo => ({ fileId: photo.fileId, ...(photo.guideBox ? { guideBox: photo.guideBox } : {}) })), note }) });
       await refresh(); setCapture(null); setPhotos([]); notify('Đã gửi ảnh cho chủ nhà để xem và xác minh chỉ số.');
     } catch (reason) { setError((reason as Error).message); } finally { setBusy(false); }
   }
-  return <section className="card meter-submissions"><div className="card-header"><div><h2>{landlord ? 'Ảnh công tơ cần xác minh' : 'Chụp và gửi ảnh công tơ'}</h2><p>{landlord ? 'Mở ảnh người thuê gửi hoặc thêm ảnh của bạn để nhận đề xuất và xác minh.' : 'Chụp rõ công tơ và gửi ảnh để chủ nhà xem và xác minh chỉ số.'}</p></div><div className="inline">{landlord ? <><button className="btn btn-assistant btn-sm" onClick={() => setOwnerCapture(true)}><Camera size={16} />Đọc ảnh công tơ</button><button className="btn btn-warning btn-sm" onClick={() => void refresh().catch(reason => notify(reason.message, 'error'))}><RefreshCw size={15} />Tải lại</button></> : room && tenant?.status === 'active' ? (['electric', 'water'] as const).map(utility => <button key={utility} className="btn btn-sm" onClick={() => { setPeriod(defaultPeriod); setCapture(utility); setPhotos([]); setNote(''); setError(''); }}><Camera size={16} />Chụp {label(utility)}</button>) : <span className="muted">Cần liên kết phòng đang thuê để gửi ảnh.</span>}</div></div>
+  return <section className="card meter-submissions"><div className="card-header"><div><h2>{landlord ? 'Ảnh công tơ cần xác minh' : 'Chụp và gửi ảnh công tơ'}</h2><p>{landlord ? 'Xem chỉ số và lượng dùng dự kiến đã đọc từ ảnh. Mở ảnh để đối chiếu và xác minh.' : 'Chụp rõ công tơ và gửi ảnh để chủ nhà xem và xác minh chỉ số.'}</p></div><div className="inline">{landlord ? <><button className="btn btn-assistant btn-sm" onClick={() => setOwnerCapture(true)}><Camera size={16} />Đọc ảnh công tơ</button><button className="btn btn-warning btn-sm" onClick={() => void refresh().catch(reason => notify(reason.message, 'error'))}><RefreshCw size={15} />Tải lại</button></> : room && tenant?.status === 'active' ? (['electric', 'water'] as const).map(utility => <button key={utility} className="btn btn-sm" onClick={() => { setPeriod(defaultPeriod); setCapture(utility); setPhotos([]); setNote(''); setError(''); }}><Camera size={16} />Chụp {label(utility)}</button>) : <span className="muted">Cần liên kết phòng đang thuê để gửi ảnh.</span>}</div></div>
     <div className="card-body stack"><div className="tabs">{[['pending', 'Chờ xác minh'], ['all', 'Tất cả']].map(([value, text]) => <button key={value} className={filter === value ? 'active' : ''} onClick={() => setFilter(value)}>{text}{value === 'pending' ? ` (${rows.filter(waiting).length})` : ''}</button>)}</div>
-      {rows.filter(row => filter === 'all' || waiting(row)).slice(0, 30).map(row => <div className="meter-submission-row" key={row.id}><div><strong>Phòng {data.rooms.find(item => item.id === row.roomId)?.code || '—'} · {label(row.utility)} · {row.period}</strong><small className="muted block">{landlord ? `${row.submittedByName || 'Người thuê'} · ` : ''}{date(row.createdAt)} · {row.photos.length} ảnh</small><Badge value={row.status === 'approved' ? 'confirmed' : row.status === 'rejected' ? 'overdue' : 'draft'} label={statusLabels[row.status]} />{landlord && row.reviewNote && <p>{row.reviewNote}</p>}</div><button className="btn btn-sm" onClick={() => setSelected(row)}>{landlord && waiting(row) ? 'Xem ảnh & xác minh' : landlord ? 'Xem ảnh' : 'Xem ảnh đã gửi'}</button></div>)}
+      {visibleRows.map(row => <div className="meter-submission-row" key={row.id}><div><strong>Phòng {data.rooms.find(item => item.id === row.roomId)?.code || '—'} · {label(row.utility)} · {row.period}</strong><small className="muted block">{landlord ? `${row.submittedByName || 'Người thuê'} · ` : ''}{date(row.createdAt)} · {row.photos.length} ảnh</small><Badge value={row.status === 'approved' ? 'confirmed' : row.status === 'rejected' ? 'overdue' : 'draft'} label={statusLabels[row.status]} />{landlord && waiting(row) && <SubmissionAutomaticSummary result={automatic[row.id]} utility={row.utility} />}{landlord && row.reviewNote && <p>{row.reviewNote}</p>}</div><button className="btn btn-sm" onClick={() => setSelected(row)}>{landlord && waiting(row) ? 'Xem ảnh & xác minh' : landlord ? 'Xem ảnh' : 'Xem ảnh đã gửi'}</button></div>)}
+      {pageCount > 1 && <nav className="inline meter-automatic-actions" aria-label="Trang bộ ảnh công tơ"><button type="button" className="btn btn-sm" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Trang trước</button><span className="form-note">Trang {currentPage + 1}/{pageCount} · {filteredRows.length} bộ ảnh</span><button type="button" className="btn btn-sm" disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}>Trang sau</button></nav>}
       {!rows.some(row => filter === 'all' || waiting(row)) && <p className="muted">{filter === 'pending' ? 'Chưa có bộ ảnh chờ xác minh.' : 'Chưa có ảnh công tơ được gửi.'}</p>}
       <small className="muted">Mỗi công tơ gửi tối đa 3 ảnh. Chủ nhà xem ảnh gốc và xác minh trước khi lưu chỉ số.</small>
     </div>
@@ -47,6 +82,14 @@ export function MeterSubmissionsPanel() {
     {landlord && ownerCapture && <OwnerMeterEvidenceEntry onClose={() => setOwnerCapture(false)} onCreated={async row => { setOwnerCapture(false); setSelected(row); await refresh().catch(reason => notify(reason.message, 'error')); }} />}
     {selected && <MeterSubmissionReview submission={rows.find(row => row.id === selected.id) || selected} onClose={() => setSelected(null)} onSaved={async () => { await refresh(); setSelected(null); }} />}
   </section>;
+}
+
+function SubmissionAutomaticSummary({ result, utility }: { result: MeterAutomaticResult | null | undefined; utility: string }) {
+  if (result === undefined) return <p className="form-note">Đang lấy kết quả đọc ảnh…</p>;
+  if (result === null) return <p className="form-note">Chưa lấy được kết quả. Mở ảnh để kiểm tra.</p>;
+  const proposal = result.proposal;
+  if (result.status === 'ready' && proposal?.status === 'ready' && proposal.reading && Date.parse(proposal.expiresAt) > Date.now()) return <div className="meter-submission-proposal"><p>Chỉ số đề xuất <b>{proposal.reading.displayText} {unit(utility)}</b></p><MeterUsageSummary usage={result.usage} compact /></div>;
+  return <p className="form-note">{result.status === 'queued' ? 'Ảnh đang chờ đọc tự động.' : result.status === 'processing' ? 'Đang đọc ảnh công tơ…' : result.status === 'retake' ? 'Ảnh chưa đủ rõ. Cần kiểm tra hoặc chụp lại.' : 'Cần đối chiếu ảnh để xác minh chỉ số.'}</p>;
 }
 
 /** Owner uploads follow the same reviewed-evidence flow; creation cannot set a reading. */
@@ -62,12 +105,12 @@ export function OwnerMeterEvidenceEntry({ onClose, onCreated }: { onClose: () =>
     event.preventDefault(); if (!roomId || !period || uploading || !eligible.length || busy) return;
     setBusy(true); setError(''); const controller = new AbortController(); request.current = controller;
     try {
-      const row = await api<RecordData>('/meter/owner-evidence', { method: 'POST', signal: controller.signal, body: JSON.stringify({ roomId, period, utility, photos: eligible.map(photo => ({ fileId: photo.fileId })), note }) });
+      const row = await api<RecordData>('/meter/owner-evidence', { method: 'POST', signal: controller.signal, body: JSON.stringify({ roomId, period, utility, photos: eligible.map(photo => ({ fileId: photo.fileId, ...(photo.guideBox ? { guideBox: photo.guideBox } : {}) })), note }) });
       if (mounted.current && !controller.signal.aborted) await onCreated(row);
     } catch (reason) { if (mounted.current && !controller.signal.aborted) setError((reason as Error).message); } finally { if (mounted.current) setBusy(false); request.current = null; }
   }
   return <Modal title="Đọc ảnh công tơ của chủ nhà" wide onClose={() => { if (!busy) onClose(); }}><form className="stack" onSubmit={create}>
-    <p className="form-note">Tạo bộ ảnh cho đúng phòng và kỳ. Hệ thống tự tìm vùng số và đề xuất chỉ số với thiết lập công tơ đã xác nhận; bạn đối chiếu ảnh trước khi lưu.</p>
+    <p className="form-note">Tạo bộ ảnh cho đúng phòng và kỳ. Hệ thống tự tìm vùng số, đọc chỉ số và tính lượng dùng dự kiến; bạn đối chiếu ảnh trước khi lưu.</p>
     <div className="form-grid"><Field label="Phòng của ảnh công tơ" type="select" value={roomId} required disabled={busy} onChange={event => { setRoomId(event.target.value); setPeriod(suggestedPeriod(event.target.value)); setPhotos([]); setError(''); }}><option value="">Chọn phòng</option>{rooms.map(room => <option value={room.id} key={room.id}>Phòng {room.code} · {data.properties.find(row => row.id === room.propertyId)?.name}</option>)}</Field><Field label="Kỳ của ảnh công tơ" type="month" value={period} required disabled={busy} onChange={event => { setPeriod(event.target.value); setPhotos([]); setError(''); }} /><Field label="Loại công tơ trong ảnh" type="select" value={utility} disabled={busy} onChange={event => { setUtility(event.target.value as 'electric' | 'water'); setPhotos([]); setError(''); }} options={[{ value: 'electric', label: 'Điện · kWh' }, { value: 'water', label: 'Nước · m³' }]} /></div>
     {roomId ? <MeterEvidenceCapture key={`${roomId}-${period}-${utility}`} roomId={roomId} period={period} utility={utility} owner onChange={setPhotos} disabled={busy} /> : <p className="muted">Chọn một phòng đang quản lý để thêm ảnh.</p>}
     <Field label="Ghi chú bộ ảnh (không bắt buộc)" type="textarea" value={note} maxLength={1000} disabled={busy} onChange={event => setNote(event.target.value)} />
@@ -98,12 +141,11 @@ function OwnerMeterSubmissionReview({ submission, onClose, onSaved }: { submissi
   const invalidateProposal = useCallback(() => { if (appliedRef.current) setValue(''); setApplied(null); setFractionalChecked(false); setChecked(false); }, []);
   useEffect(() => {
     if (!applied) return;
-    const remaining = Date.parse(applied.expiresAt) - Date.now(), timeout = setTimeout(invalidateProposal, Math.max(0, Math.min(remaining, 2147483647)));
-    return () => clearTimeout(timeout);
+    return scheduleMeterProposalExpiry(applied.expiresAt, invalidateProposal);
   }, [applied, invalidateProposal]);
   function applyProposal(proposal: MeterReaderProposal) {
     if (proposal.status !== 'ready' || !proposal.reading || !meterProposalMatchesUtility(proposal, submission.utility) || proposal.fileId !== photo?.fileId || proposal.submissionVersion !== submission.version || Date.parse(proposal.expiresAt) <= Date.now()) return;
-    setApplied(proposal); setValue(String(proposal.reading.integerValue)); setChecked(false); setFractionalChecked(false); setError('');
+    setApplied(proposal); setValue(String(proposal.reading.integerValue)); setNote(current => current.trim() ? current : 'Xác minh chỉ số từ ảnh công tơ và đề xuất nhận dạng.'); setChecked(false); setFractionalChecked(false); setError('');
   }
   const current = data.readings.find(row => row.roomId === submission.roomId && row.period === submission.period), noteLength = note.trim().length;
   async function review(decision: 'approve' | 'reject') {

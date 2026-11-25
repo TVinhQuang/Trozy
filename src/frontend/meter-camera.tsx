@@ -4,7 +4,9 @@ import { analyzeMeterPixels, type MeterImageQuality } from '../shared/meter-imag
 import { cameraCounterRectangle, cameraLumaSample, cameraMotion, cameraReadiness, emptyCameraReadiness, type MeterCaptureRectangle } from './meter-capture-quality';
 import { Field } from './ui';
 
-export function MeterCamera({ onCapture, disabled = false }: { onCapture: (file: File, rectangle: MeterCaptureRectangle) => void; disabled?: boolean }) {
+export type MeterGuideBox = { left: number; top: number; width: number; height: number };
+
+export function MeterCamera({ onCapture, disabled = false, utility }: { onCapture: (file: File, rectangle: MeterCaptureRectangle, guideBox?: MeterGuideBox) => void; disabled?: boolean; utility?: 'electric' | 'water' }) {
   const [open, setOpen] = useState(false), [opening, setOpening] = useState(false), [capturing, setCapturing] = useState(false), [error, setError] = useState(''), [quality, setQuality] = useState<MeterImageQuality | null>(null), [ready, setReady] = useState(false), [rowCenter, setRowCenter] = useState(.5), [rowWidth, setRowWidth] = useState(.8), [guide, setGuide] = useState<MeterCaptureRectangle | null>(null), [size, setSize] = useState({ width: 0, height: 0 });
   const video = useRef<HTMLVideoElement>(null), stream = useRef<MediaStream | null>(null), generation = useRef(0), hold = useRef(emptyCameraReadiness()), previous = useRef<number[] | null>(null), available = useRef(false), disabledRef = useRef(disabled);
   disabledRef.current = disabled;
@@ -72,19 +74,31 @@ export function MeterCamera({ onCapture, disabled = false }: { onCapture: (file:
       const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob(value => value ? resolve(value) : reject(Error('Không tạo được ảnh chụp.')), 'image/jpeg', .94));
       if (request !== generation.current || disabledRef.current) return;
       if (blob.size > 5 * 1024 * 1024) throw Error('Ảnh chụp vượt quá 5 MB. Hãy giảm độ phân giải camera.');
-      onCapture(new File([blob], `cong-to-${Date.now()}.jpg`, { type: 'image/jpeg' }), rectangle); setError('');
+      const guideBox: MeterGuideBox = {
+        left: Number((rectangle.left / canvas.width).toFixed(4)),
+        top: Number((rectangle.top / canvas.height).toFixed(4)),
+        width: Number((rectangle.width / canvas.width).toFixed(4)),
+        height: Number((rectangle.height / canvas.height).toFixed(4)),
+      };
+      onCapture(new File([blob], `cong-to-${Date.now()}.jpg`, { type: 'image/jpeg' }), rectangle, guideBox); setError('');
     } catch (reason) { if (request === generation.current) setError((reason as Error).message); }
     finally { if (request === generation.current) { setCapturing(false); resetReadiness(); } }
   }
 
+  const tip = utility === 'electric'
+    ? 'Mẹo: Giữ máy ngang tầm công tơ điện, cách 15–30 cm để thấy rõ chữ kWh, toàn bộ dãy số và khung đỏ phần lẻ. Tránh đèn flash chiếu thẳng mặt kính.'
+    : utility === 'water'
+      ? 'Mẹo: Lau nhẹ mặt kính đồng hồ nước nếu đọng hơi, chụp thẳng góc cách 15–25 cm để thấy đủ các bánh số đen và bánh đỏ (m³).'
+      : 'Mẹo: Giữ điện thoại ngang tầm đồng hồ, cách 15–30 cm, đủ sáng để thấy rõ từng chữ số. Chủ nhà sẽ đối chiếu ảnh để xác minh chỉ số; ứng dụng không tự thay đổi số đọc.';
+
   return <section className="meter-camera" aria-label="Chụp ảnh công tơ có kiểm tra độ nét">
     {!open ? <button type="button" className="btn" disabled={disabled} onClick={start}><Camera size={17} />Mở camera để chụp</button> : <>
-      <div className="toolbar"><b>Đặt cả hàng số và trọng số vào khung</b><button type="button" className="icon-button" aria-label="Tắt camera" onClick={close}><X size={18} /></button></div>
+      <div className="toolbar"><b>Đưa <em>toàn bộ dãy số</em> công tơ vào khung vàng — càng gần, càng nét càng tốt</b><button type="button" className="icon-button" aria-label="Tắt camera" onClick={close}><X size={18} /></button></div>
       <div className="meter-camera-stage"><video ref={video} autoPlay muted playsInline aria-label="Camera công tơ trực tiếp" />{guide && size.width > 0 && <svg viewBox={`0 0 ${size.width} ${size.height}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect x={guide.left} y={guide.top} width={guide.width} height={guide.height} className={ready ? 'ready' : ''} /></svg>}</div>
-      <div className="form-grid"><Field label="Vị trí khung số" type="range" min={.15} max={.85} step={.01} value={rowCenter} onChange={event => setRowCenter(Number(event.target.value))} /><Field label="Chiều rộng khung số" type="range" min={.45} max={.95} step={.01} value={rowWidth} onChange={event => setRowWidth(Number(event.target.value))} /></div>
-      <div role="status" className={`meter-camera-status ${ready ? 'ready' : ''}`}>{opening ? <><LoaderCircle size={16} className="spin" />Đang mở camera…</> : ready ? <><CheckCircle2 size={16} />Đủ nét và ổn định để chụp</> : quality?.status === 'retake' ? quality.reasons.join(' ') : 'Giữ yên máy khoảng một giây để kiểm tra độ nét.'}</div>
+      <div className="form-grid"><Field label="Vị trí hàng số (lên/xuống)" type="range" min={.15} max={.85} step={.01} value={rowCenter} onChange={event => setRowCenter(Number(event.target.value))} /><Field label="Chiều rộng khung số" type="range" min={.45} max={.95} step={.01} value={rowWidth} onChange={event => setRowWidth(Number(event.target.value))} /></div>
+      <div role="status" className={`meter-camera-status ${ready ? 'ready' : ''}`}>{opening ? <><LoaderCircle size={16} className="spin" />Đang mở camera…</> : ready ? <><CheckCircle2 size={16} />Đủ nét và ổn định — nhấn chụp</> : quality?.status === 'retake' ? quality.reasons.join(' ') : 'Căn dãy số công tơ vào khung vàng. Giữ yên khoảng 1 giây để kiểm tra độ nét.'}</div>
       <button type="button" className="btn btn-primary" disabled={disabled || opening || capturing || !ready} onClick={capture}><Camera size={17} />{capturing ? 'Đang chụp…' : 'Chụp ảnh đủ nét'}</button>
-      <p className="form-note">Kiểm tra trực tiếp đo độ nét, ánh sáng và độ ổn định. Chủ nhà sẽ đối chiếu ảnh gốc để xác minh chỉ số; kiểm tra độ nét không đọc các chữ số.</p>
+      <p className="form-note">{tip}</p>
     </>}
     {error && <p className="form-error" role="alert">{error}</p>}
   </section>;

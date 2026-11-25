@@ -1,7 +1,7 @@
 import {id,now,COLLECTIONS,safeUser} from './db.mjs';
 import {dataFor,fail,ownerId} from './domain.mjs';
 import {runExtension,extensionCapabilities} from './extensions.mjs';
-import {getOllamaStatus} from '../ai/ollama.mjs';
+import {getAiStatus} from '../ai/llm.mjs';
 import {analyzeUtilities} from '../ai/anomalies.mjs';
 import {createHash} from 'node:crypto';
 
@@ -84,7 +84,7 @@ export function syncUtilityNotifications(store,user){
 export function createAIService(store){
  initializeAI(store);let languageActive=0;
  return {
-  async status(){return {...await getOllamaStatus(),features:extensionCapabilities()};},
+  async status(){return {...await getAiStatus(),features:extensionCapabilities()};},
   history(user,feature){
    if(feature&&!featureNames.includes(feature))fail(400,'Tính năng lịch sử không hợp lệ.');
    if(feature==='B03')return {entries:[]};

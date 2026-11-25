@@ -1,0 +1,24 @@
+{
+    "checkedAt":  "2026-11-12T14:48:35.7224881Z",
+    "scope":  "Local organization verification; real-model fixtures are plumbing checks, not general OCR accuracy",
+    "canonicalFilesVerified":  10,
+    "hashesUnchanged":  true,
+    "pythonTestsPassed":  23,
+    "http":  {
+                 "ok":  true,
+                 "scope":  "SQLite RAM only",
+                 "realElectricAutomatic":  "ready",
+                 "realElectricManual":  "00766.4",
+                 "explicitElectricReview":  "paddleocr-and-human",
+                 "waterAutomatic":  "00001.056",
+                 "syntheticElectricAutomatic":  "01234.5",
+                 "syntheticIsNotAccuracyEvidence":  true,
+                 "sourceHashesStable":  true,
+                 "report":  null
+             },
+    "frozenTrialSourceHashesVerified":  4,
+    "legacyWheelLoads":  true,
+    "legacyWheelSharesCanonicalFile":  true,
+    "independentReview":  "No remaining important findings",
+    "cDriveTemporaryFilesCreated":  0
+}

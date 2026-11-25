@@ -5,22 +5,27 @@ import {existsSync,mkdirSync,mkdtempSync,readFileSync,statSync} from 'node:fs';
 import {rm} from 'node:fs/promises';
 import {basename,dirname,join,resolve} from 'node:path';
 import {projectDirectory,projectRoot} from '../shared/project-paths.mjs';
+import {imageLayoutEvidence,waterAgreementEvidence} from '../shared/meter-layout-evidence.mjs';
 
 const ROOT='.runtime/meter-digits/visionstate-yolo';
 const WHEEL_HASH='5644705e1f0e684b30bf3c7a6cb23e7eb1ddda616cd16b5321423f45bf7fd8b6';
-const YOLO_HASH='f2882a477bc12ecc5526cf73438d254945271c3e1b2b4214aa8e4deb637c3be9';
+const YOLO_HASH='e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16';
 const PADDLE_ROOT='.runtime/paddleocr';
-const DET_HASH='d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e';
-const REC_HASH='5435fd747c9e0efe15a96d0b378d5bd157e9492ed8fd80edf08f30d02fa24634';
+const DET_HASH='5269b6bf7ed33c30591a23a3bde495f3a71f25a6a725e48c5f65b85681be58e1';
+const REC_HASH='97d8a25dfa5b2feff8ca23c87f05e41948bc04bedcdd97ac4634241a74f93036';
 const PADDLE_HASH=createHash('sha256').update(DET_HASH+':'+REC_HASH).digest('hex');
 const PADDLE_CONFIG_HASHES={
- 'PP-OCRv6_small_det_onnx_infer/inference.yml':'193f435274bf9f0b5f71a929bbfbcf148282df7e633b34e7c373e8f44741b516',
- 'PP-OCRv6_small_det_onnx_infer/inference.json':'89240f689a4a77aad75ef55a8df0a15c8e1d4980a327d17e58f24bbadde5aeab',
- 'PP-OCRv6_small_rec_onnx_infer/inference.yml':'ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1',
- 'PP-OCRv6_small_rec_onnx_infer/inference.json':'f0bf53c853937a917affdd74467472167727f8ab0f0f7bded01c4a16c27e46e6',
+ 'electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.yml':'193f435274bf9f0b5f71a929bbfbcf148282df7e633b34e7c373e8f44741b516',
+ 'electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.json':'89240f689a4a77aad75ef55a8df0a15c8e1d4980a327d17e58f24bbadde5aeab',
+ 'electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.yml':'ab078671bb49f06228eadccd34f1bb501e157f7a047095ffb943ba81512c77d1',
+ 'electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.json':'f0bf53c853937a917affdd74467472167727f8ab0f0f7bded01c4a16c27e46e6',
 };
 const MAX_IMAGE=40*1024*1024,MAX_OUTPUT=192*1024;
 const modelCache=new Map();
+
+export function meterReaderModelDigests(utility='water'){
+ return {modelDigest:utility==='electric'?PADDLE_HASH:WHEEL_HASH,locatorDigest:utility==='electric'?PADDLE_HASH:YOLO_HASH};
+}
 
 export class MeterReaderError extends Error{
  constructor(status,message){super(message);this.name='MeterReaderError';this.status=status;}
@@ -43,15 +48,22 @@ export function meterReaderStatus(utility='water'){
  const installed=name=>!!packages&&existsSync(join(packages,name,'__init__.py'));
  const common=enabled&&!!executable&&existsSync(executable)&&!!worker&&existsSync(worker)&&['numpy','PIL','cv2','onnxruntime'].every(installed);
  const electric=utility==='electric',paddlePackages=path(`${PADDLE_ROOT}/site-packages`);
- const paddle=!!(common&&paddlePackages&&['paddleocr','paddlex'].every(name=>existsSync(join(paddlePackages,name,'__init__.py')))&&modelReady(`${PADDLE_ROOT}/models/PP-OCRv6_small_det_onnx_infer/inference.onnx`,DET_HASH)&&modelReady(`${PADDLE_ROOT}/models/PP-OCRv6_small_rec_onnx_infer/inference.onnx`,REC_HASH)&&Object.entries(PADDLE_CONFIG_HASHES).every(([file,expected])=>modelReady(`${PADDLE_ROOT}/models/${file}`,expected)));
- const readerAvailable=electric?paddle:!!(common&&modelReady(`${ROOT}/models/wheels-v2.onnx`,WHEEL_HASH));
- const locatorAvailable=electric?paddle:!!(common&&['torch','ultralytics'].every(installed)&&modelReady(`${ROOT}/models/stage1_meter_window_digits.pt`,YOLO_HASH));
+ const paddle=!!(common&&paddlePackages&&['paddleocr','paddlex'].every(name=>existsSync(join(paddlePackages,name,'__init__.py')))&&modelReady(`${PADDLE_ROOT}/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx`,DET_HASH)&&modelReady(`${PADDLE_ROOT}/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx`,REC_HASH)&&Object.entries(PADDLE_CONFIG_HASHES).every(([file,expected])=>modelReady(`${PADDLE_ROOT}/models/${file}`,expected)));
+ const readerAvailable=electric?paddle:!!(common&&modelReady(`${ROOT}/models/water/wheels-v2.onnx`,WHEEL_HASH));
+ const locatorAvailable=electric?paddle:!!(common&&['torch','ultralytics'].every(installed)&&modelReady(`${ROOT}/models/water/trozy_water_yolov8_obb.pt`,YOLO_HASH));
  return {available:readerAvailable,readerAvailable,locatorAvailable,automaticAvailable:readerAvailable&&locatorAvailable,engine:electric?'paddleocr':'visionstate',model:electric?'paddleocr-ppocrv6':'wheels-v2',mechanicalOnly:true,
   message:readerAvailable?(electric?'Bộ đọc ảnh điện PaddleOCR sẵn sàng.':'Bộ đọc ảnh nước YOLO + VisionState sẵn sàng.')+' Đối chiếu đề xuất với ảnh trước khi lưu.':'Bộ đọc cục bộ chưa sẵn sàng; bạn vẫn có thể nhập tay.'};
 }
 
 function validConfig(digits,decimals){return Number.isInteger(digits)&&digits>=1&&digits<=12&&Number.isInteger(decimals)&&decimals>=0&&decimals<=4&&decimals<digits&&digits-decimals<=9;}
 function validCorners(value){return Array.isArray(value)&&value.length===4&&value.every(point=>Array.isArray(point)&&point.length===2&&point.every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<=1));}
+function validGuideBox(value){
+ if(!value||typeof value!=='object'||Array.isArray(value))return false;
+ const keys=Object.keys(value);
+ if(!keys.every(key=>['left','top','width','height'].includes(key)))return false;
+ const {left,top,width,height}=value;
+ return [left,top,width,height].every(n=>typeof n==='number'&&Number.isFinite(n))&&left>=0&&left<1&&top>=0&&top<1&&width>=.08&&width<=1&&height>=.04&&height<=1&&left+width<=1.001&&top+height<=1.001;
+}
 function validateInput(input){
  if(!input||!['read','locate','auto'].includes(input.mode)||!Buffer.isBuffer(input.bytes)||!input.bytes.length||input.bytes.length>MAX_IMAGE)throw new MeterReaderError(400,'Ảnh hoặc tác vụ đọc công tơ không hợp lệ.');
  if(input.mime!=='image/png'||!input.bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))throw new MeterReaderError(415,'Bộ đọc cần ảnh PNG đã chuẩn hóa từ máy chủ.');
@@ -62,6 +74,7 @@ function validateInput(input){
  if(input.mode==='auto'){
   const profile=input.profile;
   if(!['electric','water'].includes(input.utility)||(profile!==undefined&&profile!==null&&(!profile||typeof profile!=='object'||Array.isArray(profile)||Object.keys(profile).some(key=>!['digits','decimals'].includes(key))||!validConfig(profile.digits,profile.decimals))))throw new MeterReaderError(400,'Cấu hình đọc tự động không hợp lệ.');
+  if(input.guideBox!==undefined&&input.guideBox!==null&&!validGuideBox(input.guideBox))throw new MeterReaderError(400,'Khung gợi ý vùng số không hợp lệ.');
  }
  if(input.mode==='locate'&&input.utility!==undefined&&!['electric','water'].includes(input.utility))throw new MeterReaderError(400,'Loại công tơ không hợp lệ.');
  if(input.mode==='locate'&&input.profile!=null&&!validConfig(input.profile.digits,input.profile.decimals))throw new MeterReaderError(400,'Cấu hình tìm vùng không hợp lệ.');
@@ -78,10 +91,12 @@ function checkedEnvelope(output,mode,utility){
   if(result.modelDigest!==digest||result.engine!==(electric?'paddleocr':'visionstate')||result.model!==(electric?'paddleocr-ppocrv6':'wheels-v2')||!(mode==='auto'?['ready','needs_review','retake','needs_setup']:['ready','needs_review','retake']).includes(result.status)||!Number.isFinite(result.confidence)||result.confidence<0||result.confidence>1.0000001)throw unavailable();
   if(electric&&(!Array.isArray(result.cells)||result.cells.length!==0||!result.ocrEvidence||!Array.isArray(result.ocrEvidence.observations)||result.ocrEvidence.observations.length>32))throw unavailable();
   if(mode==='auto'){
-   if(!['confirmed',null].includes(result.profileSource)||result.configNeedsConfirmation!==false||!Array.isArray(result.cells))throw unavailable();
+   if(!['confirmed','image',null].includes(result.profileSource)||result.configNeedsConfirmation!==false||!Array.isArray(result.cells))throw unavailable();
    if(result.status==='ready'){
     const config=result.config;
-    if(result.profileSource!=='confirmed'||!config||!validConfig(config.digits,config.decimals)||!validCorners(config.corners))throw unavailable();
+    if(!['confirmed','image'].includes(result.profileSource)||!config||!validConfig(config.digits,config.decimals)||!validCorners(config.corners))throw unavailable();
+    if(result.profileSource==='image'&&!imageLayoutEvidence(result.layoutEvidence,config,result.reading,utility,result.ocrEvidence))throw unavailable();
+    if(result.profileSource==='image'&&utility==='water'&&!waterAgreementEvidence(result.waterEvidence,result.reading))throw unavailable();
    }else if(result.reading!==null)throw unavailable();
   }
  }
@@ -108,10 +123,12 @@ export function createMeterReader({spawnImpl=spawn,timeoutMs}={}){
     YOLO_CONFIG_DIR:path('.cache/ultralytics-meter-reader'),MPLCONFIGDIR:path('.cache/meter-reader-matplotlib'),TORCH_HOME:join(runtime,'cache/torch'),
     HF_HOME:join(runtime,'cache/huggingface'),XDG_CACHE_HOME:path('.cache'),YOLO_AUTOINSTALL:'false',YOLO_OFFLINE:'true',OMP_NUM_THREADS:'2',OPENBLAS_NUM_THREADS:'2'};
    Object.assign(env,{TROZY_METER_ENGINE:input.utility==='electric'?'paddleocr':'visionstate',PADDLE_PDX_CACHE_HOME:path('.cache/paddlex'),PADDLEOCR_HOME:path(`${PADDLE_ROOT}/cache`),PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK:'True',HF_HUB_OFFLINE:'1',TRANSFORMERS_OFFLINE:'1',MODELSCOPE_CACHE:path('.cache/modelscope'),HOME:directory,USERPROFILE:directory,LOCALAPPDATA:directory,APPDATA:directory});
+   // sitecustomize runs before the worker: never inherit the training runtime.
+   delete env.TROZY_USE_TRAIN_GPU;delete env.TROZY_TRAIN_GPU_SITE;
    delete env.PYTHONPATH;delete env.PYTHONHOME;
    const configured=Number(process.env.TROZY_METER_READER_TIMEOUT_MS||30000);
    const duration=timeoutMs??(Number.isFinite(configured)?Math.max(2000,Math.min(60000,configured)):30000);
-   const request=JSON.stringify({protocol:1,mode:input.mode,image:input.bytes.toString('base64'),utility:input.utility??'water',...(input.mode==='read'?{corners:input.corners,digits:input.digits,decimals:input.decimals}:input.mode==='auto'||input.mode==='locate'?{profile:input.profile??null}:{})});
+   const request=JSON.stringify({protocol:1,mode:input.mode,image:input.bytes.toString('base64'),utility:input.utility??'water',...(input.mode==='read'?{corners:input.corners,digits:input.digits,decimals:input.decimals}:input.mode==='auto'?{profile:input.profile??null,...(input.guideBox?{guideBox:input.guideBox}:{})}:input.mode==='locate'?{profile:input.profile??null}:{})});
    return await new Promise((resolvePromise,rejectPromise)=>{
     let child,finished=false,size=0,output='',failure,killTimer;
     const finish=(error,value)=>{if(finished)return;finished=true;clearTimeout(timer);clearTimeout(killTimer);signal?.removeEventListener('abort',abort);error?rejectPromise(error):resolvePromise(value);};

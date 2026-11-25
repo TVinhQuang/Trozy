@@ -1,3 +1,67 @@
+## Mốc đồng bộ GitHub ngày 25/11/2026
+
+- Phạm vi gồm mã nguồn Trozy, công cụ và báo cáo OCR, tài liệu yêu cầu và `pa/PA4/PA4.pdf`. Trong nhóm PA chỉ cập nhật PA4.
+- Mã nguồn và công cụ được chia sẻ cùng cấu hình mẫu. Dữ liệu nghiệp vụ, khóa API, runtime, trọng số và cache nằm trong các đường dẫn cục bộ theo `.gitignore`.
+
+## Hệ thống Gold-set, bộ công cụ thu thập, gán nhãn và cải thiện mô hình đọc đồng hồ điện/nước Việt Nam — 05/11/2026 (hoàn tất)
+
+- **Hệ thống Gold-set độc lập (`scripts/meter-gold/`):**
+  - Xây dựng chuẩn phân chia deterministic 60% train / 20% val / 20% test theo hash (`trozy-gold-split-v1`), gom toàn bộ ảnh của một công tơ vào cùng một split để tránh rò rỉ dữ liệu.
+  - Tự động làm sạch ảnh: xóa toàn bộ EXIF nhạy cảm (GPS, thiết bị), xoay chuẩn theo orientation quang học, chuẩn hóa kích thước tối đa 2000px, nén JPEG 92%.
+  - Cơ chế xuất ảnh từ cơ sở dữ liệu Trozy (`export-verified.mjs`) đọc an toàn ở chế độ Read-Only, chỉ lấy ảnh đã được chủ nhà duyệt (`status='approved'`), yêu cầu xác nhận sự đồng thuận (`--consent-confirmed`), ẩn toàn bộ định danh cá nhân và gắn cờ ca khó (`hard=true`).
+  - Giao diện gán nhãn web cục bộ (`label-server.mjs`) bảo vệ bằng token ngẫu nhiên, chống DNS-rebinding. Cơ chế **Gán nhãn mù (Blind Labeling)** cho tập validation và test ngăn chặn mô hình tự học lại lỗi của chính mình. Hỗ trợ nguồn gợi ý nhãn kép: bộ đọc Trozy nội bộ và mô hình Ollama Qwen3 Vision (`--suggest ollama`).
+  - Đánh giá nghiêm ngặt (`evaluate-gold.mjs`): Phân loại kết quả rõ ràng (`correct`, `abstain`, `wrong_ready`), tính khoảng tin cậy Wilson CI95; bảo vệ tập test chỉ được phép chạy khi có cờ `--final`.
+- **Mở rộng dữ liệu đồng hồ Việt Nam (`scripts/datasets/build_water.py`):**
+  - Bổ sung hàm `synthesize_vn_water_meter_scene` mô phỏng chính xác các loại công tơ phổ biến tại Việt Nam: 5 bánh số nguyên (Asahi, Minh Hòa, Kent, Sun-Tech), 6 bánh 5+1 (Sensus, Elster, Itron) và 4 bánh (DAWACO).
+  - Giả lập chân thực bề mặt môi trường Việt Nam: tường gạch men, bê tông ẩm, kim loại gỉ sét, vết ố nước và ánh đèn tuýp chói loá.
+- **Tối ưu hóa pipeline huấn luyện (`scripts/train/train_water_yolo.py`):**
+  - Tích hợp `load_gold_val_score()` đọc kết quả thực tế từ báo cáo gold-set val, bổ sung trọng số đánh giá mô hình thực chất, giảm dần việc phụ thuộc cứng vào các mẫu fixture tĩnh.
+  - Huấn luyện lại thành công `YOLOv8n-OBB` với tập dữ liệu Việt Nam mới (1.596 ảnh) trên RTX 4070 (284.8s): độ chính xác `meter` mAP50=99.4%, `window` mAP50=99.3%, tỷ lệ tách đủ hàng số trên test 4 góc xoay tăng từ **4.82% lên 25.46% (gấp 5.2 lần baseline)**. Trọng số mới lưu tại `trozy_water_yolov8_obb.pt` (SHA-256: `e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16`), đồng bộ vào `meter-reader.mjs` và `meter_reader_worker.py`.
+- **Nâng cấp giao diện camera (`src/frontend/meter-camera.tsx`):**
+  - Bổ sung hướng dẫn người thuê bằng tiếng Việt rõ ràng, gợi ý khoảng cách chụp 15–30 cm và phản hồi trạng thái nét/ánh sáng trước khi cho phép chụp.
+- **Kiểm thử và xác minh:**
+  - `9/9 pass` unit tests cho bộ công cụ gold-set (`tests/meter-gold.test.mjs`).
+  - `41/41 pass` AI UI interaction tests (`scripts/check-ai-ui.mjs`).
+  - Build TypeScript và Vite đóng gói thành công 100%.
+  - Bổ sung đầy đủ lệnh npm: `ai:gold-stats`, `ai:gold-import`, `ai:gold-export`, `ai:gold-label`, `ai:gold-label-ollama`, `ai:gold-eval`.
+
+## Thiết lập và xác minh OCR sau fine-tune — 03/11/2026 (hoàn tất)
+
+- Đã đối chiếu báo cáo `docs/test/METER-OCR-TRAINING-20261103.md` với bốn trọng số và cấu hình thực tế: hash khớp, hai nhánh sẵn sàng. Giữ lựa chọn model fine-tune đã có, không train/tải/cài lại.
+- Chặn biến training GPU kế thừa vào worker; tiến trình kiểm thử thật xác nhận dùng Torch CPU. Backend lưu/kiểm `modelDigest`, thêm `locatorDigest` cho proposal tự động; cache và xác minh chặn proposal từ model cũ, yêu cầu đọc lại ảnh.
+- Sửa launcher `--python` và hai lệnh npm training; training dùng temp riêng có kiểm tra đường dẫn trước khi dọn. README/hướng dẫn đã ghi đúng artifact fine-tune và điều kiện cài trên máy mới.
+- **169/169 Node, 46/46 Python, 41/41 UI đạt; build thành công.** Ảnh nước xanh đọc đúng ở cả bốn góc; ảnh điện mờ/đối chứng bị từ chối an toàn. HTTP model thật trên SQLite RAM đạt, hóa đơn không đổi, giữ các bước chủ nhà xác minh ảnh/phần lẻ.
+- Báo cáo mới: [thiết lập OCR](docs/test/METER-OCR-CONFIGURATION-20261103.md), [hồi quy ảnh](docs/test/METER-OCR-CONFIGURATION-SAMPLES-20261103.json), [HTTP RAM](docs/test/METER-OCR-CONFIGURATION-LIVE-20261103.json). Không mở database nghiệp vụ thật. Khởi động lại backend, tải lại trang và đọc lại proposal cũ khi cần.
+
+## Huấn luyện GPU & tích hợp mô hình OCR công tơ nước và điện — 03/11/2026 (hoàn tất)
+
+- Đã thiết lập môi trường huấn luyện GPU cục bộ hoàn toàn trong dự án (`.runtime/meter-digits/train-gpu-packages/` với `torch==2.8.0+cu126`, `torchvision==0.23.0+cu126` trên `NVIDIA GeForce RTX 4070 Laptop GPU`) thông qua `scripts/setup-gpu-train.ps1`, chỉ bật khi đặt `TROZY_USE_TRAIN_GPU=1` để bảo toàn runtime suy luận CPU sản xuất.
+- **Đồng hồ điện (`scripts/train/onnx_torch_bridge.py`, `scripts/train/train_electric_paddle.py`):**
+  - Chuyển đổi hai chiều `onnx2torch` -> PyTorch GPU -> ONNX và huấn luyện tinh chỉnh cả hai nhánh `PP-OCRv6_small_det` (DBNet) và `PP-OCRv6_small_rec` (SVTR/CTC) trên tập dữ liệu mặt công tơ cơ khí nhiều chữ (`Det: 1.500 train / 180 val / 180 test`; `Rec: 4.313 train / 506 val / 526 test`).
+  - Độ chính xác dãy số (`digit_exact_acc`) tăng từ **85,99% lên 100,00% (207/207)**; `shrink_iou` của nhánh tìm vùng tăng từ **45,10% lên 94,35%**; tỷ lệ đọc đúng tự động 2-pass (`full` + `crop`) trên 80 mặt đồng hồ điện nhiều chữ tăng từ **10,00% (8/80) lên 92,50% (74/80, 0 sai — độ chính xác 100% khi `ready`)**.
+  - Xuất mô hình sang `.runtime/paddleocr/models/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx` và `PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx`, giữ nguyên bản gốc.
+- **Đồng hồ nước (`scripts/train/train_water_yolo.py`):**
+  - Huấn luyện `YOLOv8n-OBB` trên RTX 4070 với dữ liệu thực tế `DL7981` ở cả 4 góc xoay (`0°, 90°, 180°, 270°`) và mặt đồng hồ cũ/ố vàng, kết hợp `WiSE-FT` và hiệu chỉnh cân bằng bias chữ số đa tỷ lệ (`P3/P4`).
+  - Mẫu `water-blue.jpg` (`00001.056`) đọc chính xác tuyệt đối ở **cả 4/4 góc xoay (`0°, 90°, 180°, 270°`)** (baseline chỉ đạt 2/4); mẫu đồng hồ cũ `water-weathered.webp` (`1303.8`) định vị được cửa sổ ở **3/4 góc xoay và đọc đúng `13038` (`conf=0.9982`) ở góc `90°`** (baseline 0/4); tập `test` 4 góc xoay tăng tỷ lệ định vị cửa sổ từ **32,89% lên 88,16%** và tỷ lệ tách đủ bánh số từ **6,58% lên 27,63% (gấp 4,2 lần)**.
+  - Xuất mô hình sang `.runtime/meter-digits/visionstate-yolo/models/trozy_water_yolov8_obb.pt`, giữ nguyên `stage1_meter_window_digits.pt`.
+- Đã nối trọng số và mã băm SHA-256 mới vào `src/ai/meter-reader.mjs`, `src/ai/meter_reader_worker.py`, `src/ai/meter_paddle.py`, `scripts/check-meter-utility-split-live.mjs` và thêm lệnh `ai:train-water`, `ai:train-electric` vào `package.json`.
+- **Kiểm chứng:** 29/29 Python unit tests, 41/41 AI UI tests, build Vite/TypeScript, `evaluate-meter-utility-split.mjs` (`docs/test/METER-OCR-FINETUNE-SAMPLES-20261103.json`) và `npm run ai:meter-split-check` đều đạt 100%. Xem báo cáo chi tiết tại `docs/test/METER-OCR-TRAINING-20261103.md`.
+
+## Tải và chuẩn hóa dataset công tơ nước và điện — 02/11/2026 (hoàn tất)
+
+- Đã thu thập và tải thành công các tập dữ liệu ảnh công tơ thực tế từ Hugging Face và GitHub vào `.runtime/datasets/raw/` theo đúng quy định Trozy (không cài ngoài thư mục dự án):
+  - Nước: DL7981 Water Meter (~3.900 files, 112 MB), SCUT-WMN, WMeter5K.
+  - Điện: Henrik Energy Meter (344 MB, 168 ảnh thực tế có chuỗi nhãn), Saarthak Meter OCR.
+- Xây dựng hệ thống pipeline xử lý tự động trong `scripts/datasets/`:
+  - `fetch.py`: Tải và đồng bộ dữ liệu từ các nguồn mở.
+  - `build_water.py`: Chuẩn hóa 3.480 ảnh đồng hồ nước sang định dạng YOLOv8-OBB (4 góc xoay) đúng 13 lớp của `ntarekp/watermeter-yolov8-obb` (`meter`, `window`, `0`-`9`, `u`), tự động tính vùng cửa sổ và xuất `data.yaml`.
+  - `build_electric.py`: Chuẩn hóa 173 ảnh công tơ điện sang định dạng PaddleOCR PP-OCRv6 cho cả nhánh Detection (`det_label.txt`) và Recognition (`rec_label.txt`).
+  - `audit.py`: Kiểm tra tính toàn vẹn, xác minh không có rò rỉ dữ liệu (leakage=0) giữa train/val/test và không có ảnh hỏng (corrupt=0).
+- Kết quả kiểm toán:
+  - Đồng hồ nước: Train: 2.477 ảnh | Val: 309 ảnh | Test: 694 ảnh.
+  - Đồng hồ điện: Det Train: 138, Test: 36 | Rec Train: 138, Test: 32.
+- Đã bổ sung các lệnh npm: `ai:dataset-fetch`, `ai:dataset-build`, `ai:dataset-audit` vào `package.json`. Tất cả các test AI UI (41/41) tiếp tục đạt 100%.
+
 ## Gọn dòng quá hạn dưới công nợ — 01/11/2026 (hoàn tất)
 
 - Theo yêu cầu mới, ô công nợ giữ một số tiền chính in đậm. Bên dưới chỉ còn chữ nhỏ **Quá hạn** khi có nợ quá hạn; bỏ số tiền lặp, nền, viền và kiểu inline để không nằm cạnh số tiền.

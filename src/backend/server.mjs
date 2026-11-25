@@ -38,7 +38,7 @@ export function createApp(options={}){
   const ai=createAIService(store);
   const meterReader=createMeterReaderService(store,options.meterReader);
   const meterAutomatic=createMeterAutomaticService(store,meterReader,options.meterAutomatic);
-  const meter=createMeterSubmissionService(store,{onCreated:row=>meterAutomatic.enqueueCreated(row)});
+  const meter=createMeterSubmissionService(store,{onCreated:row=>meterAutomatic.enqueueCreated(row),onReviewed:(user,row,proposal)=>meterAutomatic.rememberVerifiedLayout(user,row,proposal)});
   const secureCookies=options.secureCookies??['1','true'].includes(String(process.env.TROZY_SECURE_COOKIES).toLowerCase());
   const dist=resolve(options.distPath||'dist');
   const limiter=new Map();

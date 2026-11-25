@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {meterReaderModelDigests} from '../src/ai/meter-reader.mjs';
 import sharp from 'sharp';
 import {createConnection} from 'node:net';
 import {createApp} from '../src/backend/server.mjs';
@@ -8,8 +9,9 @@ import {HttpError} from '../src/backend/domain.mjs';
 const profile={roomId:'room_101',utility:'electric',digits:6,decimals:1,meterType:'mechanical',confirmed:true};
 const corners=[[.1,.2],[.9,.2],[.9,.8],[.1,.8]];
 function ready(input){
- const {digits,decimals}=input.profile,integerDigits='13010'.padStart(digits-decimals,'0'),fractionalDigits='4'.repeat(decimals);
- return {width:240,height:90,status:'ready',confidence:.91,warnings:[],model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',config:{digits,decimals,corners},profileSource:'confirmed',configNeedsConfirmation:false,
+ const {digits,decimals}=input.profile||{digits:6,decimals:1},integerDigits='13010'.padStart(digits-decimals,'0'),fractionalDigits='4'.repeat(decimals);
+ return {width:240,height:90,status:'ready',confidence:.91,warnings:[],model:input.utility==='electric'?'paddleocr-ppocrv6':'wheels-v2',engine:input.utility==='electric'?'paddleocr':'visionstate',modelDigest:meterReaderModelDigests(input.utility).modelDigest,config:{digits,decimals,corners},profileSource:input.profile?'confirmed':'image',configNeedsConfirmation:false,
+ ...(!input.profile?{layoutEvidence:{version:1,source:'image',method:'red-suffix',digits,decimals,cells:Array.from({length:digits},(_,index)=>({index,redShare:index>=digits-decimals ? .25 : .001,neutralShare:.5})),separatorTexts:[],countSource:input.utility==='electric'?'ocr-line':'detected-wheel-grid',complete:true},...(input.utility==='water'?{waterEvidence:{agreement:true,observations:[0,1].map(()=>({digits:integerDigits+fractionalDigits,corners,confidence:.91}))}}:{})}:{}),
  quality:{canRead:true,checks:{resolution:true,exposure:true,contrast:true,sharpness:true},metrics:{width:200,height:60,cellWidth:33,meanLuma:120,contrast:50,edgeEnergy:150}},
  ...(input.utility==='electric'?{cells:[],ocrEvidence:{scope:'automatic',observations:['full','crop'].map(pass=>({text:integerDigits+fractionalDigits,confidence:.91,corners,pass})),selectedObservationIndices:[0,1],agreement:true}}:{cells:Array.from({length:digits},(_,index)=>({index,position:1,confidence:.91,alternatives:[{position:1,confidence:.91}]}))}),reading:{digits:integerDigits+fractionalDigits,integerDigits,fractionalDigits,displayText:integerDigits+(decimals?'.'+fractionalDigits:''),integerValue:Number(integerDigits),unit:input.utility==='electric'?'kWh':'m3'}};
 }
@@ -38,7 +40,7 @@ test('automatic HTTP status/profile/retry are owner-only and jobs never leak int
  assert.equal((await f.anonymous(path)).status,401);assert.equal((await f.tenant(path)).status,403);assert.equal((await f.other(path)).status,404);
  assert.equal((await f.owner('/meter/reader/status?utility=electric')).body.engine,'paddleocr');assert.equal((await f.owner('/meter/reader/status?utility=water')).body.engine,'visionstate');assert.deepEqual(f.statusCalls,['electric','water']);
  assert.equal((await f.tenant('/meter/reader/status?utility=electric')).status,403);assert.equal((await f.owner('/meter/reader/status?utility=gas')).status,400);
- const setupResult=await f.owner(path);assert.equal(setupResult.status,200);assert.equal(setupResult.body.status,'needs_setup');assert.equal(setupResult.body.profile,null);assert.equal(f.calls.length,0);
+ const inferred=await poll(f.owner,path);assert.equal(inferred.status,'ready');assert.equal(inferred.profile,null);assert.equal(inferred.proposal.profileSource,'image');assert.equal(inferred.proposal.profileVersion,null);assert.equal(f.calls.length,1);assert.equal(f.calls[0].profile,null);
  assert.deepEqual(Object.keys(sent).sort(),['createdAt','id','period','photos','propertyId','roomId','status','tenantId','updatedAt','utility'].sort());
  assert.equal((await f.tenant('/meter/profile?roomId=room_101&utility=electric')).status,403);
  assert.equal((await f.other('/meter/profile?roomId=room_101&utility=electric')).status,403);
@@ -52,7 +54,7 @@ test('automatic HTTP status/profile/retry are owner-only and jobs never leak int
  const saved=await f.owner('/meter/profile',profile,'PUT');assert.equal(saved.status,200);assert.equal(saved.body.profile.version,1);
  const result=await poll(f.owner,path);assert.equal(result.proposal.reading.displayText,'13010.4');assert.equal(result.proposal.profileVersion,1);assert.equal(result.profile.version,1);assert.equal(result.proposal.engine,'paddleocr');assert.equal(result.proposal.model,'paddleocr-ppocrv6');assert.deepEqual(result.proposal.cells,[]);
  assert.equal(result.fileId,fileId);assert.equal(result.submissionVersion,1);assert.ok(f.calls.every(input=>input.mode==='auto'&&input.mime==='image/png'));
- assert.deepEqual(f.calls[0].profile,{digits:6,decimals:1});assert.notEqual((await f.owner('/meter/updates')).body.revision,versionBefore);
+ assert.deepEqual(f.calls.at(-1).profile,{digits:6,decimals:1});assert.notEqual((await f.owner('/meter/updates')).body.revision,versionBefore);
  for(const route of ['/bootstrap','/export','/meter/submissions']){
   const json=JSON.stringify((await f.tenant(route)).body);for(const secret of [result.proposal.id,'profileVersion','profileSource','meter-reader-jobs','meter-auto-proposal','13010.4'])assert.ok(!json.includes(secret));
  }
@@ -97,7 +99,7 @@ test('photo submissions and their durable jobs roll back together when queue per
   assert.equal(f.app.store.db.prepare('SELECT count(*) AS n FROM meter_reader_jobs').get().n,0);
   f.app.meterAutomatic.enqueueCreated=enqueue;
   const sent=await request(route,input);assert.equal(sent.status,role==='tenant'?202:201);
-  const job=f.app.store.db.prepare('SELECT * FROM meter_reader_jobs WHERE submission_id=?').get(sent.body.id);assert.equal(job.file_id,upload.body.id);assert.equal(job.status,'needs_setup');
+  const job=f.app.store.db.prepare('SELECT * FROM meter_reader_jobs WHERE submission_id=?').get(sent.body.id);assert.equal(job.file_id,upload.body.id);assert.ok(['queued','processing','ready'].includes(job.status));
  });
 });
 

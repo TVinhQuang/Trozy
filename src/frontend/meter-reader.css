@@ -37,11 +37,42 @@
 .meter-manual-fallback>.meter-reader-panel{margin-top:14px}
 .meter-profile-setup label.inline,.meter-reader-applied label.inline{align-items:flex-start;font-size:14px;line-height:1.8}
 .meter-profile-setup input[type=checkbox],.meter-reader-applied input[type=checkbox]{flex-shrink:0;margin-top:5px;accent-color:var(--focus)}
+.meter-automatic-actions{flex-wrap:wrap;gap:10px}
+.meter-usage-preview{min-width:0;color:var(--foreground)}
+.meter-usage-preview dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0 0 8px;padding:14px 0;border-top:1px solid var(--action-assistant-border);border-bottom:1px solid var(--action-assistant-border)}
+.meter-usage-preview dl>div{min-width:0}
+.meter-usage-preview dt{font-size:13px;line-height:1.7}
+.meter-usage-preview dd{margin:4px 0 0;font-size:17px;font-weight:650;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.meter-usage-preview small{font-size:12px;line-height:1.7}
+.meter-submission-proposal{margin-top:10px;color:var(--foreground);font-size:14px;line-height:1.8}
+.meter-submission-proposal>p{margin:0}
+.meter-usage-compact{display:flex;flex-wrap:wrap;column-gap:16px;margin:4px 0 0;font-variant-numeric:tabular-nums}
+.meter-usage-compact>span{color:var(--muted)}
+.meter-pipeline-trace{border:1px solid var(--border);border-radius:12px;background:var(--secondary);padding:12px 14px;font-size:13px;line-height:1.65;color:var(--foreground)}
+.meter-pipeline-trace>summary{cursor:pointer;font-weight:600;color:var(--foreground);list-style-position:outside;margin-left:14px}
+.meter-trace-steps{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.meter-trace-step{padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.meter-trace-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.meter-trace-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
+.meter-trace-pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:650;letter-spacing:.01em}
+.meter-trace-pill.ok{background:var(--success-bg);color:var(--success)}
+.meter-trace-pill.miss{background:var(--warning-bg);color:var(--warning)}
+.meter-trace-pill.error{background:var(--danger-bg);color:var(--danger)}
+.meter-trace-pill.skipped{background:var(--secondary);color:var(--muted)}
+.meter-trace-model{font-size:12px;padding:1px 7px;border-radius:6px;background:var(--info-bg);color:var(--info);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.meter-trace-time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.meter-trace-summary{margin:0;font-size:13px;color:var(--foreground);overflow-wrap:anywhere}
+.meter-trace-reading{font-weight:700;color:var(--info);font-variant-numeric:tabular-nums}
+.meter-trace-details{margin:2px 0 0;padding-left:18px;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.meter-trace-details li{overflow-wrap:anywhere}
 @media(max-width:760px){
  .meter-reader-panel{padding:16px}
  .meter-reader-coordinates{grid-template-columns:minmax(0,1fr)}
  .meter-reader-panel button,.meter-profile-summary>.btn{min-height:44px}
  .meter-profile-setup{padding:14px}
+ .meter-usage-preview dl{grid-template-columns:minmax(0,1fr);gap:10px}
+ .meter-usage-preview dl>div{display:flex;align-items:baseline;justify-content:space-between;gap:16px}
+ .meter-usage-preview dd{margin:0;text-align:right}
 }
 @media(max-width:600px){
  .meter-reader-stage circle{r:23}

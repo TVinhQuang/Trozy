@@ -17,12 +17,13 @@ class AutomaticWorkerTests(unittest.TestCase):
     def setUp(self):
         self.frame = Image.new('RGB', (400, 240), '#888888')
 
-    def test_missing_profile_never_guesses_count_or_decimal_boundary(self):
+    def test_missing_profile_runs_detection_without_guessing_ambiguous_layout(self):
         encoded = io.BytesIO(); self.frame.save(encoded, format='PNG')
-        with patch.object(worker, 'detect', side_effect=AssertionError('must not run')):
+        with patch.object(worker, 'detect', return_value={'status': 'no_window'}) as detect:
             result = worker.process_request({'protocol': 1, 'mode': 'auto', 'utility': 'water',
                 'image': base64.b64encode(encoded.getvalue()).decode()})
-        self.assertEqual(result['status'], 'needs_setup')
+        detect.assert_called_once()
+        self.assertEqual(result['status'], 'needs_review')
         self.assertIsNone(result['reading'])
         self.assertIsNone(result['config'])
         self.assertIsNone(result['profileSource'])
@@ -46,6 +47,7 @@ class AutomaticWorkerTests(unittest.TestCase):
         located = {'status': 'selected', 'selected': {'corners': []}, 'detections': []}
         with patch.object(worker, 'detect', return_value=located), \
              patch.object(worker, 'refine_row', return_value={'status': 'rejected'}) as refine, \
+             patch.object(worker, 'zoomed_detection', return_value=None), \
              patch.object(worker, 'WheelReader', side_effect=AssertionError('must not read')):
             result = worker.automatic({'utility': 'water', 'profile': {'digits': 8, 'decimals': 3}}, self.frame)
         self.assertEqual(refine.call_args.args[2], 8)
@@ -79,6 +81,45 @@ class AutomaticWorkerTests(unittest.TestCase):
         self.assertEqual(result['config']['corners'][0], [.8, 110/240])
         self.assertEqual(result['profileSource'], 'confirmed')
         self.assertFalse(result['configNeedsConfirmation'])
+
+    def test_parse_guide_box_rejects_invalid_and_pads_valid_box(self):
+        self.assertIsNone(worker.parse_guide_box(None, self.frame))
+        self.assertIsNone(worker.parse_guide_box({'left': -0.1, 'top': 0.2, 'width': 0.5, 'height': 0.2}, self.frame))
+        self.assertIsNone(worker.parse_guide_box({'left': 0.1, 'top': 0.2, 'width': 0.02, 'height': 0.2}, self.frame))
+        box = worker.parse_guide_box({'left': 0.2, 'top': 0.3, 'width': 0.5, 'height': 0.2}, self.frame)
+        self.assertIsNotNone(box)
+        l, t, r, b = box
+        self.assertTrue(0 <= l < r <= 400 and 0 <= t < b <= 240)
+
+    def test_map_rotated_crop_maps_all_rotations_within_frame(self):
+        located = {
+            'status': 'selected',
+            'selected': {'corners': [[10, 10], [90, 10], [90, 40], [10, 40]]},
+            'detections': [{'class_name': '0', 'confidence': 0.9, 'corners': [[10, 10], [30, 10], [30, 40], [10, 40]]}],
+        }
+        for angle in (0, 90, 180, 270):
+            mapped = worker._map_rotated_crop(located, 50, 40, (120, 100), angle)
+            pts = mapped['selected']['corners']
+            self.assertEqual(len(pts), 4)
+            for x, y in pts:
+                self.assertTrue(50 <= x <= 170 and 40 <= y <= 140)
+
+    def test_zoomed_candidates_yields_meter_crop_fallback_when_window_zoom_missing(self):
+        located = {
+            'status': 'selected',
+            'selected': {'corners': [[100, 80], [260, 80], [260, 120], [100, 120]]},
+            'detections': [{'class_name': 'meter', 'confidence': 0.9, 'corners': [[60, 40], [300, 40], [300, 180], [60, 180]]}],
+        }
+        meter_det = {
+            'status': 'selected',
+            'selected': {'corners': [[40, 40], [200, 40], [200, 80], [40, 80]]},
+            'detections': [],
+        }
+        with patch.object(worker, 'zoomed_detection', return_value=None), \
+             patch.object(worker, 'detect', return_value=meter_det):
+            candidates = list(worker.zoomed_candidates(self.frame, located))
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0]['status'], 'selected')
 
 
 if __name__ == '__main__':

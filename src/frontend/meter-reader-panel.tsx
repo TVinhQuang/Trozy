@@ -5,15 +5,17 @@ import type { RecordData } from './types';
 import './meter-reader.css';
 
 export type MeterCorners = [number, number][];
-export type MeterReaderEngine = 'paddleocr' | 'visionstate';
+export type MeterReaderEngine = 'paddleocr' | 'visionstate' | 'gemini-vision';
 export type MeterReaderProposal = {
   id: string; fileId: string; submissionVersion: number; status: 'ready' | 'needs_review' | 'retake';
   reading: null | { digits: string; displayText: string; integerDigits: string; fractionalDigits: string; integerValue: number; unit: 'kWh' | 'm3' };
   confidence: number; warnings: string[]; expiresAt: string;
   config: { digits: number; decimals: number; corners: MeterCorners };
-  profileSource?: 'confirmed'; profileVersion?: number | null; configNeedsConfirmation?: boolean;
+  profileSource?: 'confirmed' | 'image' | 'gemini-vision'; profileVersion?: number | null; configNeedsConfirmation?: boolean;
+  layoutEvidence?: { version: 1; source: 'image'; method: 'red-suffix' | 'printed-decimal'; digits: number; decimals: number; complete: true; countSource: 'detected-wheel-grid' | 'ocr-line'; cells: { index: number; redShare: number; neutralShare: number }[]; separatorTexts: string[] };
   engine?: MeterReaderEngine; model?: string;
   ocrEvidence?: { scope?: 'automatic' | 'owner-region'; observations: { text: string; confidence: number; corners: MeterCorners; pass: 'full' | 'region' | 'crop' }[]; selectedObservationIndices: number[]; agreement: boolean };
+  visionEvidence?: { provider: 'gemini'; model: string; reason: string; attempts?: number; rotatedFrom?: string[] };
 };
 type ReaderStatus = { available: boolean; readerAvailable?: boolean; locateAvailable?: boolean; locatorAvailable?: boolean; engine?: MeterReaderEngine; message: string };
 type Candidate = { corners: MeterCorners; confidence: number };
@@ -21,17 +23,36 @@ const initialCorners = (): MeterCorners => [[.15, .35], [.85, .35], [.85, .65], 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 
 export const meterReaderEngine = (utility: string): MeterReaderEngine => utility === 'electric' ? 'paddleocr' : 'visionstate';
+/** Re-arm long-lived proposals instead of expiring at the browser timer limit. */
+export function scheduleMeterProposalExpiry(expiresAt: string, onExpire: () => void) {
+  const expires = Date.parse(expiresAt); let stopped = false, timer: ReturnType<typeof setTimeout>;
+  function schedule() {
+    if (stopped) return;
+    const remaining = expires - Date.now();
+    if (!Number.isFinite(remaining) || remaining <= 0) { onExpire(); return; }
+    timer = setTimeout(schedule, Math.min(remaining, 2147483647));
+  }
+  schedule();
+  return () => { stopped = true; clearTimeout(timer); };
+}
 export function meterProposalMatchesUtility(proposal: MeterReaderProposal, utility: string): boolean {
-  return proposal.engine === meterReaderEngine(utility) && proposal.model === (utility === 'electric' ? 'paddleocr-ppocrv6' : 'wheels-v2') && (!proposal.reading || proposal.reading.unit === (utility === 'electric' ? 'kWh' : 'm3'));
+  const unitMatches = !proposal.reading || proposal.reading.unit === (utility === 'electric' ? 'kWh' : 'm3');
+  if (!unitMatches) return false;
+  if (proposal.engine === 'gemini-vision') return typeof proposal.model === 'string' && proposal.model.length > 0;
+  return proposal.engine === meterReaderEngine(utility) && proposal.model === (utility === 'electric' ? 'paddleocr-ppocrv6' : 'wheels-v2');
 }
 
 /** OCR text is one observation of a region, not a probability for each wheel. */
 export function MeterOCREvidence({ proposal }: { proposal: MeterReaderProposal }) {
+  if (proposal.engine === 'gemini-vision' && proposal.visionEvidence) {
+    const info = proposal.visionEvidence;
+    return <details className="meter-ocr-evidence"><summary>Nguồn đề xuất dự phòng · Gemini Vision ({info.model})</summary><ul>{info.reason && <li>Ghi chú đọc ảnh: {info.reason}</li>}{info.rotatedFrom && info.rotatedFrom.length > 0 && <li>Đã tự xoay model khi chạm hạn mức: {info.rotatedFrom.join(', ')}</li>}</ul><p>Gemini Vision đọc thẳng chỉ số phần nguyên (kWh / m³) khi bộ đọc cục bộ chưa chắc chắn. Chủ nhà bắt buộc đối chiếu ảnh gốc trước khi xác minh.</p></details>;
+  }
   const evidence = proposal.engine === 'paddleocr' ? proposal.ocrEvidence : null;
   if (!Array.isArray(evidence?.observations) || !evidence.observations.length || !Array.isArray(evidence.selectedObservationIndices)) return null;
   const selected = evidence.selectedObservationIndices.map(index => evidence.observations[index]).filter(observation => observation && typeof observation.text === 'string');
   if (!selected.length) return null;
-  return <details className="meter-ocr-evidence"><summary>Văn bản đã nhận dạng</summary><ul>{selected.map((observation, index) => <li key={index}>{observation.pass === 'full' ? 'Ảnh toàn cảnh' : observation.pass === 'region' ? 'Vùng đã chọn' : 'Vùng chỉ số'}: {observation.text}</li>)}</ul><p>Đây là kết quả OCR của vùng chữ số. Hãy đối chiếu từng ô số, đơn vị và phần lẻ trên ảnh gốc.</p></details>;
+  return <details className="meter-ocr-evidence"><summary>Văn bản đã nhận dạng</summary><ul>{selected.map((observation, index) => <li key={index}>{observation.pass === 'full' ? 'Ảnh toàn cảnh' : observation.pass === 'region' ? evidence.scope === 'automatic' ? 'Vùng có ngữ cảnh' : 'Vùng đã chọn' : 'Vùng chỉ số'}: {observation.text}</li>)}</ul><p>Đây là kết quả OCR của vùng chữ số. Hãy đối chiếu từng ô số, đơn vị và phần lẻ trên ảnh gốc.</p></details>;
 }
 
 export function validMeterCorners(corners: MeterCorners): boolean {
@@ -95,9 +116,7 @@ export function MeterReaderPanel({ submission, fileId, disabled = false, onApply
   }, [submission.id, submission.version, submission.utility, fileId]);
   useEffect(() => {
     if (!proposal) return;
-    const remaining = new Date(proposal.expiresAt).getTime() - Date.now();
-    const timeout = setTimeout(() => { setProposal(null); setError('Đề xuất đã hết hạn. Hãy đọc lại vùng ảnh trước khi dùng.'); latestInvalidate.current(); }, Math.max(0, Math.min(remaining, 2147483647)));
-    return () => clearTimeout(timeout);
+    return scheduleMeterProposalExpiry(proposal.expiresAt, () => { setProposal(null); setError('Đề xuất đã hết hạn. Hãy đọc lại vùng ảnh trước khi dùng.'); latestInvalidate.current(); });
   }, [proposal]);
   async function request(mode: 'locate' | 'read') {
     if (disabled || busy || !imageReady || (mode === 'read' && !canRead)) return;

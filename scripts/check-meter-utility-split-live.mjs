@@ -5,7 +5,7 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {setTimeout as delay} from 'node:timers/promises';
 import sharp from 'sharp';
 import {createApp} from '../src/backend/server.mjs';
-import {meterReaderStatus} from '../src/ai/meter-reader.mjs';
+import {meterReaderModelDigests,meterReaderStatus} from '../src/ai/meter-reader.mjs';
 
 const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
 const local=path=>new URL('../'+path,import.meta.url);
@@ -23,16 +23,16 @@ const electric=await sample('electric-clear'),water=await sample('water-blue');
 const svgPath='tests/fixtures/electric-paddle-synthetic.svg',svg=await readFile(local(svgPath));
 const synthetic=await sharp(svg).png().toBuffer();
 const paths=[
- 'src/ai/meter-reader.mjs','src/ai/meter_reader_worker.py','src/ai/meter_paddle.py','src/ai/meter_wheels.py','src/ai/meter_geometry.py','src/ai/meter_row_geometry.py',
+ 'src/ai/meter-reader.mjs','src/ai/meter_reader_worker.py','src/ai/meter_paddle.py','src/ai/meter_wheels.py','src/ai/meter_geometry.py','src/ai/meter_row_geometry.py','src/ai/meter_layout.py','src/shared/meter-layout-evidence.mjs',
  'src/backend/meter-reader-service.mjs','src/backend/meter-automatic.mjs','src/backend/meter-profile.mjs','src/backend/meter-submissions.mjs','src/backend/meter-visibility.mjs','src/backend/server.mjs',
  'src/frontend/meter-reader-panel.tsx','src/frontend/meter-automatic-panel.tsx','src/frontend/meter-submissions-panel.tsx','src/frontend/meter-evidence-capture.tsx','src/frontend/api.ts',
  'scripts/check-meter-utility-split-live.mjs','docs/test/fixtures/visionstate-yolo-samples.json',svgPath,
 ];
 const modelPaths={
- electricDetection:'.runtime/paddleocr/models/PP-OCRv6_small_det_onnx_infer/inference.onnx',
- electricRecognition:'.runtime/paddleocr/models/PP-OCRv6_small_rec_onnx_infer/inference.onnx',
- waterWindow:'.runtime/meter-digits/visionstate-yolo/models/stage1_meter_window_digits.pt',
- waterWheels:'.runtime/meter-digits/visionstate-yolo/models/wheels-v2.onnx',
+ electricDetection:'.runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx',
+ electricRecognition:'.runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx',
+ waterWindow:'.runtime/meter-digits/visionstate-yolo/models/water/trozy_water_yolov8_obb.pt',
+ waterWheels:'.runtime/meter-digits/visionstate-yolo/models/water/wheels-v2.onnx',
 };
 const hashes=async()=>Object.fromEntries(await Promise.all([...paths,...Object.values(modelPaths)].map(async path=>[path,digest(await readFile(local(path)))])));
 const startedHashes=await hashes();
@@ -75,9 +75,11 @@ async function automatic(cookie,submission){
 const snapshot=()=>JSON.stringify({readings:app.store.list('readings'),invoices:app.store.list('invoices')});
 function paddleProposal(proposal,scope,digits){
  assert.equal(proposal.status,'ready');assert.equal(proposal.engine,'paddleocr');assert.equal(proposal.model,'paddleocr-ppocrv6');assert.deepEqual(proposal.cells,[]);
+ assert.equal(proposal.modelDigest,meterReaderModelDigests('electric').modelDigest);
+ if(scope==='automatic')assert.equal(proposal.locatorDigest,meterReaderModelDigests('electric').locatorDigest);
  assert.equal(proposal.reading.digits,digits);assert.equal(proposal.ocrEvidence.scope,scope);assert.equal(proposal.ocrEvidence.agreement,true);
  const selected=proposal.ocrEvidence.selectedObservationIndices.map(index=>proposal.ocrEvidence.observations[index]);
- assert.equal(selected.length,2);assert.deepEqual(selected.map(row=>row.pass).sort(),scope==='automatic'?['crop','full']:['crop','region']);assert(selected.every(row=>row.confidence>=.85));
+ assert.equal(selected.length,2);const passes=selected.map(row=>row.pass).sort();assert(scope==='automatic'?JSON.stringify(passes)==='["crop","full"]'||JSON.stringify(passes)==='["crop","region"]':JSON.stringify(passes)==='["crop","region"]');assert(selected.every(row=>row.confidence>=.85));
 }
 try{
  const owner=await login('chu@trozy.vn'),tenant=await login('thue@trozy.vn'),other=await login('khac@trozy.vn');
@@ -93,7 +95,7 @@ try{
  assert.equal((await request(tenant,realElectric.prefix+`/automatic?fileId=${realElectric.fileId}`)).status,403);
  assert.equal((await request(other,realElectric.prefix+`/automatic?fileId=${realElectric.fileId}`)).status,404);
  const electricAuto=await automatic(owner,realElectric);
- assert.equal(electricAuto.status,'needs_review',JSON.stringify(electricAuto));assert.equal(electricAuto.proposal,null,'Missing full-photo fractional digit must not become an automatic proposal.');assert.equal(snapshot(),original);
+ assert.equal(electricAuto.status,'ready',JSON.stringify(electricAuto));paddleProposal(electricAuto.proposal,'automatic','007664');assert.equal(electricAuto.proposal.layoutEvidence.source,'image');assert.equal(snapshot(),original);
  const ownerRows=await request(owner,'/meter/submissions');assert.equal(ownerRows.status,200);
  realElectric.row=ownerRows.body.records.find(row=>row.id===realElectric.row.id);assert(realElectric.row&&Number.isSafeInteger(realElectric.row.version),'Read review version from owner evidence, never from the tenant receipt.');
  const corners=electric.entry.manualRegion.corners.map(([x,y])=>[x/electric.entry.sourceSize.width,y/electric.entry.sourceSize.height]);
@@ -111,7 +113,7 @@ try{
  assert.equal((await request(owner,realElectric.prefix+'/review',review)).status,400);assert.equal(snapshot(),original);
  const approved=await request(owner,realElectric.prefix+'/review',{...review,fractionalChecked:true});assert.equal(approved.status,200,JSON.stringify(approved.body));
  assert.equal(approved.body.reading.electricNew,766);assert.equal(approved.body.reading.confirmed,false);assert.equal(approved.body.submission.verificationSource,'paddleocr-and-human');assert.equal(JSON.stringify(app.store.list('invoices')),invoicesBefore);
- evidence.realElectric={automatic:{status:electricAuto.status,states:electricAuto.states,durationMs:electricAuto.durationMs,reason:electricAuto.reason,proposal:null},manual:{status:manual.status,engine:proposal.engine,model:proposal.model,reading:proposal.reading,confidence:proposal.confidence,quality:proposal.quality,cells:proposal.cells,ocrEvidence:proposal.ocrEvidence},review:{missingImageConsent:400,missingFractionalConsent:400,explicitReview:200,electricValue:766,verificationSource:approved.body.submission.verificationSource,periodConfirmed:false,invoicesUnchanged:true},reference:electric.entry.reference};
+ evidence.realElectric={automatic:{status:electricAuto.status,states:electricAuto.states,durationMs:electricAuto.durationMs,reason:electricAuto.reason,proposal:electricAuto.proposal},manual:{status:manual.status,engine:proposal.engine,model:proposal.model,reading:proposal.reading,confidence:proposal.confidence,quality:proposal.quality,cells:proposal.cells,ocrEvidence:proposal.ocrEvidence},review:{missingImageConsent:400,missingFractionalConsent:400,explicitReview:200,electricValue:766,verificationSource:approved.body.submission.verificationSource,periodConfirmed:false,invoicesUnchanged:true},reference:electric.entry.reference};
  const afterReview=snapshot(),realWater=await submit(tenant,'room_101','water',water.bytes,'image/jpeg');
  const waterAuto=await automatic(owner,realWater);assert.equal(waterAuto.status,'ready',JSON.stringify(waterAuto));
  const waterProposal=waterAuto.proposal;assert.equal(waterProposal.engine,'visionstate');assert.equal(waterProposal.model,'wheels-v2');assert.equal(waterProposal.reading.displayText,'00001.056');assert.equal(waterProposal.cells.length,8);assert.equal(waterProposal.ocrEvidence,undefined);assert.equal(waterProposal.source,'automatic');assert.equal(snapshot(),afterReview);
@@ -122,6 +124,8 @@ try{
  assert.equal(syntheticAuto.status,'ready',JSON.stringify(syntheticAuto));paddleProposal(syntheticAuto.proposal,'automatic','012345');assert.equal(syntheticAuto.proposal.reading.displayText,'01234.5');assert.equal(snapshot(),afterReview);
  evidence.syntheticElectric={synthetic:true,accuracyBenchmark:false,submissionStatus:ownerSynthetic.status,status:syntheticAuto.status,states:syntheticAuto.states,durationMs:syntheticAuto.durationMs,engine:syntheticAuto.proposal.engine,model:syntheticAuto.proposal.model,reading:syntheticAuto.proposal.reading,confidence:syntheticAuto.proposal.confidence,ocrEvidence:syntheticAuto.proposal.ocrEvidence,approved:false,readingsAndInvoicesUnchanged:true};
  evidence.authorization={tenantReaderStatus:403,tenantAutomatic:403,otherOwnerAutomatic:404,tenantManualRead:403,otherOwnerManualRead:404,tenantBootstrapAndExportHaveMachineEvidence:false};
+ assert.equal(waterProposal.modelDigest,meterReaderModelDigests('water').modelDigest);assert.equal(waterProposal.locatorDigest,meterReaderModelDigests('water').locatorDigest);
+ evidence.proposalModelDigests={realElectric:{modelDigest:proposal.modelDigest},realWater:{modelDigest:waterProposal.modelDigest,locatorDigest:waterProposal.locatorDigest},syntheticElectric:{modelDigest:syntheticAuto.proposal.modelDigest,locatorDigest:syntheticAuto.proposal.locatorDigest}};
  evidence.sourceSha256=await hashes();assert.deepEqual(evidence.sourceSha256,startedHashes,'Source or model files changed during verification. Rerun after edits finish.');evidence.sourcesStable=true;
  if(output)await writeFile(output,JSON.stringify(evidence,null,2)+'\n','utf8');
  console.log(JSON.stringify({ok:true,scope:'SQLite RAM only',realElectricAutomatic:electricAuto.status,realElectricManual:proposal.reading.displayText,explicitElectricReview:approved.body.submission.verificationSource,waterAutomatic:waterProposal.reading.displayText,syntheticElectricAutomatic:syntheticAuto.proposal.reading.displayText,syntheticIsNotAccuracyEvidence:true,sourceHashesStable:true,report:output||null}));

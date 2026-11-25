@@ -1,0 +1,225 @@
+{
+  "createdAt": "2026-11-05T16:08:58.952Z",
+  "scope": "Actual project-local CPU OCR over HTTP; no configured profiles, SQLite RAM only, original photos unchanged.",
+  "referencePolicy": "Reused development fixtures and synthetic plumbing controls, not a held-out accuracy benchmark.",
+  "results": [
+    {
+      "id": "water-blue",
+      "utility": "water",
+      "sha256": "b19590eeeb7779795310ad13b7c59cd5538ae195252238bea205cad8e7d3d9bf",
+      "synthetic": false,
+      "status": "ready",
+      "reading": {
+        "digits": "00001056",
+        "displayText": "00001.056",
+        "integerDigits": "00001",
+        "fractionalDigits": "056",
+        "integerValue": 1,
+        "unit": "m3"
+      },
+      "usage": {
+        "status": "available",
+        "previousValue": 0,
+        "proposedValue": 1,
+        "consumption": 1,
+        "unit": "m3",
+        "baselineSource": "previous-reading"
+      },
+      "layout": {
+        "version": 1,
+        "source": "image",
+        "method": "red-suffix",
+        "digits": 8,
+        "decimals": 3,
+        "cells": [
+          {
+            "index": 0,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 1,
+            "redShare": 0,
+            "neutralShare": 0.9404117009750813
+          },
+          {
+            "index": 2,
+            "redShare": 0,
+            "neutralShare": 0.766522210184182
+          },
+          {
+            "index": 3,
+            "redShare": 0,
+            "neutralShare": 0.613956043956044
+          },
+          {
+            "index": 4,
+            "redShare": 0,
+            "neutralShare": 0.49241758241758243
+          },
+          {
+            "index": 5,
+            "redShare": 0.5802816901408451,
+            "neutralShare": 0.12502708559046588
+          },
+          {
+            "index": 6,
+            "redShare": 0.6262188515709642,
+            "neutralShare": 0.09794149512459371
+          },
+          {
+            "index": 7,
+            "redShare": 0.6646803900325027,
+            "neutralShare": 0.2581798483206934
+          }
+        ],
+        "separatorTexts": [],
+        "countSource": "detected-wheel-grid",
+        "complete": true
+      },
+      "durationMs": 4891,
+      "reason": "Đây là đề xuất từ ảnh. Chủ nhà phải đối chiếu từng ô và phần lẻ trước khi lưu."
+    },
+    {
+      "id": "electric-clear",
+      "utility": "electric",
+      "sha256": "a558d4d4667aea2410f7f3a01d01e5caf9f350a60596b2aa4a821041eed37e33",
+      "synthetic": false,
+      "status": "ready",
+      "reading": {
+        "digits": "007664",
+        "displayText": "00766.4",
+        "integerDigits": "00766",
+        "fractionalDigits": "4",
+        "integerValue": 766,
+        "unit": "kWh"
+      },
+      "usage": {
+        "status": "available",
+        "previousValue": 0,
+        "proposedValue": 766,
+        "consumption": 766,
+        "unit": "kWh",
+        "baselineSource": "previous-reading"
+      },
+      "layout": {
+        "version": 1,
+        "source": "image",
+        "method": "red-suffix",
+        "digits": 6,
+        "decimals": 1,
+        "cells": [
+          {
+            "index": 0,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 1,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 2,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 3,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 4,
+            "redShare": 0,
+            "neutralShare": 1
+          },
+          {
+            "index": 5,
+            "redShare": 0.5994152046783626,
+            "neutralShare": 0.19298245614035087
+          }
+        ],
+        "separatorTexts": [],
+        "countSource": "ocr-line",
+        "complete": true
+      },
+      "durationMs": 7682,
+      "reason": "Đây là đề xuất PaddleOCR từ ảnh điện; đối chiếu dãy số và phần lẻ trước khi lưu."
+    },
+    {
+      "id": "electric-26762",
+      "utility": "electric",
+      "sha256": "5e8b308031f2e98ec578acc9af3c8285248b7386820aebc49b8a9d503089e67d",
+      "synthetic": false,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 7141,
+      "reason": "PaddleOCR chưa đọc chắc toàn bộ hàng số điện. Hãy kiểm tra vùng hoặc ảnh gốc."
+    },
+    {
+      "id": "electric-screenshot",
+      "utility": "electric",
+      "sha256": "db1a436b661c58c9414717f03d5133592366592cca63157b8bb631cd83a45fc7",
+      "synthetic": false,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 5624,
+      "reason": "PaddleOCR chưa đọc chắc toàn bộ hàng số điện. Hãy kiểm tra vùng hoặc ảnh gốc."
+    },
+    {
+      "id": "water-weathered",
+      "utility": "water",
+      "sha256": "b3f6eb362ad2a4440be011e62fc071edc6dc1cf13e01e409ca93299f8031a425",
+      "synthetic": false,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 4091,
+      "reason": "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+    },
+    {
+      "id": "electric-unmarked-control",
+      "utility": "electric",
+      "sha256": "3d8c09fe65f0a6f999257964a762a06914399474035761b9ffab39086dc711f0",
+      "synthetic": true,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 5036,
+      "reason": "Đã đọc hàng số nhưng chưa xác định rõ phần lẻ từ ảnh. Hãy kiểm tra ảnh gốc hoặc chọn vùng thủ công."
+    },
+    {
+      "id": "blank-electric",
+      "utility": "electric",
+      "sha256": "62c01a7b281894cfb484191511c31bf21f1d9009d6261958852cc2b262b5d02c",
+      "synthetic": true,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 4707,
+      "reason": "PaddleOCR chưa đọc chắc toàn bộ hàng số điện. Hãy kiểm tra vùng hoặc ảnh gốc."
+    },
+    {
+      "id": "blank-water",
+      "utility": "water",
+      "sha256": "62c01a7b281894cfb484191511c31bf21f1d9009d6261958852cc2b262b5d02c",
+      "synthetic": true,
+      "status": "needs_review",
+      "reading": null,
+      "usage": null,
+      "layout": null,
+      "durationMs": 3742,
+      "reason": "Chưa xác định chắc chắn toàn bộ hàng số. Hãy chọn vùng thủ công hoặc chụp rõ hơn."
+    }
+  ],
+  "financialDataUnchanged": true,
+  "ownerProfileCount": 0
+}

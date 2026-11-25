@@ -3,7 +3,10 @@ import {createHash} from 'node:crypto';
 import {id,now} from './db.mjs';
 import {audit,fail,visible} from './domain.mjs';
 import {confirmedMeterProfile,meterProfileDTO,validMeterLayout,meterEngine,meterModel} from './meter-profile.mjs';
-import {assertMeterSubmissionBaseline} from './meter-submissions.mjs';
+import {assertMeterSubmissionBaseline,meterSubmissionUsage} from './meter-submissions.mjs';
+import {imageLayoutEvidence,waterAgreementEvidence} from '../shared/meter-layout-evidence.mjs';
+import {meterReaderModelDigests} from '../ai/meter-reader.mjs';
+import {GEMINI_VISION_DIGEST} from '../ai/gemini.mjs';
 
 const must=(condition,message,status=400)=>{if(!condition)fail(status,message);};
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
@@ -27,6 +30,7 @@ export function initializeMeterAutomatic(store){
  CREATE INDEX IF NOT EXISTS meter_reader_jobs_owner ON meter_reader_jobs(owner_id,submission_id);`);
  const columns=store.db.prepare('PRAGMA table_info(meter_reader_jobs)').all();
  if(!columns.some(column=>column.name==='engine'))store.db.exec("ALTER TABLE meter_reader_jobs ADD COLUMN engine TEXT NOT NULL DEFAULT ''");
+ if(!columns.some(column=>column.name==='trace'))store.db.exec('ALTER TABLE meter_reader_jobs ADD COLUMN trace TEXT');
 }
 
 export function createMeterAutomaticService(store,reader,options={}){
@@ -40,17 +44,29 @@ export function createMeterAutomaticService(store,reader,options={}){
   must(!store.get('properties',room.propertyId)?.archived,'Cơ sở đã lưu trữ không nhận cấu hình công tơ mới.',409);return room;
  }
  function getProfile(user,roomId,utility){profileScope(user,roomId,utility);return {profile:meterProfileDTO(confirmedMeterProfile(store,user.id,roomId,utility))};}
+ /** Called only within a successful owner image-review transaction. */
+ function rememberVerifiedLayout(user,row,proposal){
+  if(!proposal||proposal.profileSource!=='image'||row.status!=='approved'||row.reviewedBy!==user.id)return;
+  owner(user);
+  must(row.ownerId===user.id&&imageLayoutEvidence(proposal.layoutEvidence,proposal.config,proposal.reading,row.utility,proposal.ocrEvidence),'Bố cục trên ảnh chưa đủ bằng chứng để ghi nhớ.',409);
+  if(confirmedMeterProfile(store,user.id,row.roomId,row.utility))return;
+  const old=rawProfile(user.id,row.roomId,row.utility);
+  const saved=store.put('meterProfiles',{id:old?.id||id('meter_profile'),ownerId:user.id,propertyId:row.propertyId,roomId:row.roomId,utility:row.utility,digits:proposal.config.digits,decimals:proposal.config.decimals,meterType:'mechanical',confirmed:true,reader:'meter-reader-v3',version:(Number.isSafeInteger(old?.version)&&old.version>=0?old.version:0)+1,confirmedBy:user.id,confirmedAt:now(),source:'image-and-review',sourceSubmissionId:row.id,...(old?.createdAt?{createdAt:old.createdAt}:{})});
+  for(const pending of store.list('meterSubmissions',user.id).filter(item=>item.status==='pending'&&item.roomId===row.roomId&&item.utility===row.utility))for(const photo of pending.photos||[])queueRow(pending,photo.fileId,{replace:true});
+  audit(store,user,'meter-layout-remember','meterProfiles',saved,'Ghi nhớ bố cục từ đề xuất đã được chủ nhà đối chiếu ảnh và xác minh.');
+  wake();
+ }
  function queueRow(row,fileId,{replace=false}={}){
   const file=store.db.prepare('SELECT * FROM files WHERE id=? AND owner_id=?').get(fileId,row.ownerId);
   must(file&&(row.photos||[]).some(photo=>photo.fileId===fileId),'Ảnh không thuộc bộ gửi.',403);
   const existing=store.db.prepare('SELECT * FROM meter_reader_jobs WHERE submission_id=? AND file_id=?').get(row.id,fileId);
   const profile=confirmedMeterProfile(store,row.ownerId,row.roomId,row.utility),fileHash=hash(file.bytes);
   if(!replace&&existing&&existing.engine===meterEngine(row.utility)&&existing.submission_version===row.version&&existing.file_hash===fileHash&&existing.profile_version===(profile?.version??null))return;
-  const state=profile?'queued':'needs_setup',time=now();
-  store.db.prepare(`INSERT INTO meter_reader_jobs(id,owner_id,submission_id,file_id,submission_version,file_hash,profile_version,status,reason,created_at,updated_at,engine)
-   VALUES(?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(submission_id,file_id) DO UPDATE SET
+  const state='queued',time=now();
+  store.db.prepare(`INSERT INTO meter_reader_jobs(id,owner_id,submission_id,file_id,submission_version,file_hash,profile_version,status,reason,created_at,updated_at,engine,trace)
+   VALUES(?,?,?,?,?,?,?,?,?,?,?,?,NULL) ON CONFLICT(submission_id,file_id) DO UPDATE SET
    id=excluded.id,owner_id=excluded.owner_id,submission_version=excluded.submission_version,file_hash=excluded.file_hash,profile_version=excluded.profile_version,
-   status=excluded.status,engine=excluded.engine,attempts=0,next_attempt_at=0,lease_token=NULL,lease_until=NULL,proposal_id=NULL,reason=excluded.reason,created_at=excluded.created_at,updated_at=excluded.updated_at`)
+   status=excluded.status,engine=excluded.engine,attempts=0,next_attempt_at=0,lease_token=NULL,lease_until=NULL,proposal_id=NULL,trace=NULL,reason=excluded.reason,created_at=excluded.created_at,updated_at=excluded.updated_at`)
    .run(id('meter_job'),row.ownerId,row.id,fileId,row.version,fileHash,profile?.version??null,state,REASONS[state],time,time,meterEngine(row.utility));
  }
  /** Runs inside the submission transaction; deferred wake cannot run before its commit. */
@@ -92,20 +108,26 @@ export function createMeterAutomaticService(store,reader,options={}){
   const scopedRow=scoped(user,key,fileId),{row}=scopedRow;fileId=scopedRow.fileId;
   const profile=confirmedMeterProfile(store,user.id,row.roomId,row.utility);
   const job=store.db.prepare('SELECT * FROM meter_reader_jobs WHERE owner_id=? AND submission_id=? AND file_id=?').get(user.id,key,fileId);
-  let state=job?.status|| (profile?'unavailable':'needs_setup'),reason=job?.reason|| (profile?'Ảnh này chưa có tác vụ tự động. Hãy bấm thử lại.':REASONS.needs_setup),proposal=null;
+  let state=job?.status||'unavailable',reason=job?.reason||'Ảnh này chưa có tác vụ tự động. Hãy bấm thử lại.',proposal=null,trace=null;
   if(job){
+   if(job.trace)try{const parsed=JSON.parse(job.trace);if(Array.isArray(parsed))trace=parsed;}catch{}
    const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=?').get(fileId,user.id);
-   if(job.engine!==meterEngine(row.utility)||row.status!=='pending'||job.submission_version!==row.version||job.profile_version!==(profile?.version??null)||!file||hash(file.bytes)!==job.file_hash){state='needs_review';reason=REASONS.stale;}
+   if(job.engine!==meterEngine(row.utility)||row.status!=='pending'||job.submission_version!==row.version||job.profile_version!==(profile?.version??null)||!file||hash(file.bytes)!==job.file_hash){state='needs_review';reason=REASONS.stale;trace=null;}
    else if(job.proposal_id){
     const record=store.db.prepare('SELECT * FROM meter_reader_proposals WHERE id=? AND owner_id=? AND submission_id=?').get(job.proposal_id,user.id,key);
     if(record&&!record.used_at&&record.expires_at>Date.now()&&record.submission_version===row.version&&record.file_id===fileId&&record.file_hash===job.file_hash){
-     const candidate=JSON.parse(record.result);if(candidate.engine===meterEngine(row.utility)&&candidate.model===meterModel(row.utility)&&(row.utility!=='electric'||candidate.ocrEvidence?.scope==='automatic'))proposal=candidate;else{state='needs_review';reason=REASONS.stale;}
+     const candidate=JSON.parse(record.result),digests=meterReaderModelDigests(row.utility);
+     const expectedUnit=row.utility==='electric'?'kWh':'m3';
+     const validGemini=candidate.engine==='gemini-vision'&&typeof candidate.model==='string'&&candidate.model.length>0&&candidate.modelDigest===GEMINI_VISION_DIGEST&&candidate.locatorDigest===GEMINI_VISION_DIGEST&&candidate.source==='automatic'&&candidate.profileSource==='gemini-vision'&&candidate.visionEvidence?.provider==='gemini'&&(!candidate.reading||candidate.reading.unit===expectedUnit);
+     const validLocal=candidate.engine===meterEngine(row.utility)&&candidate.model===meterModel(row.utility)&&candidate.modelDigest===digests.modelDigest&&candidate.source==='automatic'&&candidate.locatorDigest===digests.locatorDigest&&(row.utility!=='electric'||candidate.ocrEvidence?.scope==='automatic')&&(candidate.profileSource!=='image'||imageLayoutEvidence(candidate.layoutEvidence,candidate.config,candidate.reading,row.utility,candidate.ocrEvidence)&&(row.utility!=='water'||waterAgreementEvidence(candidate.waterEvidence,candidate.reading)));
+     if(validLocal||validGemini)proposal=candidate;
+     else{state='needs_review';reason='Bộ đọc hoặc phiên bản mô hình công tơ đã thay đổi. Hãy đọc lại ảnh.';}
     }
     else{state='needs_review';reason=REASONS.expired;}
    }
   }
-  if(row.status==='pending')try{reader.scope(user,key,fileId,row.version);assertMeterSubmissionBaseline(store,row);}catch(error){if(![403,404,409].includes(error.status))throw error;state='needs_review';reason=REASONS.stale;proposal=null;}
-  return {status:state,proposal,reason,profile:meterProfileDTO(profile),fileId,submissionVersion:row.version};
+  if(row.status==='pending')try{reader.scope(user,key,fileId,row.version);assertMeterSubmissionBaseline(store,row);}catch(error){if(![403,404,409].includes(error.status))throw error;state='needs_review';reason=REASONS.stale;proposal=null;trace=null;}
+  return {status:state,proposal,reason,profile:meterProfileDTO(profile),fileId,submissionVersion:row.version,usage:meterSubmissionUsage(store,row,proposal),...(trace?.length?{trace}:{})};
  }
  function retry(user,key,input){
   owner(user);only(input,['fileId','version']);must(stringId(input.fileId)&&Number.isSafeInteger(input.version),'Chọn ảnh và phiên bản bộ gửi hợp lệ.');
@@ -122,14 +144,15 @@ export function createMeterAutomaticService(store,reader,options={}){
  }
  function finish(job,token,outcome,row){
   guard(job,token);
-  store.db.prepare('UPDATE meter_reader_jobs SET status=?,reason=?,proposal_id=?,lease_token=NULL,lease_until=NULL,updated_at=? WHERE id=? AND lease_token=?').run(outcome.status,outcome.reason,outcome.proposal?.id||null,now(),job.id,token);
+  const traceJson=Array.isArray(outcome.trace)&&outcome.trace.length?JSON.stringify(outcome.trace):null;
+  store.db.prepare('UPDATE meter_reader_jobs SET status=?,reason=?,proposal_id=?,trace=?,lease_token=NULL,lease_until=NULL,updated_at=? WHERE id=? AND lease_token=?').run(outcome.status,outcome.reason,outcome.proposal?.id||null,traceJson,now(),job.id,token);
   if(outcome.status==='ready')store.put('notifications',{id:id('not'),ownerId:row.ownerId,propertyId:row.propertyId,roomId:row.roomId,recipientUserId:row.ownerId,meterSubmissionId:row.id,title:`Đã có chỉ số ${row.utility==='electric'?'điện':'nước'} đề xuất kỳ ${row.period}`,body:'Bộ đọc tự động đã hoàn tất. Hãy mở ảnh gốc và xác nhận chỉ số trước khi lưu.',kind:'general',readBy:[]});
  }
  async function processJob(job,token,controller){
   try{
    const user=store.db.prepare('SELECT * FROM users WHERE id=?').get(job.owner_id),scopedRow=reader.scope(user,job.submission_id,job.file_id,job.submission_version),profile=confirmedMeterProfile(store,job.owner_id,scopedRow.row.roomId,scopedRow.row.utility);
-   must(profile&&job.engine===meterEngine(scopedRow.row.utility)&&scopedRow.fileHash===job.file_hash&&profile.version===job.profile_version,'Ảnh, bộ đọc hoặc cấu hình đã thay đổi.',409);
-   assertMeterSubmissionBaseline(store,scopedRow.row);active.row=scopedRow.row;active.profileVersion=profile.version;
+   must(job.engine===meterEngine(scopedRow.row.utility)&&scopedRow.fileHash===job.file_hash&&(profile?.version??null)===job.profile_version,'Ảnh, bộ đọc hoặc cấu hình đã thay đổi.',409);
+   assertMeterSubmissionBaseline(store,scopedRow.row);active.row=scopedRow.row;active.profileVersion=profile?.version??null;
    await reader.automatic(user,job.submission_id,{fileId:job.file_id,version:job.submission_version},profile,{signal:controller.signal,guard:()=>guard(job,token),onPersist:(outcome,row)=>finish(job,token,outcome,row)});
   }catch(error){
    const current=store.db.prepare('SELECT * FROM meter_reader_jobs WHERE id=? AND lease_token=?').get(job.id,token);if(!current)return;
@@ -137,7 +160,8 @@ export function createMeterAutomaticService(store,reader,options={}){
    // A shared worker occupied by a manual read has not attempted this image yet.
    const attempts=shutdown||busy?Math.max(0,current.attempts-1):current.attempts,again=shutdown||busy||(transient&&attempts<maxAttempts);
    const state=again?'queued':([400,413,422].includes(error.status)?'retake':[403,404,409].includes(error.status)?'needs_review':'unavailable');
-   store.db.prepare('UPDATE meter_reader_jobs SET status=?,attempts=?,next_attempt_at=?,reason=?,lease_token=NULL,lease_until=NULL,updated_at=? WHERE id=? AND lease_token=?').run(state,attempts,Date.now()+(shutdown?0:retryMs*Math.max(1,attempts)),REASONS[state]||REASONS.stale,now(),job.id,token);
+   const traceJson=Array.isArray(error?.trace)&&error.trace.length?JSON.stringify(error.trace):null;
+   store.db.prepare('UPDATE meter_reader_jobs SET status=?,attempts=?,next_attempt_at=?,reason=?,trace=COALESCE(?,trace),lease_token=NULL,lease_until=NULL,updated_at=? WHERE id=? AND lease_token=?').run(state,attempts,Date.now()+(shutdown?0:retryMs*Math.max(1,attempts)),REASONS[state]||REASONS.stale,traceJson,now(),job.id,token);
   }
  }
  function wake(){
@@ -163,7 +187,14 @@ export function createMeterAutomaticService(store,reader,options={}){
   try{await running;}finally{running=null;active=null;if(!closed)wake();}
  }
  async function close(){closed=true;if(timer)clearTimeout(timer);timer=null;active?.controller.abort();if(running)await running;}
+ // Unblock only explicitly persisted photo jobs from the former setup prerequisite.
+ store.transaction(()=>{
+  for(const job of store.db.prepare("SELECT * FROM meter_reader_jobs WHERE status='needs_setup'").all()){
+   const row=store.get('meterSubmissions',job.submission_id);
+   if(row?.status==='pending'&&row.version===job.submission_version&&(row.photos||[]).some(photo=>photo.fileId===job.file_id))queueRow(row,job.file_id,{replace:true});
+  }
+ });
  // Resume only explicit jobs already persisted by this automatic reader.
  if(store.db.prepare("SELECT 1 FROM meter_reader_jobs WHERE status IN ('queued','processing') LIMIT 1").get())wake();
- return {enqueue,enqueueCreated,get,retry,getProfile,saveProfile,revision,close};
+ return {enqueue,enqueueCreated,get,retry,getProfile,saveProfile,rememberVerifiedLayout,revision,close};
 }
