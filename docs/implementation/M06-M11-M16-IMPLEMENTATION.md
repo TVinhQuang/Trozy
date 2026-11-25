@@ -11,7 +11,7 @@
 - Dùng dữ liệu đã chốt cho các phép tính hóa đơn theo công tơ. Phương thức tính theo đầu người hoặc phí cố định không bắt buộc có số đọc.
 - Kết quả OCR chỉ là đề xuất. Chỉ số chỉ được dùng tính tiền sau khi chủ trọ kiểm tra, xác nhận và chốt kỳ.
 - VietQR là hướng dẫn chuyển khoản; không phải bằng chứng thanh toán. Báo đã chuyển của người thuê luôn ở trạng thái chờ cho đến khi chủ trọ xác nhận.
-- Tiền cọc đang giữ không phải doanh thu. Bù trừ công nợ từ tiền cọc không tạo dòng tiền thu mới.
+- Tiền cọc đang giữ không phải doanh thu. Mọi hóa đơn liên quan phải được tất toán trước khi lập phương án quyết toán cọc.
 
 ## 2. Phạm vi đã triển khai
 
@@ -52,15 +52,16 @@
 ### M10 - Security Deposit and Refund Management (UC40-UC41)
 
 - Nhận cọc, bổ sung, điều chỉnh, khấu trừ và hoàn; lưu từng mục lịch sử. Tiền cọc đang giữ không được ghi vào doanh thu.
-- Chỉ tạo quyết toán sau khi hợp đồng đã kết thúc và biên bản trả phòng được hai bên xác nhận.
-- Hồ sơ quyết toán có nhiều khoản khấu trừ, lý do và tệp bằng chứng; hệ thống tính số cọc giữ, khấu trừ, công nợ được bù và khoản còn lại phải hoàn.
-- Người thuê có thể đồng ý hoặc gửi ý kiến không đồng ý; chủ trọ điều chỉnh và gửi lại hồ sơ. Chỉ khi người thuê đồng ý mới cho ghi nhận hoàn tiền.
-- Khi chốt quyết toán, phần công nợ được phân bổ vào hóa đơn chưa thanh toán bằng bút toán `deposit_offset` (không phải tiền mặt thu mới); tiền hoàn thực tế được ghi thành chi phí dòng tiền và lịch sử hoàn cọc.
+- Sau khi hai bên xác nhận bàn giao, hợp đồng và phòng tiếp tục chờ quyết toán. Hóa đơn cũ phải được thanh toán và báo chuyển khoản phải được đối soát.
+- Mỗi mục hư hỏng lúc trả phòng có mã, chi phí và phần phân bổ. Hệ thống khấu trừ tối đa đến số cọc đang giữ và lập một hóa đơn phụ cho phần vượt.
+- Người thuê duyệt phương án hoặc gửi ý kiến. Chủ trọ phát hành hóa đơn phụ đã duyệt và xác nhận thực thu. Khi giảm tổng hóa đơn xuống dưới số đã thu, hệ thống lưu biên nhận gốc và chuyển phần dư sang số dư của người thuê.
+- Khi số dư các hóa đơn bằng 0, chủ trọ ghi nhận tiền thực hoàn nếu có và hoàn tất quyết toán. Hệ thống đóng hợp đồng và giải phóng phòng.
+
 
 ### M11 - Income and Expense Management (UC42-UC43)
 
 - Sổ thu/chi thủ công theo cơ sở, phòng, loại, danh mục, ngày, số tiền, mô tả và tệp minh chứng; lưu lịch sử sửa/xóa theo cơ chế hiện hành.
-- Xác nhận tiền hóa đơn tự tạo bút toán thu; hoàn tiền hóa đơn/trả dư và hoàn cọc tạo bút toán chi tương ứng. Bù trừ cọc vào công nợ không được ghi thành tiền mặt thu.
+- Xác nhận tiền hóa đơn tự tạo bút toán thu; hoàn tiền hóa đơn/trả dư và hoàn cọc tạo bút toán chi tương ứng.
 - Báo cáo theo khoảng ngày/cơ sở, phân biệt hóa đơn đã lập, tiền đã thu theo hóa đơn, công nợ còn lại, khoản thu khác, chi phí và dòng tiền ròng.
 - Hỗ trợ xuất CSV, Excel (`exceljs`) và in/lưu PDF qua hộp thoại in trình duyệt.
 - Sổ thu chi này không phải kế toán kép; sổ cọc vẫn cần được đối chiếu ở phân hệ M10.
@@ -95,17 +96,16 @@
 
 - `tests/backend.test.mjs` - fixture/ca kiểm thử theo quy tắc số đọc chốt, phương thức phi công tơ, thay công tơ nhiều lần, báo chuyển khoản và quyết toán cọc.
 - `tests/security.test.mjs` - ca bảo mật/riêng tư, gồm thông báo nhiều phòng.
-- `docs/requirements/FEATURE-COVERAGE.md` - cập nhật ma trận trạng thái so với yêu cầu.
 - `docs/implementation/M06-M11-M16-IMPLEMENTATION.md` - tài liệu này.
 
-## 4. Kiểm tra đã thực hiện
+## 4. Kiểm tra trên bản triển khai ngày 14/11/2026
 
 - `node --check` cho `src/backend/domain.mjs`, `src/backend/db.mjs` và `src/backend/server.mjs`.
 - TypeScript `transpileModule` kiểm tra cú pháp 28 tệp triển khai trong `src/`: không có lỗi cú pháp.
 - `node --test tests/backend.test.mjs tests/security.test.mjs`: 29/29 test pass.
 - Vì môi trường kiểm thử hiện tại không cài dependency native `sharp`, hai bộ test backend/security được chạy với module stub tạm thời; hai bộ test này không gọi xử lý ảnh. Stub đã được xóa sau kiểm thử.
 
-## 5. Giới hạn kiểm thử/môi trường cần nhóm xác nhận
+## 5. Giới hạn của môi trường kiểm thử ngày 14/11/2026
 
 - Repository yêu cầu Node.js `>=24.0.0`; môi trường hiện tại là Node.js `22.16.0`.
 - Không có `node_modules` đã cài, nên chưa chạy được Vite production build, TypeScript type-check đầy đủ, Excel export runtime hoặc kiểm thử xử lý ảnh OCR có `sharp` thật.

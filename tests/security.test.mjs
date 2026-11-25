@@ -215,7 +215,7 @@ test('overpayments, credit allocations and both refund paths preserve cash and i
   assert.equal(netCash(), beforeDenied.cash);
 });
 
-test('issued invoice adjustments preserve paid allocation and reject undercutting received money', async t => {
+test('issued invoice adjustments preserve receipts and turn excess allocations into spendable credit', async t => {
   const { app, owner } = await fixture(t);
   const previousReading = app.store.list('readings', 'owner_demo').filter(row => row.roomId === 'room_101' && row.confirmed && row.period < '2026-11').sort((a, b) => b.period.localeCompare(a.period))[0];
   app.store.put('readings', { id: 'security_reading_2026_11', ownerId: 'owner_demo', propertyId: 'property_01', roomId: 'room_101', period: '2026-11', electricOld: previousReading.electricNew, electricNew: previousReading.electricNew + 80, waterOld: previousReading.waterNew, waterNew: previousReading.waterNew + 5, confirmed: true, recorderId: 'test', finalizedAt: '2026-11-01T00:00:00.000Z' });
@@ -232,12 +232,15 @@ test('issued invoice adjustments preserve paid allocation and reject undercuttin
   assert.equal(changed.data.total, issued.data.total + 10000);
   assert.equal(changed.data.version, 2);
   assert.equal(changed.data.versions[0].total, issued.data.total);
-  const before = app.store.get('invoices', invoiceId);
-  const rejected = await owner('/actions/invoice-adjust', { method: 'POST', body: { id: invoiceId, rent: 0, electricRate: 0, waterRate: 0, serviceFee: 0, adjustment: 0, reason: 'Thử giảm tổng thấp hơn phần đã thu.' } });
-  assert.equal(rejected.status, 400);
-  assert.equal(app.store.get('invoices', invoiceId).total, before.total);
-  assert.equal(app.store.get('invoices', invoiceId).paid, before.paid);
-  assert.equal(app.store.get('invoices', invoiceId).version, before.version);
+  const receipts = app.store.list('payments').filter(r=>r.invoiceId===invoiceId);
+  const cash = app.store.list('transactions').length;
+  const adjusted = await owner('/actions/invoice-adjust', { method: 'POST', body: { id: invoiceId, rent: 0, electricRate: 0, waterRate: 0, serviceFee: 0, adjustment: 0, reason: 'Thử giảm tổng thấp hơn phần đã thu.' } });
+  assert.equal(adjusted.status,200,adjusted.data.error);
+  assert.equal(adjusted.data.total,0);assert.equal(adjusted.data.paid,0);
+  assert.equal(app.store.list('transactions').length,cash);
+  for(const receipt of receipts)assert.deepEqual(app.store.get('payments',receipt.id),receipt);
+  const view=await owner('/bootstrap');
+  assert.equal(view.data.data.credits.find(c=>c.invoiceId===invoiceId).balance,200000);
   const periodChange = await owner('/actions/invoice-adjust', { method: 'POST', body: { id: invoiceId, period: '2026-12', reason: 'Không được chuyển kỳ một hóa đơn đã phát hành.' } });
   assert.equal(periodChange.status, 400);
 });
