@@ -27,7 +27,7 @@ export function SecondaryNavigation({role,page,navigate,compact,onExpand,unread,
     if(active)setOpenGroup(active.id);
   },[page]);
   return <nav className="sidebar-nav" aria-label="Điều hướng bổ sung">
-    <p className="sidebar-nav-intro">Công cụ quản lý</p>
+    <p className="sidebar-nav-intro">{role === 'landlord' ? 'Công cụ quản lý' : 'Cổng thông tin người thuê'}</p>
     {secondaryNavigation.map(group=>{
       const entries=group.items.filter(item=>permitted(item,role));
       if(!entries.length)return null;
