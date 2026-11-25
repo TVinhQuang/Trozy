@@ -23,8 +23,15 @@ async function fixture(t){
 const post=(cookie,body)=>({method:'POST',cookie,body});
 const patch=(cookie,body)=>({method:'PATCH',cookie,body});
 function nextInvoice(store,roomId='room_101'){
-  const reading=store.list('readings').filter(r=>r.roomId===roomId).sort((a,b)=>b.period.localeCompare(a.period))[0];
-  return {roomId,period:'2026-11',electricOld:reading.electricNew,electricNew:reading.electricNew+80,waterOld:reading.waterNew,waterNew:reading.waterNew+5,electricRate:3500,waterRate:15000,serviceFee:130000,adjustment:0};
+  const period='2026-11';
+  let reading=store.list('readings').find(r=>r.roomId===roomId&&r.period===period);
+  if(!reading){
+    const previous=store.list('readings').filter(r=>r.roomId===roomId&&r.confirmed&&r.period<period).sort((a,b)=>b.period.localeCompare(a.period))[0];
+    assert(previous,`Missing previous finalized reading for ${roomId}.`);
+    const room=store.get('rooms',roomId);
+    reading=store.put('readings',{id:`test_reading_${roomId}_${period}`,ownerId:'owner_demo',propertyId:room.propertyId,roomId,period,electricOld:previous.electricNew,electricNew:previous.electricNew+80,waterOld:previous.waterNew,waterNew:previous.waterNew+5,confirmed:true,recorderId:'test',recordedAt:'2026-11-01T00:00:00.000Z',finalizedAt:'2026-11-01T00:00:00.000Z'});
+  }
+  return {roomId,period,electricOld:reading.electricOld,electricNew:reading.electricNew,waterOld:reading.waterOld,waterNew:reading.waterNew,electricRate:3500,waterRate:15000,serviceFee:130000,adjustment:0};
 }
 
 test('strict owner and tenant data boundaries',async t=>{
@@ -77,12 +84,13 @@ test('contract overlap, renewal acknowledgement and move-out settlement',async t
   assert.equal((await request('/api/actions/contract-end',post(owner,{id:'contract_01'}))).status,200);assert.equal(store.get('rooms','room_101').status,'handover');
   const handover=await request('/api/handovers',post(owner,{propertyId:'property_01',roomId:'room_101',tenantId:'tenant_01',contractId:'contract_01',type:'move_out',date:'2026-11-01',condition:'Đã kiểm tra hiện trạng phòng.',electricReading:1400,waterReading:130}));assert.equal(handover.status,201);
   assert.equal((await request('/api/actions/handover-confirm',post(owner,{id:handover.body.id}))).status,200);
-  assert.equal((await request('/api/actions/handover-confirm',post(tenant,{id:handover.body.id}))).status,400);
+  assert.equal((await request('/api/actions/handover-confirm',post(tenant,{id:handover.body.id}))).status,200);
+  assert.equal(store.get('rooms','room_101').status,'vacant');assert.equal(store.get('tenants','tenant_01').status,'left');
   assert.equal((await request('/api/actions/deposit-record',post(owner,{contractId:'contract_01',type:'refund',amount:3500001,date:'2026-11-01'}))).status,400);
   assert.equal((await request('/api/actions/deposit-record',post(owner,{contractId:'contract_01',type:'refund',amount:3500000,date:'2026-11-01'}))).status,200);
   assert.equal((await request('/api/actions/deposit-record',post(owner,{contractId:'contract_01',type:'receipt',amount:1,date:'2026-11-01'}))).status,400);
   const due=store.list('invoices').find(i=>i.id==='HD-10-101');assert.equal((await request('/api/actions/payment-record',post(owner,{invoiceId:due.id,amount:due.total-due.paid,method:'transfer',date:'2026-11-01'}))).status,200);
-  assert.equal((await request('/api/actions/handover-confirm',post(tenant,{id:handover.body.id}))).status,200);assert.equal(store.get('rooms','room_101').status,'vacant');assert.equal(store.get('tenants','tenant_01').status,'left');
+  assert.equal((await request('/api/actions/handover-confirm',post(tenant,{id:handover.body.id}))).status,409);assert.equal(store.get('rooms','room_101').status,'vacant');assert.equal(store.get('tenants','tenant_01').status,'left');
 });
 
 test('two-party maintenance workflow, support ticket reopen and notification read state',async t=>{
@@ -219,10 +227,72 @@ test('identity numbers encrypted at rest, persistent and recoverable from full b
   try{
     const app=createApp({dbPath:path,seed:true});
     app.store.put('tenants',{...app.store.get('tenants','tenant_01'),identityNumber:'012345678901'});
-    const raw=app.store.db.prepare('SELECT data FROM records WHERE collection=? AND id=?').get('tenants','tenant_01').data;assert(!raw.includes('012345678901'));assert(raw.includes('enc:'));app.store.close();
-    const reopened=createApp({dbPath:path,seed:true});assert.equal(reopened.store.get('tenants','tenant_01').identityNumber,'012345678901');assert.equal(reopened.store.list('properties').length,3);reopened.store.close();
+    const raw=app.store.db.prepare('SELECT data FROM records WHERE collection=? AND id=?').get('tenants','tenant_01').data;assert(!raw.includes('012345678901'));assert(raw.includes('enc:'));await app.close();
+    const reopened=createApp({dbPath:path,seed:true});assert.equal(reopened.store.get('tenants','tenant_01').identityNumber,'012345678901');assert.equal(reopened.store.list('properties').length,3);await reopened.close();
     const destination=join(directory,'backup');
     await promisify(execFile)(process.execPath,['src/backend/backup.mjs',destination],{env:{...process.env,TROZY_DB_PATH:path}});
-    const restored=createApp({dbPath:join(destination,'trozy.sqlite'),seed:false});assert.equal(restored.store.get('tenants','tenant_01').identityNumber,'012345678901');assert.equal(restored.store.list('properties').length,3);restored.store.close();
+    const restored=createApp({dbPath:join(destination,'trozy.sqlite'),seed:false});assert.equal(restored.store.get('tenants','tenant_01').identityNumber,'012345678901');assert.equal(restored.store.list('properties').length,3);await restored.close();
   }finally{rmSync(directory,{recursive:true,force:true});}
+});
+
+test('M06 non-meter billing accepts per-person and fixed rates without finalized readings',async t=>{
+  const {request,login}=await fixture(t);const owner=await login();
+  const settings=await request('/api/settings/settings_property_01',patch(owner,{electricMethod:'person',electricPersonRate:120000,waterMethod:'fixed',waterFixedFee:80000,effectiveFrom:'2026-11-01'}));
+  assert.equal(settings.status,200);
+  const preview=await request('/api/actions/invoice-preview',post(owner,{roomId:'room_101',period:'2026-11',serviceFee:0}));
+  assert.equal(preview.status,200,preview.body.error);
+  assert.equal(preview.body.electricMethod,'person');assert.equal(preview.body.waterMethod,'fixed');
+  assert.equal(preview.body.items.find(item=>item.name==='Điện').amount,120000);
+  assert.equal(preview.body.items.find(item=>item.name==='Nước').amount,80000);
+});
+
+test('M06 meter replacement before reading entry preserves every meter segment in consumption',async t=>{
+  const {store,request,login}=await fixture(t);const owner=await login(),room=store.get('rooms','room_101'),period='2026-11';
+  const previous=store.list('readings','owner_demo').filter(row=>row.roomId===room.id&&row.confirmed&&row.period<period).sort((a,b)=>b.period.localeCompare(a.period))[0];
+  assert(previous,'Fixture needs a previous finalized reading.');
+  const first=await request('/api/meters',post(owner,{propertyId:room.propertyId,roomId:room.id,utility:'electric',code:'E-TEST-01',initialReading:previous.electricNew,installedAt:'2026-11-01',status:'active'}));
+  assert.equal(first.status,201,first.body.error);
+  const replace1=await request('/api/actions/meter-replace',post(owner,{id:first.body.id,finalReading:previous.electricNew+30,newCode:'E-TEST-02',initialReading:5,effectiveDate:'2026-11-08'}));
+  assert.equal(replace1.status,200,replace1.body.error);
+  const replace2=await request('/api/actions/meter-replace',post(owner,{id:replace1.body.replacement.id,finalReading:20,newCode:'E-TEST-03',initialReading:2,effectiveDate:'2026-11-12'}));
+  assert.equal(replace2.status,200,replace2.body.error);
+  const reading=await request('/api/readings',post(owner,{propertyId:room.propertyId,roomId:room.id,period,electricOld:2,electricNew:10,waterOld:previous.waterNew,waterNew:previous.waterNew+3,confirmed:false}));
+  assert.equal(reading.status,201,reading.body.error);assert.equal(reading.body.meterBreakdown.filter(row=>row.utility==='electric').length,2);
+  assert.equal((await request('/api/actions/reading-finalize',post(owner,{id:reading.body.id,confirmAnomaly:true}))).status,200);
+  const preview=await request('/api/actions/invoice-preview',post(owner,{roomId:room.id,period}));
+  assert.equal(preview.status,200,preview.body.error);
+  assert.equal(preview.body.items.find(item=>item.name==='Điện').quantity,53,'30 + 15 + 8 units should be charged across the three meter segments.');
+});
+
+test('M09 tenant transfer reports remain pending until landlord confirmation',async t=>{
+  const {store,request,login}=await fixture(t);const owner=await login(),tenant=await login('thue@trozy.vn');
+  const invoice=store.get('invoices','HD-10-101'),paidBefore=invoice.paid,transactionsBefore=store.list('transactions','owner_demo').length;
+  const report=await request('/api/actions/payment-report-transfer',post(tenant,{invoiceId:invoice.id,amount:100000,date:today()}));
+  assert.equal(report.status,200,report.body.error);assert.equal(report.body.status,'pending');assert.equal(report.body.appliedAmount,0);
+  assert.equal(store.get('invoices',invoice.id).paid,paidBefore);assert.equal(store.list('transactions','owner_demo').length,transactionsBefore);
+  const confirmed=await request('/api/actions/payment-confirm-transfer',post(owner,{id:report.body.id}));
+  assert.equal(confirmed.status,200,confirmed.body.error);assert.equal(confirmed.body.status,'confirmed');
+  assert.equal(store.get('invoices',invoice.id).paid,paidBefore+100000);
+  assert.equal(store.list('transactions','owner_demo').length,transactionsBefore+1);
+});
+
+test('M10 deposit settlement requires tenant agreement and offsets debt without counting deposit as income',async t=>{
+  const {store,request,login}=await fixture(t);const owner=await login(),tenant=await login('thue@trozy.vn');
+  assert.equal((await request('/api/actions/contract-end',post(owner,{id:'contract_01'}))).status,200);
+  const handover=await request('/api/handovers',post(owner,{propertyId:'property_01',roomId:'room_101',tenantId:'tenant_01',contractId:'contract_01',type:'move_out',date:today(),condition:'Đã kiểm tra và ghi nhận tình trạng phòng.'}));assert.equal(handover.status,201);
+  assert.equal((await request('/api/actions/handover-confirm',post(owner,{id:handover.body.id}))).status,200);
+  assert.equal((await request('/api/actions/handover-confirm',post(tenant,{id:handover.body.id}))).status,200);
+  const cashBefore=store.list('transactions','owner_demo').reduce((sum,row)=>sum+(row.type==='income'?row.amount:-row.amount),0);
+  const settlement=await request('/api/actions/deposit-settlement-create',post(owner,{contractId:'contract_01',deductions:[{label:'Vệ sinh bổ sung',reason:'Cần vệ sinh lại khu bếp theo biên bản.',amount:100000}]}));
+  assert.equal(settlement.status,200,settlement.body.error);assert.equal(settlement.body.status,'pending_tenant');
+  assert(settlement.body.debt>0);assert(settlement.body.debtApplied>0);assert(settlement.body.refundAmount>0);
+  const earlyRefund=await request('/api/actions/deposit-settlement-refund',post(owner,{id:settlement.body.id}));assert.equal(earlyRefund.status,400);
+  const tenantData=(await request('/api/bootstrap',{cookie:tenant})).body.data;
+  assert(tenantData.depositSettlements.some(row=>row.id===settlement.body.id));
+  const accepted=await request('/api/actions/deposit-settlement-respond',post(tenant,{id:settlement.body.id,decision:'accept'}));assert.equal(accepted.status,200,accepted.body.error);
+  const refunded=await request('/api/actions/deposit-settlement-refund',post(owner,{id:settlement.body.id}));assert.equal(refunded.status,200,refunded.body.error);assert.equal(refunded.body.status,'refunded');
+  const invoice=store.get('invoices','HD-10-101');assert.equal(invoice.paid,invoice.total,'Deposit offset must settle the remaining invoice debt.');
+  const cashAfter=store.list('transactions','owner_demo').reduce((sum,row)=>sum+(row.type==='income'?row.amount:-row.amount),0);
+  assert.equal(cashBefore-cashAfter,settlement.body.refundAmount,'Only the actual cash refund reduces cash; held deposit is not revenue.');
+  assert.equal(store.list('transactions','owner_demo').filter(row=>row.source==='deposit_settlement'&&row.type==='income').length,0);
 });

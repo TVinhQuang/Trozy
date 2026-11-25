@@ -642,6 +642,10 @@ tbody tr:hover { background: var(--surface-hover); }
 @media print {
   body { background: white; }
   .sidebar, .workspace-chrome, .topbar, .scopebar, .app-footer, .main-content, .toast, .form-actions { display: none !important; }
+  .main-content:has(.report-print) { display: block !important; max-width: none; margin: 0; padding: 0; }
+  .report-print .header-actions, .report-print .report-filters { display: none !important; }
+  .report-print .card { box-shadow: none; break-inside: avoid; }
+  .report-print .page-header { margin-bottom: 12px; }
   .main-shell { margin: 0; }
   .modal-backdrop { position: static; background: white; display: block; padding: 0; }
   .modal { box-shadow: none; max-height: none; max-width: none; border-radius: 0; }

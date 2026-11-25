@@ -3,7 +3,7 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { randomUUID, scryptSync, randomBytes, timingSafeEqual, createHash, createCipheriv, createDecipheriv } from 'node:crypto';
 
-export const COLLECTIONS = ['properties','rooms','tenants','contracts','readings','meterSubmissions','meterProfiles','services','invoices','payments','credits','deposits','transactions','issues','assets','handovers','notifications','tickets','documents','vehicles','amenities','bookings','settings','audits'];
+export const COLLECTIONS = ['properties','rooms','tenants','contracts','readings','meters','meterSubmissions','meterProfiles','services','charges','invoices','payments','credits','deposits','depositSettlements','transactions','issues','assets','handovers','notifications','tickets','documents','vehicles','amenities','bookings','settings','audits'];
 export const id = prefix => `${prefix}_${randomUUID().replaceAll('-','').slice(0,18)}`;
 export const now = () => new Date().toISOString();
 export const today = () => new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Ho_Chi_Minh'});
@@ -24,12 +24,15 @@ export function openStore(path='data/trozy.sqlite') {
     CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,expires_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS auth_tokens (token_hash TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,kind TEXT NOT NULL,expires_at INTEGER NOT NULL);
     CREATE TABLE IF NOT EXISTS mail_outbox (id TEXT PRIMARY KEY,email TEXT NOT NULL,kind TEXT NOT NULL,token TEXT NOT NULL,created_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS notification_mail_outbox (id TEXT PRIMARY KEY,notification_id TEXT NOT NULL,owner_id TEXT NOT NULL,user_id TEXT NOT NULL,email TEXT NOT NULL,status TEXT NOT NULL DEFAULT 'queued',attempts INTEGER NOT NULL DEFAULT 0,last_error TEXT,created_at TEXT NOT NULL,delivered_at TEXT,UNIQUE(notification_id,user_id));
+    CREATE INDEX IF NOT EXISTS notification_mail_queue ON notification_mail_outbox(status,created_at);
     CREATE TABLE IF NOT EXISTS records (collection TEXT NOT NULL,id TEXT NOT NULL,owner_id TEXT NOT NULL REFERENCES users(id),property_id TEXT,tenant_id TEXT,data TEXT NOT NULL CHECK(json_valid(data)),PRIMARY KEY(collection,id));
     CREATE INDEX IF NOT EXISTS records_owner ON records(owner_id,collection);
     CREATE UNIQUE INDEX IF NOT EXISTS rooms_code_unique ON records(owner_id,property_id,lower(json_extract(data,'$.code'))) WHERE collection='rooms';
     CREATE UNIQUE INDEX IF NOT EXISTS invoice_period_unique ON records(owner_id,json_extract(data,'$.roomId'),json_extract(data,'$.period')) WHERE collection='invoices' AND json_extract(data,'$.status')!='cancelled';
     CREATE UNIQUE INDEX IF NOT EXISTS reading_period_unique ON records(owner_id,json_extract(data,'$.roomId'),json_extract(data,'$.period')) WHERE collection='readings';
     CREATE UNIQUE INDEX IF NOT EXISTS meter_profile_unique ON records(owner_id,json_extract(data,'$.roomId'),json_extract(data,'$.utility')) WHERE collection='meterProfiles';
+    CREATE UNIQUE INDEX IF NOT EXISTS meter_code_unique ON records(owner_id,property_id,lower(json_extract(data,'$.code'))) WHERE collection='meters';
     CREATE UNIQUE INDEX IF NOT EXISTS settings_property_unique ON records(owner_id,property_id) WHERE collection='settings';
     CREATE TABLE IF NOT EXISTS files(id TEXT PRIMARY KEY,owner_id TEXT NOT NULL REFERENCES users(id),uploader_id TEXT NOT NULL REFERENCES users(id),property_id TEXT,tenant_id TEXT,name TEXT NOT NULL,type TEXT NOT NULL,bytes BLOB NOT NULL,created_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS schema_migrations(version INTEGER PRIMARY KEY,applied_at TEXT NOT NULL);
@@ -46,6 +49,7 @@ export function openStore(path='data/trozy.sqlite') {
   const fileColumns=db.prepare('PRAGMA table_info(files)').all().map(column=>column.name);
   if(!fileColumns.includes('room_id'))db.exec('ALTER TABLE files ADD COLUMN room_id TEXT');
   db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(4,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
+  db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(5,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
   const read=db.prepare('SELECT data FROM records WHERE collection=? AND id=?');
   const all=db.prepare('SELECT data FROM records WHERE collection=? ORDER BY rowid');
   const own=db.prepare('SELECT data FROM records WHERE collection=? AND owner_id=? ORDER BY rowid');

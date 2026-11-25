@@ -185,6 +185,8 @@ test('overpayments, credit allocations and both refund paths preserve cash and i
   assert.equal(app.store.get('invoices', oldInvoice.id).paid, oldInvoice.total);
   assert.equal(netCash() - baseline, due + 500000);
 
+  const previousReading = app.store.list('readings', 'owner_demo').filter(row => row.roomId === 'room_101' && row.confirmed && row.period < '2026-11').sort((a, b) => b.period.localeCompare(a.period))[0];
+  app.store.put('readings', { id: 'security_reading_2026_11', ownerId: 'owner_demo', propertyId: 'property_01', roomId: 'room_101', period: '2026-11', electricOld: previousReading.electricNew, electricNew: previousReading.electricNew + 80, waterOld: previousReading.waterNew, waterNew: previousReading.waterNew + 5, confirmed: true, recorderId: 'test', finalizedAt: '2026-11-01T00:00:00.000Z' });
   const next = await owner('/actions/invoice-issue', { method: 'POST', body: { roomId: 'room_101', period: '2026-11' } });
   assert.equal(next.status, 200);
   const transactionCount = app.store.list('transactions', 'owner_demo').length;
@@ -215,6 +217,8 @@ test('overpayments, credit allocations and both refund paths preserve cash and i
 
 test('issued invoice adjustments preserve paid allocation and reject undercutting received money', async t => {
   const { app, owner } = await fixture(t);
+  const previousReading = app.store.list('readings', 'owner_demo').filter(row => row.roomId === 'room_101' && row.confirmed && row.period < '2026-11').sort((a, b) => b.period.localeCompare(a.period))[0];
+  app.store.put('readings', { id: 'security_reading_2026_11', ownerId: 'owner_demo', propertyId: 'property_01', roomId: 'room_101', period: '2026-11', electricOld: previousReading.electricNew, electricNew: previousReading.electricNew + 80, waterOld: previousReading.waterNew, waterNew: previousReading.waterNew + 5, confirmed: true, recorderId: 'test', finalizedAt: '2026-11-01T00:00:00.000Z' });
   const draft = await owner('/actions/invoice-draft', { method: 'POST', body: { roomId: 'room_101', period: '2026-11', serviceItems: [{ name: 'Internet', quantity: 1, rate: 100000 }] } });
   assert.equal(draft.status, 200);
   assert.equal(draft.data.status, 'draft');
