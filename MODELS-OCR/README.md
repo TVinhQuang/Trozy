@@ -1,15 +1,6 @@
 # Model OCR điện và nước của Trozy
 
-Đây là nơi mở nhanh và kiểm kê **4 model OCR đang dùng**, sắp xếp ngày 12/11/2026. Mọi trọng số đều nằm trong `D:\Trozy` trên ổ D; không tải lại hoặc train lại model.
-
-## Mở model đang dùng
-
-- Nhấp đúp **DIEN.lnk**: mở hai thư mục PaddleOCR đọc công tơ điện.
-- Nhấp đúp **NUOC.lnk**: mở YOLO tìm vùng và VisionState đọc bánh số nước.
-- `models.json`: bảng kê đường dẫn, dung lượng và SHA-256 của từng file tại thời điểm sắp xếp. Bảng kê không tự cập nhật khi bạn train lại.
-- `verification.json`: kết quả kiểm tra sau sắp xếp: 10 file giữ nguyên hash, 23 bài kiểm tra Python đạt và đọc mẫu điện/nước qua HTTP thành công. Đây là kiểm tra tích hợp, không phải độ chính xác chung trên ảnh thực tế.
-
-Các lối tắt mở thư mục thật, không chứa bản sao trọng số. Nếu chuyển toàn bộ dự án sang vị trí khác, cần tạo lại hai lối tắt Windows; app tự lấy đường dẫn theo thư mục dự án.
+Danh mục ngày 12/11/2026 ghi bốn model đang dùng. Đường dẫn bên dưới tính từ thư mục gốc Trozy. [Danh mục và SHA-256](models.json) · [Biên bản kiểm tra ngày 12/11](verification.json)
 
 | Nhánh | Model đang dùng | Công việc | Dung lượng trọng số |
 | --- | --- | --- | ---: |
@@ -21,7 +12,7 @@ Các lối tắt mở thư mục thật, không chứa bản sao trọng số. N
 **Thư mục thật của điện:**
 
 ```text
-D:\Trozy\.runtime\paddleocr\models\electric\
+.runtime\paddleocr\models\electric\
   PP-OCRv6_small_det_trozy_onnx_infer\
     inference.onnx
     inference.yml
@@ -39,18 +30,18 @@ Giữ mỗi bộ Paddle nguyên thư mục: app cần cả trọng số, cấu h
 **Thư mục thật của nước:**
 
 ```text
-D:\Trozy\.runtime\meter-digits\visionstate-yolo\models\water\
+.runtime\meter-digits\visionstate-yolo\models\water\
   trozy_water_yolov8_obb.pt
   wheels-v2.onnx
 ```
 
-Đường dẫn cũ `models/wheels-v2.onnx` còn được giữ bằng **NTFS hard link** tới đúng file `models/water/wheels-v2.onnx`, để các script thử nghiệm đã khóa mã nguồn tiếp tục hoạt động. Đây là hai tên của cùng một file trên D, không phải hai bản trọng số chiếm dung lượng riêng. App hiện dùng đường dẫn trong `water/`.
+Trên máy lập biên bản, đường dẫn cũ `models/wheels-v2.onnx` là hard link phục vụ script thử nghiệm. Ứng dụng đọc model nước ở thư mục `models/water/`.
 
 ## Model gốc và checkpoint để đối chiếu
 
 Các mục này được giữ nguyên vị trí, **không phải bộ trọng số đang được app chọn**:
 
-| Loại | Vị trí trong `D:\Trozy` |
+| Loại | Vị trí tương đối trong dự án |
 | --- | --- |
 | Paddle DET gốc | `.runtime/paddleocr/models/PP-OCRv6_small_det_onnx_infer/` |
 | Paddle REC gốc | `.runtime/paddleocr/models/PP-OCRv6_small_rec_onnx_infer/` |
@@ -60,6 +51,26 @@ Các mục này được giữ nguyên vị trí, **không phải bộ trọng s
 | Báo cáo train nước | `.runtime/meter-digits/runs/water_yolov8n_obb_eval.json` |
 
 Python, thư viện, cache, dataset và checkpoint không được di chuyển trong lần sắp xếp này. Các báo cáo lịch sử giữ nguyên đường dẫn được ghi lúc tạo báo cáo.
+
+## Chuẩn bị trên máy mới
+
+1. Từ thư mục gốc của bản clone, chạy `npm run ai:setup-meter-reader` và `npm run ai:setup-paddle-meter` để chuẩn bị thư viện và model nền.
+2. Lấy bộ trọng số đã fine-tune từ người phụ trách OCR của nhóm qua kênh chia sẻ được phép. Chép từng tệp vào đường dẫn tương đối ở trường `files[].path` của [models.json](models.json), gồm cả cấu hình và bảng ký tự Paddle. Trường `root` trong danh mục ghi vị trí trên máy lập biên bản ngày 12/11.
+3. Chạy đoạn PowerShell sau ở thư mục gốc để đối chiếu kích thước và SHA-256 của toàn bộ tệp. Lỗi sẽ nêu đúng tệp cần kiểm tra.
+
+```powershell
+$models = Get-Content -Raw -LiteralPath 'MODELS-OCR/models.json' | ConvertFrom-Json
+foreach ($model in $models.files) {
+  $file = Get-Item -LiteralPath $model.path -ErrorAction Stop
+  $hash = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash
+  if ($file.Length -ne $model.bytes -or $hash -ne $model.sha256) {
+    throw "Sai kích thước hoặc SHA-256: $($model.path)"
+  }
+}
+Write-Output "Đã xác minh $($models.files.Count) tệp model."
+```
+
+Đối chiếu [giấy phép đi kèm](../THIRD-PARTY-NOTICES.md) trước khi phân phối bộ trọng số. Sau khi có bộ ảnh thử phù hợp, nhóm có thể kiểm tra hai nhánh qua HTTP bằng `npm run ai:meter-split-check`. Phép so sánh hash chỉ xác nhận đúng bộ tệp đã kê khai.
 
 ## Khi thay hoặc train model
 

@@ -20,7 +20,7 @@ Vì vậy, “train nước” hiện chỉ là train **bộ tìm vùng YOLO**, 
 
 Cả hai trainer là **fine-tune từ model gốc**, không phải train từ đầu. Lệnh mặc định cũng không tiếp tục từ model production hiện tại hoặc tự resume `last.pt`.
 
-Model đang dùng trong app được tách theo loại tại `.runtime/paddleocr/models/electric/` và `.runtime/meter-digits/visionstate-yolo/models/water/`. Mở [MODELS-OCR](../MODELS-OCR/README.md) để xem danh mục và hai lối tắt `DIEN.lnk` / `NUOC.lnk`. Model gốc và các run/checkpoint vẫn ở vị trí cũ; các ví dụ lưu lượt thử riêng bên dưới giữ nguyên đường dẫn.
+Model đang dùng trong app được tách theo loại tại `.runtime/paddleocr/models/electric/` và `.runtime/meter-digits/visionstate-yolo/models/water/`. Mở [MODELS-OCR](../MODELS-OCR/README.md) để xem danh mục, đường dẫn tương đối và SHA-256. Model gốc và các run/checkpoint vẫn ở vị trí cũ; các ví dụ lưu lượt thử riêng bên dưới giữ nguyên đường dẫn.
 
 ## 2. Máy hiện có gì, cần cài thêm không?
 

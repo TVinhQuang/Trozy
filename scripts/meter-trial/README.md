@@ -2,7 +2,7 @@
 
 This is a feasibility harness, separate from the Trozy app. It never opens a database or applies a reading. Tenant photo submission and landlord manual verification remain the active app flow.
 
-Prepared Python and model files live in `.runtime/meter-digits/visionstate-yolo/`. Cache and temporary files remain in the project. No inference call downloads a missing model. See [the report](../../docs/test/VISIONSTATE-YOLO-TRIAL-20261031.md) for limitations, provisional labels, observed failures and exact model revisions.
+Prepared Python and model files live in `.runtime/meter-digits/visionstate-yolo/`. Cache and temporary files remain in the project. No inference call downloads a missing model. See [the report](../../docs/test/reports/VISIONSTATE-YOLO-TRIAL-20261031.md) for limitations, provisional labels, observed failures and exact model revisions.
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/meter-trial/run-trial.ps1 -Output docs/test/visionstate-yolo-20261031/new-run -Controls -OrientationDiagnostics

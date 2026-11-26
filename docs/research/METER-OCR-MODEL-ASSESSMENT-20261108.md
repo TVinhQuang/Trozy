@@ -18,7 +18,7 @@ Bộ này gồm báo cáo lựa chọn, [quy trình benchmark](meter-ocr-evaluat
 | Điện | PP-OCRv6 small det/rec đã fine-tune, ONNX; khoảng 9,9 MB det + 21,2 MB rec | Có polygon, văn bản, điểm OCR; đã nối luồng xác minh; dùng ngữ cảnh kWh và hai quan sát | Dãy số dính kWh, bỏ bánh đỏ/0 đầu, dấu thập phân, từ chối do kiểm tra vùng |
 | Nước | `trozy_water_yolov8_obb.pt` khoảng 12,7 MB + `wheels-v2.onnx` khoảng 6,1 MB | Wheel Reader mô hình hóa trạng thái bánh đang quay, thay vì chỉ chọn 0–9 | Tìm cửa sổ, đủ bánh và đúng chiều; suy phần lẻ; ảnh cũ/bẩn và vùng bị cắt |
 
-Mã đang ghim YOLO SHA-256 `e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16`, trùng file thật và báo cáo train ngày 05/11. Hash `d104…` trong [báo cáo 03/11](../test/METER-OCR-TRAINING-20261103.md) là phiên bản lịch sử. Paddle det `5269b6…`, rec `97d8a2…`, Wheels `564470…` cũng trùng file hiện tại. Tham chiếu triển khai: [meter-reader.mjs](../../src/ai/meter-reader.mjs), [hướng dẫn bộ đọc](../METER-READER.md).
+Mã đang ghim YOLO SHA-256 `e02e60b02f4f24321390782de099079cbc3b060b4a8894adb00794126470ef16`, trùng file thật và báo cáo train ngày 05/11. Hash `d104…` trong [báo cáo 03/11](../test/reports/METER-OCR-TRAINING-20261103.md) là phiên bản lịch sử. Paddle det `5269b6…`, rec `97d8a2…`, Wheels `564470…` cũng trùng file hiện tại. Tham chiếu triển khai: [meter-reader.mjs](../../src/ai/meter-reader.mjs), [hướng dẫn bộ đọc](../METER-READER.md).
 
 VisionState công bố đầu ra 100 vị trí quanh mỗi bánh, có ngữ cảnh lân cận và giải mã quan hệ truyền số. Điều này sát bài toán bánh cơ. Nó vẫn cần đúng vùng ảnh; điểm tin cậy không tự thành xác suất toàn chỉ số đúng. [Model card VisionState](https://huggingface.co/oleost/visionstate-wheel-reader).
 
@@ -60,7 +60,7 @@ Các bản ONNX/GGUF chuyển đổi phải được kiểm cùng tokenizer, pre
 
 ### Trường hợp v16 đã thử trước đây
 
-[Báo cáo lịch sử](../test/METER-DIGIT-MODEL-TRIAL.md) dùng 2 ảnh điện, mỗi ảnh khoanh tay 6 ô. Bản 10 lớp đọc ảnh rõ thành `007664`; ảnh khó ra `135110` nhưng thiếu nhãn chuẩn đáng tin. Thời gian khoảng 15–16 ms gồm khởi tạo model và đọc 6 ô **không gồm tìm vùng**. Bản 100 lớp giữ nguyên nhãn pha, chưa có decoder đã kiểm chứng. Không tìm thấy model v16 hay script trial tương ứng trong dự án hiện tại; đường dẫn ngoài dự án trong báo cáo cũ chỉ là bằng chứng lịch sử. Do đó không coi đây là ứng viên đang cài sẵn, cũng không so 15 ms này với 4,9–7,7 giây của luồng HTTP.
+[Báo cáo lịch sử](../test/archive/meter-ocr/METER-DIGIT-MODEL-TRIAL.md) dùng 2 ảnh điện, mỗi ảnh khoanh tay 6 ô. Bản 10 lớp đọc ảnh rõ thành `007664`; ảnh khó ra `135110` nhưng thiếu nhãn chuẩn đáng tin. Thời gian khoảng 15–16 ms gồm khởi tạo model và đọc 6 ô **không gồm tìm vùng**. Bản 100 lớp giữ nguyên nhãn pha, chưa có decoder đã kiểm chứng. Không tìm thấy model v16 hay script trial tương ứng trong dự án hiện tại; đường dẫn ngoài dự án trong báo cáo cũ chỉ là bằng chứng lịch sử. Do đó không coi đây là ứng viên đang cài sẵn, cũng không so 15 ms này với 4,9–7,7 giây của luồng HTTP.
 
 ## 4. Những khác biệt ảnh hưởng trực tiếp tới quyết định
 

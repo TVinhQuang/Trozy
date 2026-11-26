@@ -61,9 +61,9 @@ Trên máy Windows mới, chạy `npm.cmd run ai:setup-meter-reader` rồi `npm.
 | Phát hiện chữ điện đã fine-tune | `.runtime/paddleocr/models/electric/PP-OCRv6_small_det_trozy_onnx_infer/inference.onnx` |
 | Nhận dạng chữ điện đã fine-tune | `.runtime/paddleocr/models/electric/PP-OCRv6_small_rec_trozy_onnx_infer/inference.onnx` |
 
-Hai thư mục Paddle đã fine-tune phải có cả `inference.yml` và `inference.json` tương ứng. Mã nguồn kiểm SHA-256 của trọng số lẫn cấu hình/bảng ký tự; thiếu hoặc sai hash sẽ tắt nhánh liên quan và giữ nhập tay. Mã hash chuẩn nằm ở phần 5 của [báo cáo huấn luyện](test/METER-OCR-TRAINING-20261103.md). Giữ nguyên model gốc để setup ngoại tuyến tiếp tục hoạt động. Không chạy huấn luyện lại chỉ để khởi động ứng dụng.
+Hai thư mục Paddle đã fine-tune phải có cả `inference.yml` và `inference.json` tương ứng. Mã nguồn kiểm SHA-256 của trọng số lẫn cấu hình/bảng ký tự; thiếu hoặc sai hash sẽ tắt nhánh liên quan và giữ nhập tay. Mã hash chuẩn nằm ở phần 5 của [báo cáo huấn luyện](test/reports/METER-OCR-TRAINING-20261103.md). Giữ nguyên model gốc để setup ngoại tuyến tiếp tục hoạt động. Không chạy huấn luyện lại chỉ để khởi động ứng dụng.
 
-Mở [MODELS-OCR](../MODELS-OCR/README.md) để xem danh mục model đang dùng và hai lối tắt `DIEN.lnk` / `NUOC.lnk` tới đúng thư mục. Chỉ model đang dùng được tách vào `electric/` và `water/`; model gốc, runtime, thư viện và các run/checkpoint giữ vị trí cũ.
+Mở [MODELS-OCR](../MODELS-OCR/README.md) để xem danh mục model đang dùng cùng đường dẫn tương đối và hướng dẫn xác minh SHA-256. Chỉ model đang dùng được tách vào `electric/` và `water/`; model gốc, runtime, thư viện và các run/checkpoint giữ vị trí cũ.
 
 Khi chủ động cần huấn luyện lại, `npm.cmd run ai:train-water` và `npm.cmd run ai:train-electric` gọi đúng Python portable qua launcher `--python`. Thư viện GPU dùng riêng cho training; mỗi lượt có thư mục tạm riêng trong dự án và được dọn sau khi kết thúc. Model xuất lại phải được đánh giá và cập nhật hash đã ghim trong mã nguồn trước khi dùng; ứng dụng không tự chấp nhận trọng số mới chỉ vì trùng tên file.
 
@@ -123,12 +123,12 @@ Khi xác minh, server kiểm tra lại ảnh/phiên bản/cấu hình/engine, h�
 
 ## Kiểm chứng
 
-- [Luồng không cấu hình trước, đọc nền và lượng dùng dự kiến ngày 05/11](test/METER-ZERO-SETUP-20261105.md), [HTTP CPU thật trên SQLite RAM](test/METER-ZERO-SETUP-LIVE-20261105.json). Hai ảnh rõ điện/nước có đề xuất tự động trước khi chủ nhà mở; ảnh mờ và các đối chứng không có đề xuất. Đây là ca hồi quy phát triển, chưa phải benchmark độ chính xác.
+- [Luồng không cấu hình trước, đọc nền và lượng dùng dự kiến ngày 05/11](test/reports/METER-ZERO-SETUP-20261105.md), [HTTP CPU thật trên SQLite RAM](test/METER-ZERO-SETUP-LIVE-20261105.json). Hai ảnh rõ điện/nước có đề xuất tự động trước khi chủ nhà mở; ảnh mờ và các đối chứng không có đề xuất. Đây là ca hồi quy phát triển, chưa phải benchmark độ chính xác.
 
-- [Thiết lập và kiểm chứng model sau fine-tune ngày 03/11](test/METER-OCR-CONFIGURATION-20261103.md), [năm ảnh và đối chứng](test/METER-OCR-CONFIGURATION-SAMPLES-20261103.json), [HTTP trên SQLite RAM](test/METER-OCR-CONFIGURATION-LIVE-20261103.json). Các báo cáo lưu riêng, giữ nguyên bằng chứng huấn luyện và kết quả lịch sử bên dưới.
+- [Thiết lập và kiểm chứng model sau fine-tune ngày 03/11](test/reports/METER-OCR-CONFIGURATION-20261103.md), [năm ảnh và đối chứng](test/METER-OCR-CONFIGURATION-SAMPLES-20261103.json), [HTTP trên SQLite RAM](test/METER-OCR-CONFIGURATION-LIVE-20261103.json). Các báo cáo lưu riêng, giữ nguyên bằng chứng huấn luyện và kết quả lịch sử bên dưới.
 - [Live hai nhánh qua HTTP trên SQLite RAM](test/METER-UTILITY-SPLIT-LIVE-20261101.json): Paddle chọn vùng đọc điện thật `00766.4`; nước tự động `00001.056`; điện tổng hợp tự động `01234.5` chỉ kiểm tra kỹ thuật. Kiểm tra quyền và xác minh ảnh/phần lẻ; không mở DB thật.
 - [Năm ảnh và đối chứng của hai nhánh](test/METER-UTILITY-SPLIT-SAMPLES-20261101.json): ba ảnh điện thật chưa đề xuất tự động; crop tay đọc được một ảnh. Nước xanh đọc tự động, nước cũ cần crop tay. Ảnh trống/số sê-ri riêng không sinh chỉ số. Đây là ảnh tái sử dụng có nhãn tạm của tác nhân, không phải benchmark đại diện.
-- `npm.cmd run ai:meter-split-check` kiểm chứng HTTP RAM; `node scripts/run-project.mjs scripts/evaluate-meter-utility-split.mjs` chạy hồi quy model hiện tại. [Biên bản tích hợp](test/METER-UTILITY-SPLIT-20261101.md).
+- `npm.cmd run ai:meter-split-check` kiểm chứng HTTP RAM; `node scripts/run-project.mjs scripts/evaluate-meter-utility-split.mjs` chạy hồi quy model hiện tại. [Biên bản tích hợp](test/reports/METER-UTILITY-SPLIT-20261101.md).
 
 - Lịch sử trước khi tách engine: [báo cáo tự động 31/10](test/METER-AUTOMATIC-LIVE-20261031.json) kiểm chứng nước `00001.056 m³` qua HTTP RAM; [năm ảnh 31/10](test/METER-AUTOMATIC-SAMPLES-20261031.json) dùng YOLO + VisionState cho cả điện/nước, có hai đề xuất. Giữ nguyên làm bằng chứng, không coi là kết quả engine điện hiện tại hoặc độ chính xác đại diện.
 - [Báo cáo chọn vùng thủ công trước đó](test/METER-READER-PRODUCTION-LIVE-20261031.json) được giữ nguyên làm bằng chứng lịch sử.
@@ -138,4 +138,4 @@ Khi xác minh, server kiểm tra lại ảnh/phiên bản/cấu hình/engine, h�
 - `npm.cmd run ai:meter-reader-check`: chạy lại phép kiểm chứng HTTP/model trên database RAM, không dùng database ứng dụng thật.
 - `npm.cmd run ai:meter-auto-check`: kiểm chứng upload → job nền → polling → review trên database RAM. Hồi quy năm ảnh: `node scripts/run-project.mjs scripts/evaluate-meter-automatic.mjs`.
 
-Các kết quả thử ngoại tuyến trước đó được giữ tại [báo cáo tính khả thi](test/VISIONSTATE-YOLO-TRIAL-20261031.md); không coi vài ảnh đó là độ chính xác đại diện. Camera thật trên điện thoại và bố cục trình duyệt thật cần kiểm tra trên thiết bị người dùng; phiên này công cụ browser không có host truy cập nên chỉ kiểm chứng giao diện bằng DOM/render.
+Các kết quả thử ngoại tuyến trước đó được giữ tại [báo cáo tính khả thi](test/reports/VISIONSTATE-YOLO-TRIAL-20261031.md); không coi vài ảnh đó là độ chính xác đại diện. Camera thật trên điện thoại và bố cục trình duyệt thật cần kiểm tra trên thiết bị người dùng; phiên này công cụ browser không có host truy cập nên chỉ kiểm chứng giao diện bằng DOM/render.
