@@ -28,6 +28,10 @@ Xem [ghi chú tiến độ chi tiết](docs/PROJECT-STATUS.md) để phân biệ
 
 Các mốc Build trong README là **kế hoạch**, không phải xác nhận đã hoàn thành. Prototype PA2 không thay thế Build 0 và không có nghĩa là đã đủ toàn bộ bài nộp PA2.
 
+## Cài Trozy trên điện thoại
+
+Trên điện thoại, mở [Trozy](https://trozy.nhom11.workers.dev) bằng Safari trên iPhone hoặc Chrome trên Android. Sau khi đăng nhập trong trình duyệt, bảng **Thêm Trozy vào màn hình chính** hướng dẫn cách cài. Khi đóng bảng, Trozy ghi nhớ lựa chọn cho tài khoản trên trình duyệt đó. Có thể xem lại các bước ở mục **Tài khoản của tôi** hoặc trang đăng nhập. Bản PWA dùng kết nối mạng để tải dữ liệu và gửi ảnh công tơ.
+
 ## Chạy ứng dụng
 
 Cài **Node.js 24 trở lên**, rồi chạy tại thư mục gốc repo:
