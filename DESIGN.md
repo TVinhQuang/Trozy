@@ -276,7 +276,9 @@ Fields use the dedicated control-boundary token, white surface, control radius a
 
 ### Navigation
 
-The wordmark is written **Trozy.** with an uppercase T. A continuous 2px fresh-blue line below the primary navigation separates the moving header from the page content; the active-route underline remains stronger and local to its button.
+Use the approved [Trozy artwork](docs/design/trozy-logo.png) for the web logo and home-screen icons. It includes the lowercase “trozy” wordmark, the roof and the Vietnamese tagline “QUẢN LÝ PHÒNG TRỌ”. Use “Trozy” in interface text and accessible names.
+
+A continuous 2px fresh-blue line below the primary navigation separates the moving header from the page content. The active-route underline remains stronger and local to its button.
 
 Navigation is split by frequency of use. The horizontal primary bar contains Tổng quan, Phòng trọ, Điện & nước, Hóa đơn, Thanh toán, Hợp đồng, Người thuê and Bảo trì; tenant access removes destinations not permitted for that role. The shorter visible labels Thanh toán and Bảo trì retain the full accessible labels Lịch sử thanh toán and Bảo trì & sự cố. The active primary route uses dark bold text, a pale blue fill and a blue underline.
 

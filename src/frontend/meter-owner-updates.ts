@@ -8,7 +8,7 @@ type Refresh = (signal?: AbortSignal) => Promise<void>;
 export function watchMeterOwnerUpdates(user: OwnerIdentity, refresh: Refresh) {
   if (!user || user.role !== 'landlord') return () => {};
   let stopped = false, busy = false, revision: string | undefined;
-  let timer: ReturnType<typeof window.setInterval> | undefined, controller: AbortController | undefined;
+  let timer: number | undefined, controller: AbortController | undefined;
   const visible = () => document.visibilityState !== 'hidden';
   function stop() {
     stopped = true;

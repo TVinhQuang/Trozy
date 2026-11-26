@@ -26,9 +26,10 @@ install('requestAnimationFrame', dom.window.requestAnimationFrame);
 install('cancelAnimationFrame', dom.window.cancelAnimationFrame);
 dom.window.HTMLElement.prototype.scrollIntoView = function () {};
 
-let width = 1440, reduceMotion = false;
+let width = 1440, reduceMotion = false, standalone = false;
 const mediaQueries = new Map();
 function mediaMatches(query) {
+  if (query === '(display-mode: standalone)') return standalone;
   if (query === '(prefers-reduced-motion: reduce)') return reduceMotion;
   const maximum = /max-width:\s*(\d+)px/.exec(query);
   const minimum = /min-width:\s*(\d+)px/.exec(query);
@@ -179,10 +180,13 @@ async function resizeQuick(nextWidth) {
     }
   });
 }
-async function mount() {
+const installTitle = 'Thêm Trozy vào màn hình chính';
+async function mount(dismissInstallGuide = true) {
   const view = render(h(App));
   await screen.findByRole('heading', { level: 1 });
   await waitFor(() => assert.ok(shell()));
+  const guide = screen.queryByRole('dialog', { name: installTitle });
+  if (dismissInstallGuide && guide) fireEvent.click(within(guide).getByRole('button', { name: 'Đã hiểu' }));
   return view;
 }
 function openDrawer() {
@@ -240,9 +244,35 @@ function assertRoutePartition(userRole) {
 }
 
 try {
+  let view = await mount(false);
+  const guide = screen.getByRole('dialog', { name: installTitle });
+  assert.match(guide.textContent, /Safari/);
+  fireEvent.click(within(guide).getByRole('radio', { name: 'Android' }));
+  assert.match(guide.textContent, /Chrome/);
+  fireEvent.click(within(guide).getByRole('button', { name: 'Đã hiểu' }));
+  view.unmount();
+  view = await mount(false);
+  assert.equal(screen.queryByRole('dialog', { name: installTitle }), null);
+  view.unmount();
+  fixtureUserId = 'install-guide-tenant'; role = 'tenant';
+  standalone = true;
+  view = await mount(false);
+  assert.equal(screen.queryByRole('dialog', { name: installTitle }), null);
+  view.unmount(); standalone = false;
+  Object.defineProperty(navigator, 'standalone', { configurable: true, value: true });
+  view = await mount(false);
+  assert.equal(screen.queryByRole('dialog', { name: installTitle }), null);
+  view.unmount(); delete navigator.standalone;
+  view = await mount(false);
+  assert.ok(screen.getByRole('dialog', { name: installTitle }));
+  fireEvent.keyDown(document, { key: 'Escape' });
+  assert.equal(screen.queryByRole('dialog', { name: installTitle }), null);
+  view.unmount(); fixtureUserId = 'shell-fixture-user'; role = 'landlord';
+  pass('Install guide switches platform, remembers dismissal per signed-in account and skips installed iOS and Android launches');
   // Automatic layout follows effective CSS width without persisting an incidental resize.
-  let view = await mount();
-  assert.ok(document.querySelector('.brand-word').textContent.startsWith('Trozy.'), 'The product wordmark starts with an uppercase T');
+  view = await mount();
+  const brandLink = within(sidebar()).getByRole('link', { name: 'Trozy — Trang tổng quan' });
+  assert.ok(within(brandLink).getByRole('img', { name: 'Trozy – Quản lý phòng trọ' }), 'Sidebar shows the approved product logo');
   assert.equal(document.querySelector('.rose-overview-intro'), null, 'Dashboard opens directly on date, actions and actual data');
   assert.ok(document.querySelector('time.rose-dashboard-date'));
   assert.equal(isCompact(), false);
@@ -779,7 +809,7 @@ try {
   assert.equal(propertyCreates.length, 1);
   assert.equal(propertyCreates[0].floors, 1);
   assert.equal(propertyCreates[0].archived, false);
-  assert.equal(localStorage.getItem('trozy.workspace.' + fixtureUserId), 'created-from-header');
+  await waitFor(() => assert.equal(localStorage.getItem('trozy.workspace.' + fixtureUserId), 'created-from-header'));
   assert.equal(screen.queryByRole('dialog', { name: 'Thêm cơ sở nhà trọ', exact: true }), null);
   assert.equal(location.hash, '#dashboard');
   assert.ok(propertyCombobox().textContent.includes('Cơ sở được tạo từ thanh trên'));
