@@ -14,17 +14,9 @@ Repository lưu mã nguồn, tài liệu dự án, minh chứng kiểm thử và
 | Kế hoạch tham chiếu | [Project Plan v2.0](<pa/PA2/rup_sdpln_sp (2.0).docx>) |
 | Prototype PA2 lịch sử | [UI PA2](pa/PA2/Trozy_UI_PA2_Team11.html) — bản tham chiếu cho PA2, không phải giao diện React hiện hành |
 
-### Trạng thái triển khai — 01/11/2026
+### Trạng thái triển khai
 
-| Trạng thái | Phần hiện có / còn làm |
-| --- | --- |
-| **Đã có — bản chạy cục bộ** | Tài khoản và phân quyền chủ trọ/người thuê; quản lý riêng từng cơ sở; thêm/sửa, xóa cơ sở trống, lưu trữ/khôi phục; phòng, người thuê, hợp đồng; nhập điện nước thủ công; hóa đơn, thanh toán/công nợ, cọc và thu chi. |
-| **Đã có — giao diện và vận hành** | Giao diện xanh dương trên nền trung tính, ba nút tổng quan dùng nền xanh dương/xanh ngọc/tím nhạt riêng; các trang dùng màu nền nút theo chức năng, chữ đen/xám đậm và in đậm để dễ đọc; menu thu gọn, thanh ngang có mục **Thêm**; nhớ cơ sở theo tài khoản; bảng tổng hợp phòng, tab từng phòng và xuất Excel theo bộ lọc; dashboard, bảo trì, tài sản và cổng người thuê. Địa chỉ cơ sở nằm trong danh sách xổ xuống để nút chọn gọn hơn. |
-| **ĐANG HOÀN THIỆN / THỬ NGHIỆM — OCR (B03)** | Đã nối luồng ảnh → tác vụ nền → đề xuất → chủ nhà đối chiếu. Điện dùng PaddleOCR; nước dùng YOLO + VisionState. Nhận dạng ảnh thực tế chưa ổn định, chưa công bố độ chính xác chung. **Không coi OCR là tính năng đã hoàn thiện; không tự ghi chỉ số hoặc hóa đơn.** |
-| **Đang hoàn thiện — kiểm chứng thực tế** | Kiểm tra giao diện trên trình duyệt/zoom/thiết bị thật, độ ổn định OCR và cấu hình dịch vụ như SMTP trên môi trường sử dụng thực tế. Các kiểm tra tự động không thay thế nghiệm thu vận hành. |
-| **Chưa triển khai** | B05 dự báo; đối soát ngân hàng/webhook thanh toán thật; ký số hợp đồng; chat thời gian thực và ứng dụng native. |
-
-Xem [ghi chú tiến độ chi tiết](docs/PROJECT-STATUS.md) để phân biệt phần đã có, phần đang hoàn thiện và giới hạn kiểm thử. B01/B02/B04 có triển khai cục bộ với phạm vi và cơ chế dự phòng được ghi trong tài liệu; không tự quyết định nghiệp vụ thay người dùng.
+Xem [tiến độ dự án](docs/PROJECT-STATUS.md) để tra phạm vi đang dùng, giới hạn OCR và kết quả kiểm tra theo ngày. [Bảng đối chiếu chức năng](docs/requirements/FEATURE-COVERAGE.md) liên kết các module với mã nguồn và bài kiểm thử tương ứng.
 
 Các mốc Build trong README là **kế hoạch**, không phải xác nhận đã hoàn thành. Prototype PA2 không thay thế Build 0 và không có nghĩa là đã đủ toàn bộ bài nộp PA2.
 
@@ -70,13 +62,13 @@ Tách bộ đọc cho công tơ cơ: **PaddleOCR PP-OCRv6 small đọc điện**
 
 Đề xuất hiển thị đầy đủ số lẻ. Chỉ **Dùng chỉ số đề xuất** mới điền phần nguyên vào ô xác minh; chủ nhà vẫn cần đối chiếu ảnh, xác nhận phần lẻ và ghi chú trước khi lưu. Người thuê chỉ gửi ảnh/trạng thái. Gửi hoặc đọc ảnh không đổi chỉ số hay lập hóa đơn; kỳ chỉ chốt sau khi đã xác minh cả điện và nước. LCD/LED, mặt kim hoặc ảnh chưa rõ dùng nhập tay.
 
-[Hướng dẫn dùng, runtime và API hiện hành](docs/METER-READER.md). OCR dùng model điện/nước đã fine-tune theo [báo cáo 03/11/2026](docs/test/METER-OCR-TRAINING-20261103.md). Runtime nước trong `.runtime/meter-digits/visionstate-yolo/`; Paddle trong `.runtime/paddleocr/` dùng chung Python/ONNX Runtime, giữ thư viện riêng. Máy mới chạy `npm run ai:setup-meter-reader` rồi `npm run ai:setup-paddle-meter`, sau đó chép các artifact fine-tune và cấu hình đúng đường dẫn/hash trong hướng dẫn; setup chỉ chuẩn bị model gốc và thư viện. Máy hiện tại tái sử dụng bộ đã có. Không tải model khi nhận dạng. `npm run ai:meter-split-check` kiểm chứng hai nhánh qua HTTP trên SQLite RAM; không dùng database thật. Tắt bằng `TROZY_METER_READER_ENABLED=false`; nhập tay vẫn hoạt động.
+[Hướng dẫn dùng, runtime và API hiện hành](docs/METER-READER.md). OCR dùng model điện/nước đã fine-tune theo [báo cáo 03/11/2026](docs/test/reports/METER-OCR-TRAINING-20261103.md). Runtime nước trong `.runtime/meter-digits/visionstate-yolo/`; Paddle trong `.runtime/paddleocr/` dùng chung Python/ONNX Runtime, giữ thư viện riêng. Máy mới chạy `npm run ai:setup-meter-reader` rồi `npm run ai:setup-paddle-meter`, sau đó chép các artifact fine-tune và cấu hình đúng đường dẫn/hash trong hướng dẫn; setup chỉ chuẩn bị model gốc và thư viện. Máy hiện tại tái sử dụng bộ đã có. Không tải model khi nhận dạng. `npm run ai:meter-split-check` kiểm chứng hai nhánh qua HTTP trên SQLite RAM; không dùng database thật. Tắt bằng `TROZY_METER_READER_ENABLED=false`; nhập tay vẫn hoạt động.
 
-Mở [MODELS-OCR](MODELS-OCR/README.md) để quản lý riêng model điện và nước qua `DIEN.lnk`, `NUOC.lnk` và danh mục trọng số. Model đang dùng nằm trong `.runtime/paddleocr/models/electric/` và `.runtime/meter-digits/visionstate-yolo/models/water/`; model gốc và các lượt train giữ vị trí cũ.
+Tra [danh mục model điện và nước](MODELS-OCR/README.md) để chuẩn bị runtime trên máy mới và kiểm SHA-256 của từng tệp trọng số, cấu hình và bảng ký tự.
 
 Trợ lý văn bản B01, phân tích tiêu thụ B02 và phân loại sửa chữa B04 được giữ. Runtime/model văn bản Ollama ở `.runtime/ollama/`; `npm run dev` chỉ mở runtime đã chuẩn bị. Các lệnh `ai:check`, `ai:start`, `ai:stop` dùng cho trợ lý văn bản.
 
-Ảnh gốc, database, dataset ảnh, báo cáo thử nghiệm và giấy phép được giữ. [Báo cáo thử trước tích hợp](docs/test/VISIONSTATE-YOLO-TRIAL-20261031.md) ghi cả các trường hợp YOLO định vị chưa tốt; chưa có số liệu để công bố độ chính xác chung. Mọi dependency/runtime/cache/data/tmp riêng của Trozy phải nằm trong dự án theo [hướng dẫn triển khai](docs/IMPLEMENTATION.md).
+Ảnh gốc, database, dataset ảnh, báo cáo thử nghiệm và giấy phép được giữ. [Báo cáo thử trước tích hợp](docs/test/reports/VISIONSTATE-YOLO-TRIAL-20261031.md) ghi cả các trường hợp YOLO định vị chưa tốt; chưa có số liệu để công bố độ chính xác chung. Mọi dependency/runtime/cache/data/tmp riêng của Trozy phải nằm trong dự án theo [hướng dẫn triển khai](docs/IMPLEMENTATION.md).
 
 ## Thành viên và trách nhiệm
 
@@ -129,27 +121,30 @@ Cấu trúc tuân theo đề PA0 và kế hoạch quản lý cấu hình của n
 
 ```text
 Trozy/
-├── README.md
-├── .gitignore
 ├── src/
-│   ├── frontend/            # React/TypeScript, UI hai vai trò
-│   ├── backend/             # Node HTTP API, SQLite, auth và nghiệp vụ
-│   └── ai/                  # Ollama, trợ lý, thống kê bất thường, OCR, phân loại
+│   ├── frontend/             # Giao diện React, hướng dẫn cài PWA
+│   ├── backend/              # HTTP API, SQLite, phân quyền và nghiệp vụ
+│   ├── ai/                   # Trợ lý và bộ đọc công tơ
+│   └── shared/               # Mã dùng chung
+├── public/                   # Manifest, biểu tượng PWA và tài nguyên web
+├── MODELS-OCR/               # Danh mục model, đường dẫn tương đối và SHA-256
+├── licenses/                 # Giấy phép của bên thứ ba
+├── scripts/                  # Chạy dự án, kiểm tra, chuẩn bị dữ liệu và train
+│   └── archive/              # Hai công cụ di chuyển môi trường Windows trước đây
+├── tests/                    # Kiểm thử tự động và fixture
 ├── docs/
-│   ├── management/          # Tài liệu làm việc: kế hoạch, báo cáo tuần, biên bản
-│   ├── requirements/        # Chức năng, Vision, use case, yêu cầu bổ sung
-│   ├── analysis and design/ # Kiến trúc, mô hình dữ liệu, thiết kế và API
-│   ├── test/                # Test plan, test case, test report, minh chứng
-│   └── templates/           # Biểu mẫu được cung cấp; chưa phải kết quả của nhóm
-├── tests/                  # Kiểm thử API, quyền và các bất biến nghiệp vụ
-├── scripts/                # Chạy phát triển và kiểm tra render trang
-└── pa/
-    ├── PA0/                 # Đề bài và tài liệu PA0 hiện có
-    ├── PA1/                 # Đề bài và artifact PA1 hiện có
-    └── PA2/                 # Đề bài và artifact PA2 hiện có
+│   ├── management/           # Dành cho tài liệu quản lý
+│   ├── requirements/         # Yêu cầu và đối chiếu chức năng
+│   ├── analysis and design/  # Hợp đồng kỹ thuật và thiết kế lịch sử trong archive/
+│   ├── implementation/       # Ghi chú triển khai theo nghiệp vụ
+│   ├── design/               # Tài nguyên thiết kế
+│   ├── research/             # Nghiên cứu và thử nghiệm OCR
+│   ├── test/                 # Chỉ mục báo cáo, minh chứng và fixture
+│   └── templates/            # Biểu mẫu đồ án
+└── pa/                       # PA0, PA1, PA2, PA3 và PA4
 ```
 
-Các thư mục chưa có nội dung sử dụng `.gitkeep` để được lưu trên GitHub. Khung thư mục không thể hiện tính năng hoặc tài liệu đã hoàn thành. Tạo thư mục PA3–PA5 khi có artifact tương ứng.
+[Chỉ mục kiểm thử](docs/test/README.md) dẫn đến báo cáo theo mốc, bằng chứng OCR lịch sử và dữ liệu mẫu đang dùng.
 
 - `docs/`: nơi duy trì tài liệu làm việc, có version và revision history.
 - `pa/PAx/`: lưu riêng bản chốt phục vụ từng lần nộp; không ghi đè bản đã nộp bằng bản đang chỉnh sửa. Các file PA1/PA2 hiện được giữ nguyên vị trí để nhóm tiếp tục đối chiếu và chốt bài.
@@ -169,6 +164,8 @@ Các thư mục chưa có nội dung sử dụng `.gitkeep` để được lưu 
 | Project Plan v2.0 | [Kế hoạch PA2](<pa/PA2/rup_sdpln_sp (2.0).docx>) |
 | UI tương tác PA2 | [Trozy_UI_PA2_Team11.html](pa/PA2/Trozy_UI_PA2_Team11.html) |
 | Tổng hợp chức năng | [Chức năng chi tiết của web](<docs/requirements/Chức năng chi tiết của web.docx>) |
+| Kiến trúc, sơ đồ và báo cáo tuần PA3 | [Thư mục PA3](pa/PA3/) |
+| Đề PA4 | [PA4.pdf](pa/PA4/PA4.pdf) |
 | Biểu mẫu Word và Excel | [docs/templates](docs/templates/) |
 
 ## Chạy prototype PA2
@@ -280,4 +277,4 @@ Chỉ sử dụng dữ liệu giả cho test/demo. Không commit mật khẩu, A
 
 `.gitignore` loại file tạm, cache, dependencies, output build và cấu hình riêng. Tài liệu Word/PDF/Excel, lockfile của trình quản lý package, ảnh minh chứng và ZIP bài nộp vẫn có thể được theo dõi. Kiểm tra `git status` và diff trước mỗi commit; `.gitignore` không tự loại file đã được Git theo dõi.
 
-Báo cáo lịch sử trước khi gỡ OCR/vision: [kết quả model thật, kiểm thử và giới hạn](docs/test/METER-VISION-FALLBACK-VALIDATION.md).
+Báo cáo lịch sử trước khi gỡ OCR/vision: [kết quả model thật, kiểm thử và giới hạn](docs/test/archive/meter-ocr/METER-VISION-FALLBACK-VALIDATION.md).

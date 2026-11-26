@@ -34,6 +34,7 @@ service-account.local.json
 # Operating system, editor and Microsoft Office temporary files
 .DS_Store
 ._*
+/MODELS-OCR/*.lnk
 Thumbs.db
 ehthumbs.db
 Desktop.ini

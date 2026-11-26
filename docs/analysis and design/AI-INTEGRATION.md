@@ -1,20 +1,20 @@
 # Các tính năng B01 đến B04 và cấu hình AI cục bộ
 
-> **Cập nhật 31/10/2026:** đã tích hợp bộ đọc công tơ cơ YOLO + VisionState theo luồng chủ nhà chọn/xác nhận vùng, nhận đề xuất và đối chiếu ảnh trước khi lưu. Người thuê chỉ gửi ảnh. [Hướng dẫn/API hiện hành](../METER-READER.md). Nội dung mô tả PaddleOCR/Tesseract/Ollama Vision hoặc API B03 cũ bên dưới là lịch sử trước khi gỡ; không dùng để triển khai bộ đọc mới.
+> **Bộ đọc công tơ ngày 26/11/2026.** Điện dùng PaddleOCR, nước dùng YOLO và VisionState. Gemini Vision đóng vai trò dự phòng khi đã cấu hình. Các mô tả B03 và lựa chọn nhà cung cấp ở mốc tháng 10 bên dưới ghi lại thiết kế lúc đó. [Quy trình và cấu hình đang dùng](../METER-READER.md)
 
 Trozy đã có B01–B04 trong ứng dụng: trợ lý vận hành có nguồn dữ liệu, cảnh báo điện nước, OCR công tơ và gợi ý phân loại sửa chữa. Người dùng chọn **Ollama chạy cục bộ**, không dùng API AI trả phí. B05 — dự báo công nợ, doanh thu và phòng trống — vẫn chưa triển khai.
 
 ## Luồng hiện tại: OCR ưu tiên, Vision đọc dự phòng
 
-B03 dùng `recognizeMeterAssisted`, mode `ocr-vision-assisted`: OCR tự xác định khung và đọc; Vision vẫn kiểm tra khung. OCR đã đọc đủ thì giữ đề xuất đó, không gọi Vision đọc chữ số. Nếu bằng chứng OCR xác định đúng một ô thiếu, Vision thử đọc ô ấy; mọi chữ số OCR khác giữ nguyên. Nếu vẫn chưa có đề xuất, Vision có thể đọc dự phòng toàn hàng bằng hai yêu cầu không chia sẻ đáp án: toàn cảnh + crop, sau đó chỉ crop. Mỗi lượt chỉ trả `integerDigits`, `fractionalDigits`, `uncertainDigits`; các nhóm phải trùng và không có ký tự chưa rõ. Không gửi số OCR, profile hoặc chỉ số cũ vào model. Transport không yêu cầu model suy đơn vị/loại/quy ước nên metadata chưa quan sát giữ `unknown`: nhánh dự phòng cần cấu hình công tơ đã xác nhận, khớp số ô/ranh giới nhóm, để cung cấp quy ước; thiếu cấu hình thì chưa có đề xuất. Cấu hình không ghi đè bằng chứng quan sát trái ngược trong snapshot có metadata. Các bước dùng chung ngân sách Vision mặc định 90 giây. Hai lượt cùng model chỉ kiểm tra ổn định, không bảo đảm chính xác. Không so sánh hai đáp án chính thức hoặc dùng dung sai hàng đơn vị; không suy vị trí ký tự rơi hay đoán bánh số đang xoay. Màn hình chính chỉ một đề xuất, thông tin kỹ thuật trong chi tiết; chủ nhà vẫn xem ảnh/phần lẻ trước lưu, người thuê chỉ gửi ảnh. Xem [thiết kế hiện hành](METER-OCR-VISION-ASSISTED.md).
+B03 dùng `recognizeMeterAssisted`, mode `ocr-vision-assisted`: OCR tự xác định khung và đọc; Vision vẫn kiểm tra khung. OCR đã đọc đủ thì giữ đề xuất đó, không gọi Vision đọc chữ số. Nếu bằng chứng OCR xác định đúng một ô thiếu, Vision thử đọc ô ấy; mọi chữ số OCR khác giữ nguyên. Nếu vẫn chưa có đề xuất, Vision có thể đọc dự phòng toàn hàng bằng hai yêu cầu không chia sẻ đáp án: toàn cảnh + crop, sau đó chỉ crop. Mỗi lượt chỉ trả `integerDigits`, `fractionalDigits`, `uncertainDigits`; các nhóm phải trùng và không có ký tự chưa rõ. Không gửi số OCR, profile hoặc chỉ số cũ vào model. Transport không yêu cầu model suy đơn vị/loại/quy ước nên metadata chưa quan sát giữ `unknown`: nhánh dự phòng cần cấu hình công tơ đã xác nhận, khớp số ô/ranh giới nhóm, để cung cấp quy ước; thiếu cấu hình thì chưa có đề xuất. Cấu hình không ghi đè bằng chứng quan sát trái ngược trong snapshot có metadata. Các bước dùng chung ngân sách Vision mặc định 90 giây. Hai lượt cùng model chỉ kiểm tra ổn định, không bảo đảm chính xác. Không so sánh hai đáp án chính thức hoặc dùng dung sai hàng đơn vị; không suy vị trí ký tự rơi hay đoán bánh số đang xoay. Màn hình chính chỉ một đề xuất, thông tin kỹ thuật trong chi tiết; chủ nhà vẫn xem ảnh/phần lẻ trước lưu, người thuê chỉ gửi ảnh. Xem [thiết kế hiện hành](archive/METER-OCR-VISION-ASSISTED.md).
 
 ## Lịch sử trước đó cùng ngày: so sánh cả dãy OCR/Vision
 
-`recognizeMeterReconciled`, mode `ocr-vision-reconciled`, từng đọc độc lập cả dãy và từng ô để so sánh. Đã bỏ luồng so sánh này khỏi mặc định theo yêu cầu mới; mã/snapshot và [thiết kế cũ](METER-OCR-VISION-RECONCILED.md) giữ để xem lịch sử, không phải hành vi hiện tại.
+`recognizeMeterReconciled`, mode `ocr-vision-reconciled`, từng đọc độc lập cả dãy và từng ô để so sánh. Đã bỏ luồng so sánh này khỏi mặc định theo yêu cầu mới; mã/snapshot và [thiết kế cũ](archive/METER-OCR-VISION-RECONCILED.md) giữ để xem lịch sử, không phải hành vi hiện tại.
 
 ## Lịch sử cùng ngày: Vision định vị, OCR đọc chính
 
-Ở mốc lịch sử này, B03 dùng `recognizeMeterGuided`: kiểm tra ảnh → Vision định vị một bộ đếm tích lũy → kiểm tra chất lượng đúng vùng số → OCR đọc chính và Vision đọc độc lập toàn dãy/từng ô → đối chiếu. Mô tả bên dưới được giữ để hiểu snapshot cũ, không phải luồng đang chạy. Xem [thiết kế lịch sử và giới hạn](METER-VISION-GUIDED-OCR.md).
+Ở mốc lịch sử này, B03 dùng `recognizeMeterGuided`: kiểm tra ảnh → Vision định vị một bộ đếm tích lũy → kiểm tra chất lượng đúng vùng số → OCR đọc chính và Vision đọc độc lập toàn dãy/từng ô → đối chiếu. Mô tả bên dưới được giữ để hiểu snapshot cũ, không phải luồng đang chạy. Xem [thiết kế lịch sử và giới hạn](archive/METER-VISION-GUIDED-OCR.md).
 
 OCR là nguồn của `proposedReading`; không lấy trung bình hoặc sửa chữ số theo Vision. Khớp toàn bộ trả `assessment:'proposed'`; chỉ khác đúng một ô đơn vị, các ô khác/phần lẻ khớp và chênh không quá ngưỡng trả `assessment:'within_tolerance'`. Ngưỡng mặc định 1 kWh hoặc 1 m³, cấu hình độc lập bằng `TROZY_METER_ELECTRIC_TOLERANCE`/`TROZY_METER_WATER_TOLERANCE` chỉ nhận `0` hoặc `1`. Các trường hợp khác chưa có đề xuất để áp dụng. Đây là chênh giữa hai kết quả, chưa phải sai số so với số thật.
 
@@ -32,7 +32,7 @@ Vision cung cấp số ô, trạng thái từng ô, chữ số/khả năng quan 
 
 Chủ nhà nhận thông báo trong ứng dụng, mở bộ gửi đã xử lý và duyệt tại trang chỉ số bằng `/api/meter/submissions/:id/review`: bắt buộc đối chiếu ảnh, giá trị nguyên hợp lệ; chỉnh số hoặc chưa có đề xuất đủ điều kiện cần lý do; phần lẻ cần xác nhận cách ghi phần nguyên. Web chủ nhà khi đang mở ở tab hiện kiểm tra digest `/api/meter/updates` khoảng mỗi 10 giây rồi tải lại dữ liệu khi có thay đổi, tùy độ trễ mạng; thông báo có lối mở trang ảnh công tơ. Không có email/push hoặc tin nhắn bên ngoài. Kết quả chưa rõ được giữ cho chủ nhà kiểm tra thủ công hoặc yêu cầu chụp lại. Người thuê chỉ thấy trạng thái chụp lại chung, không nhận nội dung AI/ghi chú nội bộ có thể chứa chỉ số. Kiểm tra phiên bản, kỳ trước, công tơ hiện tại, hợp đồng, kỳ sau và hóa đơn được chạy trong transaction. Chỉ khi điện và nước được kiểm tra mới chốt kỳ.
 
-Model chuyên biệt có hai bản ONNX 10/100 lớp đã chạy ngoại tuyến, giữ riêng ở D, không thay PaddleOCR hoặc tham gia quyết định tính tiền. Ảnh rõ đọc tốt nhưng ảnh chuyển số khó còn sai dù điểm model cao. Chưa huấn luyện model mới hoặc có tập đánh giá độc lập đủ lớn. Nguồn, hash, giấy phép và kết quả thực ở [báo cáo model chuyên biệt](../test/METER-DIGIT-MODEL-TRIAL.md); quy trình và kiểm chứng phiên này ở [báo cáo camera](../test/METER-CAPTURE-IMPROVEMENT.md). Những số kiểm thử/minh chứng bên dưới thuộc các mốc trước, không phải đánh giá độ chính xác của pipeline mới.
+Model chuyên biệt có hai bản ONNX 10/100 lớp đã chạy ngoại tuyến, giữ riêng ở D, không thay PaddleOCR hoặc tham gia quyết định tính tiền. Ảnh rõ đọc tốt nhưng ảnh chuyển số khó còn sai dù điểm model cao. Chưa huấn luyện model mới hoặc có tập đánh giá độc lập đủ lớn. Nguồn, hash, giấy phép và kết quả thực ở [báo cáo model chuyên biệt](../test/archive/meter-ocr/METER-DIGIT-MODEL-TRIAL.md); quy trình và kiểm chứng phiên này ở [báo cáo camera](../test/archive/meter-ocr/METER-CAPTURE-IMPROVEMENT.md). Những số kiểm thử/minh chứng bên dưới thuộc các mốc trước, không phải đánh giá độ chính xác của pipeline mới.
 
 | Tính năng | Cách xử lý | Khi Ollama chưa sẵn sàng |
 | --- | --- | --- |
@@ -67,7 +67,7 @@ Script không thêm system PATH hoặc tạo Windows service. Server lắng nghe
 
 Theo [hướng dẫn lưu trữ của dự án](../IMPLEMENTATION.md), thư viện/model/runtime/cache/log/dataset riêng của Trozy phải nằm trong dự án: `node_modules/`, `.runtime/ollama/`, `.runtime/paddleocr/`, `.runtime/meter-digits/`, `.cache/npm/` và `data/`. Mỗi lượt Codex dùng thư mục tạm riêng trong dự án, đặt `TEMP`/`TMP`/`TMPDIR` thích hợp và dọn đúng phần do lượt đó tạo khi xong; không xóa ảnh gốc/model/database/báo cáo.
 
-**Vị trí dự án và runtime từ 29/10/2026:** `D:\Trozy`, với Ollama/model ở `.runtime/ollama/` và Python/PaddleOCR/model ở `.runtime/paddleocr/`. Đã sao chép và kiểm chứng toàn bộ tệp dự án/runtime bằng SHA-256, tái sử dụng model hiện có. Kiểm tra trạng thái, kiểm thử và build chạy được tại vị trí mới. Báo cáo lịch sử giữ nguyên đường dẫn cũ; [báo cáo hiện tại](../test/METER-GUIDED-VALIDATION.md) phân biệt kiểm thử logic với kết quả model thật.
+**Vị trí dự án và runtime từ 29/10/2026:** `D:\Trozy`, với Ollama/model ở `.runtime/ollama/` và Python/PaddleOCR/model ở `.runtime/paddleocr/`. Đã sao chép và kiểm chứng toàn bộ tệp dự án/runtime bằng SHA-256, tái sử dụng model hiện có. Kiểm tra trạng thái, kiểm thử và build chạy được tại vị trí mới. Báo cáo lịch sử giữ nguyên đường dẫn cũ; [báo cáo hiện tại](../test/archive/meter-ocr/METER-GUIDED-VALIDATION.md) phân biệt kiểm thử logic với kết quả model thật.
 
 Không chạy `ollama serve` lần nữa nếu Ollama đã chạy nền. Khởi động Trozy bằng `npm run dev`, mở **Trợ lý Trozy** và nhấn **Kiểm tra**. Capability của B01–B04 biểu thị đã có provider cục bộ, không thay thế kiểm tra model đã tải/sẵn sàng.
 
@@ -121,7 +121,7 @@ Cảnh báo hiển thị phòng/kỳ, mức dùng, tham chiếu, chênh lệch, 
 
 ## Lịch sử B03: hybrid OCR trước Vision
 
-Phần mô tả và các lệnh/minh chứng B03 từ đây đến trước B04 thuộc các mốc lịch sử. `meter-vision.mjs`/`meter-consensus.mjs` vẫn phục vụ thử nghiệm hoặc snapshot cũ; luồng hiện hành dùng [OCR ưu tiên với Vision dự phòng](METER-OCR-VISION-ASSISTED.md). Không gán lại kết quả cũ thành thử nghiệm của pipeline mới.
+Phần mô tả và các lệnh/minh chứng B03 từ đây đến trước B04 thuộc các mốc lịch sử. `meter-vision.mjs`/`meter-consensus.mjs` vẫn phục vụ thử nghiệm hoặc snapshot cũ; luồng hiện hành dùng [OCR ưu tiên với Vision dự phòng](archive/METER-OCR-VISION-ASSISTED.md). Không gán lại kết quả cũ thành thử nghiệm của pipeline mới.
 
 Chủ trọ mở **Điện & nước → Đọc ảnh công tơ** hoặc bật công cụ OCR trong form ghi chỉ số:
 
@@ -147,7 +147,7 @@ Phần định dạng OCR giữ riêng `digits`, `integerDigits`, `fractionalDig
 
 Khi chọn Tesseract, provider cũ tự tìm tối đa hai hàng chữ số phù hợp từ các cụm điểm ảnh, kiểm tra độ thẳng hàng/khoảng cách, tách và chuẩn hóa kích thước từng ký tự trước khi đọc. Nhóm nền đen/đỏ được quan sát từ RGB; Tesseract đọc một số biến thể ảnh trong ngân sách tối đa 9 lượt nhận dạng. Chuỗi chỉ được coi là ổn định khi các biến thể cùng khớp số ký tự hình học và không có kết quả cạnh tranh. Cả hai provider độc lập với Vision; không nhận đáp án từ model hoặc lấy chỉ số kỳ trước để đoán chữ số. Chưa có bộ đọc bảo đảm cho mọi loại đồng hồ.
 
-Ở lượt cải tiến Tesseract trước đây trên ảnh nước đã cung cấp, OCR đọc ổn định nhóm đen `00001` ở hai biến thể, điểm văn bản `94` và `93`; toàn hàng và nhóm đỏ chưa ổn định. Minh chứng cũ chỉ đối chiếu được phần nguyên và được giữ tại [OCR-IMPROVEMENT.md](../test/OCR-IMPROVEMENT.md). Theo cơ chế hiện tại, khớp phần nguyên như vậy **không đủ điều kiện hiện kết quả chính hoặc áp dụng**.
+Ở lượt cải tiến Tesseract trước đây trên ảnh nước đã cung cấp, OCR đọc ổn định nhóm đen `00001` ở hai biến thể, điểm văn bản `94` và `93`; toàn hàng và nhóm đỏ chưa ổn định. Minh chứng cũ chỉ đối chiếu được phần nguyên và được giữ tại [OCR-IMPROVEMENT.md](../test/archive/meter-ocr/OCR-IMPROVEMENT.md). Theo cơ chế hiện tại, khớp phần nguyên như vậy **không đủ điều kiện hiện kết quả chính hoặc áp dụng**.
 
 Có thể kiểm tra riêng OCR, không cần Ollama:
 
@@ -179,7 +179,7 @@ npm run ai:vision-check -- --file 'E:\Downloads\meter.jpg' --utility water --exp
 
 Lệnh cần model đang sẵn sàng, kiểm tra kết quả Vision với chuỗi mong đợi sau khi nhận dạng, đối chiếu chỉ số cũ do server quyết định, lịch sử và bản ghi nghiệp vụ không bị sửa. Chỉ dùng `--expected-value` cho ca phải có đồng thuận đủ điều kiện đề xuất; Vision đọc đúng một mình chưa đủ để kỳ vọng số áp dụng. Tùy chọn `--evidence 'docs/test/ten-file.json'` lưu JSON kiểm chứng, không sao chép ảnh. Một ảnh đúng không đủ chứng minh chất lượng cho các loại đồng hồ khác; cần tập ảnh được gán nhãn theo loại mặt số, điều kiện sáng/góc và độ rõ để đo tỷ lệ đúng cả dãy cùng tỷ lệ từ chối đọc.
 
-Kế hoạch dữ liệu, cách tách theo thiết bị và các chỉ số cần đo ở [METER-EVALUATION.md](../test/METER-EVALUATION.md). Ảnh dùng trong quá trình sửa prompt là ca hồi quy, không phải tập đánh giá độc lập.
+Kế hoạch dữ liệu, cách tách theo thiết bị và các chỉ số cần đo ở [METER-EVALUATION.md](../test/reports/METER-EVALUATION.md). Ảnh dùng trong quá trình sửa prompt là ca hồi quy, không phải tập đánh giá độc lập.
 
 ### Minh chứng thử PaddleOCR trước tích hợp
 
@@ -187,7 +187,7 @@ Trước khi tích hợp provider, đã chạy PP-OCRv6 small từ source `Paddl
 
 Hai ảnh đồng hồ nước thật, một ảnh điện tổng hợp và hai ảnh đối chứng tạo thành 13 biến thể cố định. Ảnh đồng hồ cũ: Paddle đọc được hai vùng `1303` và `8` trên ảnh gốc; bản xoay 270° đọc được chuỗi `13038`, trong khi Tesseract không đọc được dãy. Đây là bằng chứng cải thiện nhận chữ, chưa xác nhận đơn vị hoặc vị trí thập phân. Ảnh đồng hồ xanh vẫn xuất hiện dấu `:` không đúng trong `000010:56m`; các bản xoay còn mất số 0 đầu. Vì vậy chưa dùng văn bản Paddle làm chỉ số tính tiền và chưa công bố tỷ lệ chính xác.
 
-Kết quả từng ảnh, tọa độ vùng chữ, thời gian, RAM và giới hạn ở [PADDLEOCR-TRIAL-RESULTS.md](../test/PADDLEOCR-TRIAL-RESULTS.md); dữ liệu gốc của phép đo ở [PADDLEOCR-TRIAL.json](../test/PADDLEOCR-TRIAL.json). Cách chạy lại công cụ thử riêng ở [PADDLEOCR-TRIAL-PROTOCOL.md](../test/PADDLEOCR-TRIAL-PROTOCOL.md). Provider đã được bổ sung vào B03 sau phép thử, giữ tọa độ và chuỗi gốc để kiểm tra/đối chiếu; kết quả của phép thử không tự chứng minh mọi ảnh qua ứng dụng đều được đọc đúng.
+Kết quả từng ảnh, tọa độ vùng chữ, thời gian, RAM và giới hạn ở [PADDLEOCR-TRIAL-RESULTS.md](../research/paddleocr-trial/PADDLEOCR-TRIAL-RESULTS.md); dữ liệu gốc của phép đo ở [PADDLEOCR-TRIAL.json](../research/paddleocr-trial/PADDLEOCR-TRIAL.json). Cách chạy lại công cụ thử riêng ở [PADDLEOCR-TRIAL-PROTOCOL.md](../research/paddleocr-trial/PADDLEOCR-TRIAL-PROTOCOL.md). Provider đã được bổ sung vào B03 sau phép thử, giữ tọa độ và chuỗi gốc để kiểm tra/đối chiếu; kết quả của phép thử không tự chứng minh mọi ảnh qua ứng dụng đều được đọc đúng.
 
 ### Minh chứng tích hợp PaddleOCR ban đầu
 
@@ -195,15 +195,15 @@ Lượt tích hợp ban đầu ngày 27/10/2026, trước thay đổi Vision/đ�
 
 | Đầu vào | Kết quả qua API B03 | Minh chứng |
 | --- | --- | --- |
-| Ảnh điện tổng hợp | Chuỗi `012345` đọc lặp lại ổn định và có đơn vị `kWh`; quy ước phần thập phân còn chưa xác định nên không đề xuất `12345`. Khi chưa bật Vision, kết quả cần kiểm tra (`needs_review`). | [PADDLEOCR-INTEGRATION-ELECTRIC-LIVE.json](../test/PADDLEOCR-INTEGRATION-ELECTRIC-LIVE.json) |
-| Ảnh đồng hồ nước cũ | Chuỗi `13038` ổn định; đơn vị và quy ước thập phân còn `unknown`, không đề xuất số tính tiền. | [PADDLEOCR-INTEGRATION-WATER-LIVE.json](../test/PADDLEOCR-INTEGRATION-WATER-LIVE.json) |
-| Ảnh đồng hồ nước xanh | Giữ nguyên `000010:56m` trong văn bản thô và cảnh báo dấu `:`; không tạo register hoặc đề xuất số tính tiền từ chuỗi này. | [PADDLEOCR-INTEGRATION-BLUE-LIVE.json](../test/PADDLEOCR-INTEGRATION-BLUE-LIVE.json) |
+| Ảnh điện tổng hợp | Chuỗi `012345` đọc lặp lại ổn định và có đơn vị `kWh`; quy ước phần thập phân còn chưa xác định nên không đề xuất `12345`. Khi chưa bật Vision, kết quả cần kiểm tra (`needs_review`). | [PADDLEOCR-INTEGRATION-ELECTRIC-LIVE.json](../test/archive/meter-ocr/PADDLEOCR-INTEGRATION-ELECTRIC-LIVE.json) |
+| Ảnh đồng hồ nước cũ | Chuỗi `13038` ổn định; đơn vị và quy ước thập phân còn `unknown`, không đề xuất số tính tiền. | [PADDLEOCR-INTEGRATION-WATER-LIVE.json](../test/archive/meter-ocr/PADDLEOCR-INTEGRATION-WATER-LIVE.json) |
+| Ảnh đồng hồ nước xanh | Giữ nguyên `000010:56m` trong văn bản thô và cảnh báo dấu `:`; không tạo register hoặc đề xuất số tính tiền từ chuỗi này. | [PADDLEOCR-INTEGRATION-BLUE-LIVE.json](../test/archive/meter-ocr/PADDLEOCR-INTEGRATION-BLUE-LIVE.json) |
 
 Cả ba lượt xác nhận các bản ghi nghiệp vụ không bị thay đổi sau nhận dạng; chỉ số kỳ trước và lịch sử AI dùng giá trị server xác định thay cho giá trị client gửi. Các phép thử này kiểm tra tích hợp, khả năng từ chối và giữ bằng chứng; không phải tập ảnh độc lập để suy ra độ chính xác trên các công tơ khác. Bộ 13 biến thể ở mục trên vẫn là phép thử riêng trước tích hợp.
 
-Ở lượt cũ, Vision đọc ảnh nước xanh thành `00001.056 m³`, PaddleOCR giữ văn bản có dấu `:` chưa đủ điều kiện xác nhận. Tệp [PADDLEOCR-VISION-INTEGRATION-LIVE.json](../test/PADDLEOCR-VISION-INTEGRATION-LIVE.json) giữ kết quả `vision_only` lúc đó. Phiên bản mới không cho áp dụng từ trạng thái này dù Vision đọc hợp lý.
+Ở lượt cũ, Vision đọc ảnh nước xanh thành `00001.056 m³`, PaddleOCR giữ văn bản có dấu `:` chưa đủ điều kiện xác nhận. Tệp [PADDLEOCR-VISION-INTEGRATION-LIVE.json](../test/archive/meter-ocr/PADDLEOCR-VISION-INTEGRATION-LIVE.json) giữ kết quả `vision_only` lúc đó. Phiên bản mới không cho áp dụng từ trạng thái này dù Vision đọc hợp lý.
 
-Trên ảnh điện tổng hợp ở lượt cũ, Paddle đọc ổn định `012345` nhưng Vision trả `red_digits` khi không có phần lẻ. Phép kiểm tra yêu cầu Vision đọc được đã thất bại; bộ kiểm tra nghiệp vụ giữ `readable:false`, `needs_review` và không đề xuất chỉ số. [PADDLEOCR-VISION-ELECTRIC-LIVE.json](../test/PADDLEOCR-VISION-ELECTRIC-LIVE.json) ghi việc từ chối đó; cờ `passed` chỉ nói về hợp đồng tích hợp/từ chối, không phải Vision đọc đúng. Không dùng OCR để sửa câu trả lời model; reader mới được kiểm tra lại riêng ở mục tiếp theo.
+Trên ảnh điện tổng hợp ở lượt cũ, Paddle đọc ổn định `012345` nhưng Vision trả `red_digits` khi không có phần lẻ. Phép kiểm tra yêu cầu Vision đọc được đã thất bại; bộ kiểm tra nghiệp vụ giữ `readable:false`, `needs_review` và không đề xuất chỉ số. [PADDLEOCR-VISION-ELECTRIC-LIVE.json](../test/archive/meter-ocr/PADDLEOCR-VISION-ELECTRIC-LIVE.json) ghi việc từ chối đó; cờ `passed` chỉ nói về hợp đồng tích hợp/từ chối, không phải Vision đọc đúng. Không dùng OCR để sửa câu trả lời model; reader mới được kiểm tra lại riêng ở mục tiếp theo.
 
 ### Minh chứng lịch sử của đồng thuận toàn chuỗi
 
@@ -215,9 +215,9 @@ Minh chứng HTTP của luồng mới, dùng database trong bộ nhớ và kiể
 
 | Ca | Ý nghĩa cần kiểm tra | Minh chứng |
 | --- | --- | --- |
-| Đồng hồ cũ | OCR phân tích nhóm màu thành `1303.8`, Vision không thêm số 0; đơn vị chưa rõ nên không có kết quả chính để áp dụng. | [METER-CONSENSUS-WEATHERED-LIVE.json](../test/METER-CONSENSUS-WEATHERED-LIVE.json) |
-| Điện tổng hợp | OCR và Vision khớp toàn chuỗi `012345`, kết quả chính `012345 kWh`, giá trị biểu mẫu `12345`. Đơn vị được cả hai quan sát; quy ước không phần lẻ do Vision nhận dạng và được ghi rõ. | [METER-CONSENSUS-ELECTRIC-LIVE.json](../test/METER-CONSENSUS-ELECTRIC-LIVE.json) |
-| Nước xanh | Vision có thể đọc `00001.056 m³` nhưng OCR còn dấu `:`/dãy chưa ổn định; chỉ giữ quan sát riêng, không áp dụng kết quả Vision đơn lẻ. | [METER-CONSENSUS-BLUE-LIVE.json](../test/METER-CONSENSUS-BLUE-LIVE.json) |
+| Đồng hồ cũ | OCR phân tích nhóm màu thành `1303.8`, Vision không thêm số 0; đơn vị chưa rõ nên không có kết quả chính để áp dụng. | [METER-CONSENSUS-WEATHERED-LIVE.json](../test/archive/meter-ocr/METER-CONSENSUS-WEATHERED-LIVE.json) |
+| Điện tổng hợp | OCR và Vision khớp toàn chuỗi `012345`, kết quả chính `012345 kWh`, giá trị biểu mẫu `12345`. Đơn vị được cả hai quan sát; quy ước không phần lẻ do Vision nhận dạng và được ghi rõ. | [METER-CONSENSUS-ELECTRIC-LIVE.json](../test/archive/meter-ocr/METER-CONSENSUS-ELECTRIC-LIVE.json) |
+| Nước xanh | Vision có thể đọc `00001.056 m³` nhưng OCR còn dấu `:`/dãy chưa ổn định; chỉ giữ quan sát riêng, không áp dụng kết quả Vision đơn lẻ. | [METER-CONSENSUS-BLUE-LIVE.json](../test/archive/meter-ocr/METER-CONSENSUS-BLUE-LIVE.json) |
 
 Thời gian toàn luồng của ba lượt khoảng 9–10 giây, gồm khởi tạo, OCR, chuẩn bị ảnh và Vision; xem `elapsedMs` trong từng JSON. Luồng cần OCR lấy hình học trước rồi Vision mới đọc vùng đã chuẩn bị, nên số đo này không tương đương một lượt inference nóng trên ảnh. Không suy ra độ chính xác chung từ ba ca hồi quy.
 
@@ -238,7 +238,7 @@ Tùy chọn `--with-vision true` của công cụ kiểm tra bật model thật 
 
 ### Cải tiến ảnh nhiều dãy số — 28/10/2026
 
-Sáu ảnh người dùng cung cấp được dùng để sửa lỗi chọn năm sản xuất/sê-ri thay cho bộ đếm, giữ nguyên chữ OCR và giới hạn áp dụng khi chưa đọc đủ ô số. Bản mới kiểm tra vai trò trước đồng thuận chữ số, hỗ trợ vùng nghiêng và trọng số phần lẻ điện cơ, đồng thời cho chọn lại khung trên ảnh. Kết quả từng ảnh, lệnh tái hiện, kiểm thử và giới hạn ở [METER-REGIONS-IMPROVEMENT.md](../test/METER-REGIONS-IMPROVEMENT.md). Đây là các ảnh hồi quy dùng trong phát triển; chưa có tập đánh giá độc lập để công bố tỷ lệ chính xác hoặc bảo đảm mọi ảnh đều đọc được.
+Sáu ảnh người dùng cung cấp được dùng để sửa lỗi chọn năm sản xuất/sê-ri thay cho bộ đếm, giữ nguyên chữ OCR và giới hạn áp dụng khi chưa đọc đủ ô số. Bản mới kiểm tra vai trò trước đồng thuận chữ số, hỗ trợ vùng nghiêng và trọng số phần lẻ điện cơ, đồng thời cho chọn lại khung trên ảnh. Kết quả từng ảnh, lệnh tái hiện, kiểm thử và giới hạn ở [METER-REGIONS-IMPROVEMENT.md](../test/archive/meter-ocr/METER-REGIONS-IMPROVEMENT.md). Đây là các ảnh hồi quy dùng trong phát triển; chưa có tập đánh giá độc lập để công bố tỷ lệ chính xác hoặc bảo đảm mọi ảnh đều đọc được.
 
 ## B04 Phân loại sửa chữa
 
@@ -267,4 +267,4 @@ Lịch sử AI chứa câu hỏi/kết quả vận hành; chỉ tài khoản s�
 
 ## Giới hạn và kiểm chứng
 
-B05 chưa có dự báo. B02 là cảnh báo từ lịch sử, không phải dự báo tương lai. Chưa có tập đánh giá đại diện đủ lớn để công bố độ chính xác OCR/phân loại; dữ liệu seed không phải bằng chứng chất lượng thực tế. Model/OCR có mã triển khai không đồng nghĩa đã kiểm thử trên mọi ảnh/cách hỏi. Đối chiếu các kết quả chạy thật và giới hạn UI ở [IMPLEMENTATION-VERIFICATION.md](../test/IMPLEMENTATION-VERIFICATION.md).
+B05 chưa có dự báo. B02 là cảnh báo từ lịch sử, không phải dự báo tương lai. Chưa có tập đánh giá đại diện đủ lớn để công bố độ chính xác OCR/phân loại; dữ liệu seed không phải bằng chứng chất lượng thực tế. Model/OCR có mã triển khai không đồng nghĩa đã kiểm thử trên mọi ảnh/cách hỏi. Đối chiếu các kết quả chạy thật và giới hạn UI ở [IMPLEMENTATION-VERIFICATION.md](../test/reports/IMPLEMENTATION-VERIFICATION.md).

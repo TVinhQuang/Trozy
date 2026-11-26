@@ -1,6 +1,16 @@
 # Tiến độ triển khai Trozy
 
-Cập nhật **01/11/2026**. Ghi chú này mô tả mã đang có trong bản chạy cục bộ; không thay thế kế hoạch sprint, bài nộp PA hoặc biên bản nghiệm thu sản phẩm.
+Đối chiếu ngày **26/11/2026** với mã nguồn GitHub tại `66b9daef`. Đây là nơi theo dõi phạm vi triển khai và giới hạn kiểm chứng của Trozy. Các số liệu bên dưới gắn với từng lần chạy.
+
+## Bản web trên điện thoại
+
+Trozy đã có manifest, bộ icon và hướng dẫn thêm vào màn hình chính trên iPhone và Android. Sau khi đăng nhập, người dùng có thể đóng bảng hướng dẫn và mở lại trong tài khoản. PWA cần kết nối mạng để tải dữ liệu và gửi ảnh. [Hướng dẫn sử dụng](../README.md#cài-trozy-trên-điện-thoại)
+
+## Kiểm tra trên GitHub ngày 26/11
+
+Runner dùng Node 24. Build và kiểm tra render trang đạt. Bộ Node có 223 test, gồm 210 đạt, 4 lỗi và 9 bỏ qua. Bốn lỗi nằm trong hai tệp kiểm thử API trạng thái bộ đọc công tơ. [Kết quả từng job](https://github.com/TVinhQuang/Trozy/actions/runs/45858902967)
+
+Bộ model được kiểm kê ngày 12/11. Có thể đối chiếu từng tệp trên máy mới theo [danh mục và SHA-256](../MODELS-OCR/README.md).
 
 ## Đã có trong bản chạy cục bộ
 
@@ -27,7 +37,7 @@ Phần còn hoàn thiện là khả năng nhận dạng ổn định trên ảnh
 
 ### Kiểm chứng sử dụng thực tế
 
-- Kiểm tra giao diện render, cửa sổ hẹp, browser zoom và thao tác cảm ứng trên môi trường thật. Công cụ truy cập trình duyệt chưa khả dụng trong phiên kiểm tra gần nhất, nên chưa ghi nhận visual QA đã đạt.
+- Cần kiểm tra bố cục trên cửa sổ hẹp, thu phóng và thao tác cảm ứng trên các thiết bị nhóm hỗ trợ. Job render trên GitHub kiểm tra đầu ra HTML theo trang và vai trò.
 - Kiểm tra dịch vụ tùy chọn như SMTP với cấu hình thực tế; các bài kiểm tra tự động không xác nhận thư đã được gửi qua tài khoản SMTP thật.
 - Tiếp tục kiểm tra hiệu năng, đóng gói và cấu hình triển khai trước khi nghiệm thu sử dụng. Build hiện có cảnh báo kích thước chunk JavaScript lớn; chưa phải lỗi build.
 
@@ -39,7 +49,7 @@ Phần còn hoàn thiện là khả năng nhận dạng ổn định trên ảnh
 - Chat thời gian thực, ứng dụng native, mô hình nhiều vai trò nhân viên/kỹ thuật viên.
 - OCR giấy tờ định danh và tự động suy đoán nghiệp vụ từ ảnh.
 
-## Kiểm chứng đã ghi nhận
+## Minh chứng lịch sử ngày 01/11/2026
 
 Mốc quản lý cơ sở đã ghi nhận **156 kiểm tra Node đạt**, **18 nhóm App shell**, **10 nhóm quản lý cơ sở**, **132 lượt render route/role/property**, **39 cặp tương phản token** và build TypeScript/Vite đạt. Các lần kiểm tra dùng fixture cô lập hoặc dữ liệu trong bộ nhớ, không thay đổi database/ảnh kinh doanh thật. Đây là bằng chứng kiểm tra tự động của bản cục bộ, không phải chứng nhận sản phẩm hoàn thiện hoặc triển khai production.
 
@@ -49,12 +59,12 @@ Mốc đổi theme xanh dương bổ sung **67 cặp tương phản token** cho 
 
 Mốc làm rõ chữ và màu nền nút bổ sung **87 cặp tương phản token**: chữ nút dùng cùng màu đen đậm, phần phụ xám đậm; nhãn trạng thái giữ chữ tối và dấu/nền màu riêng. Ba nút tổng quan dùng nền khác nhau, áp dụng nhất quán cho thao tác tương tự ở các trang.
 
-- [Biên bản quản lý cơ sở](test/PROPERTY-MANAGEMENT-20261101.md)
-- [Biên bản hỗ trợ theo vai trò](test/UI-SUPPORT-ROLES-20261101.md)
-- [Biên bản theme xanh dương](test/UI-BLUE-THEME-20261101.md)
-- [Biên bản chữ tối và màu nút](test/UI-DARK-INK-ACTIONS-20261101.md)
-- [Biên bản nhập lượng tiêu thụ](test/METER-CONSUMPTION-ENTRY-20261101.md)
-- [Biên bản màu giao diện](test/UI-COLOR-CLARITY-20261101.md)
-- [Đối chiếu module và giới hạn](requirements/FEATURE-COVERAGE.md) — có phần lịch sử; đọc hướng dẫn công tơ hiện hành cho engine mới.
+- [Biên bản quản lý cơ sở](test/reports/PROPERTY-MANAGEMENT-20261101.md)
+- [Biên bản hỗ trợ theo vai trò](test/archive/ui/UI-SUPPORT-ROLES-20261101.md)
+- [Biên bản theme xanh dương](test/archive/ui/UI-BLUE-THEME-20261101.md)
+- [Biên bản chữ tối và màu nút](test/archive/ui/UI-DARK-INK-ACTIONS-20261101.md)
+- [Biên bản nhập lượng tiêu thụ](test/reports/METER-CONSUMPTION-ENTRY-20261101.md)
+- [Biên bản màu giao diện](test/archive/ui/UI-COLOR-CLARITY-20261101.md)
+- [Đối chiếu module và giới hạn](requirements/FEATURE-COVERAGE.md).
 
 Các mốc Build/PA trong [README](../README.md) và tài liệu kế hoạch vẫn là kế hoạch tham chiếu. Việc một màn hình hoặc API đã tồn tại không đồng nghĩa mọi yêu cầu của module hay bài nộp đã hoàn tất.
