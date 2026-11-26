@@ -1,9 +1,5 @@
 # Third party notices
 
-## Impeccable design skill (2026-11-01)
-
-The project-local skill in `skills/impeccable/` was copied from the user's `E:\Downloads\impeccable-main` checkout, skill version 4.8.0. It supplies design guidance for the Trozy rose redesign and is a development resource, not a browser runtime dependency. Its complete Apache-2.0 license is retained at [skills/impeccable/LICENSE](skills/impeccable/LICENSE). Launch it through `scripts/impeccable.ps1` to keep downloaded engines and temporary files inside this project. The engine was unavailable during this redesign, so the skill's documented direct-reading fallback was used.
-
 The previous OCR/vision pipeline was removed on 2026-10-31. Its attribution below is retained as historical evidence. A separate offline YOLO + VisionState trial was subsequently authorized, followed by the owner-guided production integration documented in docs/METER-READER.md. The previous pipeline remains removed.
 
 ## YOLO + VisionState trial and owner-guided integration (2026-10-31)

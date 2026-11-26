@@ -55,7 +55,7 @@ Chủ nhà có thể sửa số sau xem ảnh hoặc yêu cầu chụp lại. Ph
 
 ## Lưu trữ và trạng thái môi trường
 
-Theo [AGENTS.md](../../AGENTS.md), mọi thư viện, runtime, model, dataset, cache, log và dữ liệu sinh riêng cho Trozy phải nằm trong thư mục dự án. JavaScript dùng `node_modules/`; Ollama `.runtime/ollama/`; Python và PaddleOCR `.runtime/paddleocr/`; thử model chữ số `.runtime/meter-digits/`; npm cache `.cache/npm/`; dữ liệu nghiệp vụ `data/`. Các thư mục runtime/cache/data được Git bỏ qua, không có nghĩa là nằm ngoài thư mục dự án. Công cụ hệ thống dùng chung đã có không phải thư viện riêng do Trozy cài.
+Theo [hướng dẫn triển khai](../IMPLEMENTATION.md), mọi thư viện, runtime, model, dataset, cache, log và dữ liệu sinh riêng cho Trozy phải nằm trong thư mục dự án. JavaScript dùng `node_modules/`; Ollama `.runtime/ollama/`; Python và PaddleOCR `.runtime/paddleocr/`; thử model chữ số `.runtime/meter-digits/`; npm cache `.cache/npm/`; dữ liệu nghiệp vụ `data/`. Các thư mục runtime/cache/data được Git bỏ qua, không có nghĩa là nằm ngoài thư mục dự án. Công cụ hệ thống dùng chung đã có không phải thư viện riêng do Trozy cài.
 
 Mỗi lượt Codex dùng một thư mục tạm riêng trong dự án, đặt `TEMP`/`TMP`/`TMPDIR` phù hợp rồi dọn đúng phần do lượt đó tạo sau xử lý/kiểm chứng. Trước xóa đệ quy phải kiểm tra đường dẫn tuyệt đối nằm trong mục tiêu được phép. Không xóa ảnh gốc, dữ liệu nghiệp vụ, model, thư viện, báo cáo hoặc tệp chưa rõ nguồn gốc.
 

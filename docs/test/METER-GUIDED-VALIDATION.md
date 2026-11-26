@@ -36,6 +36,6 @@ cd D:\Trozy
 npm run dev
 ```
 
-Model có sẵn được dùng lại; `npm run dev` tự mở Ollama cục bộ. Xem [thiết kế](../analysis%20and%20design/METER-VISION-GUIDED-OCR.md) và [quy tắc dự án](../../AGENTS.md).
+Model có sẵn được dùng lại; `npm run dev` tự mở Ollama cục bộ. Xem [thiết kế](../analysis%20and%20design/METER-VISION-GUIDED-OCR.md) và [hướng dẫn triển khai](../IMPLEMENTATION.md).
 
 Kết thúc chuyển: mọi tệp trong bản C đã được đối chiếu SHA-256 và loại bỏ; bản dùng chính tại `D:\Trozy`. Thư mục C còn rỗng nhưng Windows đang giữ mở theo phiên làm việc hiện tại, nên không thể xóa chính vỏ thư mục đó trong phiên này. Không còn dữ liệu dự án trong thư mục cũ. Minh chứng: [biên bản chuyển](METER-PROJECT-RELOCATION-20261029.json).
