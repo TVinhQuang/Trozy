@@ -24,4 +24,4 @@ Màn hình chính hiển thị ảnh, đúng một đề xuất hoặc lý do ng
 
 ## Giới hạn
 
-Hai model có thể cùng đọc sai. Quy tắc khác hàng đơn vị là lựa chọn ưu tiên OCR, không chứng minh OCR chính xác. Một ô được bổ sung chỉ là bằng chứng rõ hơn của Vision; chủ nhà vẫn xem ảnh gốc. Chuỗi bị thiếu ký tự hoặc model không xác định được ô cần bổ sung tiếp tục cần xem thủ công/chụp lại. Xem `CODEX_PROGRESS.md` và báo cáo kiểm thử tương ứng để biết phần nào đã chạy model thật.
+Hai model có thể cùng đọc sai. Quy tắc khác hàng đơn vị là lựa chọn ưu tiên OCR, không chứng minh OCR chính xác. Một ô được bổ sung chỉ là bằng chứng rõ hơn của Vision; chủ nhà vẫn xem ảnh gốc. Chuỗi bị thiếu ký tự hoặc model không xác định được ô cần bổ sung tiếp tục cần xem thủ công/chụp lại. Xem [báo cáo kiểm thử](../test/METER-RECONCILED-VALIDATION.md) để biết phần nào đã chạy model thật.

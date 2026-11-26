@@ -140,7 +140,7 @@ npm run ai:setup-ocr
 
 Ollama mặc định ở `.runtime/ollama/`, gồm runtime chính thức được kiểm tra SHA-256 và model văn bản `qwen3:4b-instruct`/model ảnh `qwen3-vl:4b-instruct`; server chỉ dùng loopback. PaddleOCR/Python portable và model ONNX ở `.runtime/paddleocr/`. Script dùng lại model/thư viện đã chuẩn bị, không thêm system PATH hoặc tạo Windows service; `-InstallRoot` phải là thư mục con hợp lệ của dự án. Lệnh setup lần đầu có thể tải các thành phần còn thiếu, còn `npm run dev` và nhận dạng không tải model. Không dùng lệnh pull từ một Ollama ngoài dự án để thay cho quy tắc lưu trữ này.
 
-Thư viện JavaScript ở `node_modules/`, npm cache ở `.cache/npm/`, dữ liệu nghiệp vụ ở `data/`; cache/log/dataset/runtime riêng của Trozy cũng nằm trong dự án và được Git bỏ qua khi thích hợp. Mỗi lượt Codex phải dùng thư mục tạm riêng trong dự án và dọn đúng tệp do lượt đó tạo sau khi xong, giữ nguyên ảnh gốc, model, dữ liệu và báo cáo. Xem [quy tắc dự án](../AGENTS.md).
+Thư viện JavaScript ở `node_modules/`, npm cache ở `.cache/npm/`, dữ liệu nghiệp vụ ở `data/`; cache/log/dataset/runtime riêng của Trozy cũng nằm trong dự án và được Git bỏ qua khi thích hợp. Mỗi tác vụ dùng thư mục tạm riêng trong dự án. Sau khi hoàn tất, chỉ dọn tệp tạm do tác vụ đó tạo và giữ lại ảnh gốc, model, dữ liệu và báo cáo.
 
 **Vị trí dự án ngày 29/10/2026:** dùng `D:\Trozy`, gồm Git, thư viện JavaScript, dữ liệu ứng dụng và các runtime/model dưới `.runtime/`. Đã kiểm tra SHA-256 trước khi loại bản runtime cũ trùng lặp; không tải/cài lại model. Ollama, Vision và PaddleOCR chạy được ở vị trí mới. Các đường dẫn trong báo cáo cũ giữ nguyên theo lịch sử. Xem [báo cáo kiểm chứng](test/METER-GUIDED-VALIDATION.md).
 

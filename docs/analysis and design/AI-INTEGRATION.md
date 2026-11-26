@@ -65,7 +65,7 @@ Script mặc định dùng model văn bản `qwen3:4b-instruct`. Lần cài/tả
 
 Script không thêm system PATH hoặc tạo Windows service. Server lắng nghe tại `127.0.0.1:11434`, đặt `OLLAMA_NO_CLOUD=1`; model nằm trong thư mục dự án đã chọn. Đường dẫn máy hiện tại lưu ở `.cache/ollama-location.json`, không đưa lên Git. Chạy lại script cùng thư mục để dùng runtime đã có. Không dùng một server Ollama ngoài dự án để tải model mới của Trozy.
 
-Theo [quy tắc lưu trữ dự án](../../AGENTS.md), thư viện/model/runtime/cache/log/dataset riêng của Trozy phải nằm trong dự án: `node_modules/`, `.runtime/ollama/`, `.runtime/paddleocr/`, `.runtime/meter-digits/`, `.cache/npm/` và `data/`. Mỗi lượt Codex dùng thư mục tạm riêng trong dự án, đặt `TEMP`/`TMP`/`TMPDIR` thích hợp và dọn đúng phần do lượt đó tạo khi xong; không xóa ảnh gốc/model/database/báo cáo.
+Theo [hướng dẫn lưu trữ của dự án](../IMPLEMENTATION.md), thư viện/model/runtime/cache/log/dataset riêng của Trozy phải nằm trong dự án: `node_modules/`, `.runtime/ollama/`, `.runtime/paddleocr/`, `.runtime/meter-digits/`, `.cache/npm/` và `data/`. Mỗi lượt Codex dùng thư mục tạm riêng trong dự án, đặt `TEMP`/`TMP`/`TMPDIR` thích hợp và dọn đúng phần do lượt đó tạo khi xong; không xóa ảnh gốc/model/database/báo cáo.
 
 **Vị trí dự án và runtime từ 29/10/2026:** `D:\Trozy`, với Ollama/model ở `.runtime/ollama/` và Python/PaddleOCR/model ở `.runtime/paddleocr/`. Đã sao chép và kiểm chứng toàn bộ tệp dự án/runtime bằng SHA-256, tái sử dụng model hiện có. Kiểm tra trạng thái, kiểm thử và build chạy được tại vị trí mới. Báo cáo lịch sử giữ nguyên đường dẫn cũ; [báo cáo hiện tại](../test/METER-GUIDED-VALIDATION.md) phân biệt kiểm thử logic với kết quả model thật.
 

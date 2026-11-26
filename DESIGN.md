@@ -254,7 +254,7 @@ Shared layout breakpoints are 1399px, 1100px, 900px, 640px and 380px. Dashboard-
 Tables scroll inside their own region. At 640px and below the first column is sticky, allowing the row identity to stay visible while examining later columns. Touch controls have a 44px minimum height at that breakpoint. The auth story panel is removed from the compact layout so the form receives the available space.
 ## Elevation & Depth
 
-Work surfaces are flat and separated by borders and tone. Shadows identify temporary overlays: search results, dialogs and toasts. The focus ring is an interaction state, not surface elevation. Overlay shadows, motion and breakpoints live in `.impeccable/design.json` because they fall outside the frontmatter schema.
+Work surfaces are flat and separated by borders and tone. Shadows identify temporary overlays: search results, dialogs and toasts. The focus ring is an interaction state, not surface elevation. The [frontend stylesheet](src/frontend/styles.css) defines overlay shadows, motion and breakpoints.
 
 **The Flat Workspace Rule.** Use borders and tone for persistent content; reserve diffuse shadows for temporary overlays.
 

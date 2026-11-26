@@ -40,6 +40,6 @@ Nút **Đọc lại ảnh** chạy lại ảnh pending bằng cấu hình hiện
 
 Model vẫn có thể đọc sai giống nhau qua hai lượt hoặc bỏ sót trạng thái bánh số đang chuyển; không coi đọc lặp lại là chứng minh chính xác. Các chẩn đoán yêu cầu model vừa đọc vừa trả tọa độ từng ô đã cho hình học không hợp lệ nên không tạo đề xuất; các báo cáo ấy được giữ nguyên lịch sử, không đổi thành kết quả đạt. Luồng mới giảm yêu cầu model về ba trường chép nhóm chữ số/cờ chưa rõ, cần cấu hình công tơ thay cho thông tin model không quan sát và vẫn giữ kiểm tra ảnh/chủ nhà xác minh. Chưa có tập đánh giá đủ lớn để công bố độ chính xác chung.
 
-Xem `CODEX_PROGRESS.md` và báo cáo kiểm thử tương ứng cho kết quả của mã cuối. [Thiết kế so sánh trước đây](METER-OCR-VISION-RECONCILED.md) và snapshot cũ được giữ để xem lịch sử; không gán kết quả cũ cho pipeline hiện tại.
+Xem [báo cáo kiểm thử](../test/METER-ASSISTED-VALIDATION.md) cho kết quả của mã cuối. [Thiết kế so sánh trước đây](METER-OCR-VISION-RECONCILED.md) và snapshot cũ được giữ để xem lịch sử; không gán kết quả cũ cho pipeline hiện tại.
 
 Kiểm chứng bản đọc dự phòng ngày 30/10/2026: [kết quả model thật, kiểm thử và giới hạn](../test/METER-VISION-FALLBACK-VALIDATION.md).

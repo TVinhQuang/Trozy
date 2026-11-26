@@ -18,6 +18,19 @@ service-account.local.json
 *.p12
 *.pfx
 
+# Local assistant instructions, checkpoints and design tooling
+/AGENT.md
+/AGENTS.md
+/agent.md
+/agents.md
+/CODEX_PROGRESS.md
+/PRODUCT.md
+/.agents/
+/.impeccable/
+/skills/
+/scripts/impeccable.ps1
+/docs/superpowers/
+
 # Operating system, editor and Microsoft Office temporary files
 .DS_Store
 ._*

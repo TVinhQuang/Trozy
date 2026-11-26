@@ -76,7 +76,7 @@ Mở [MODELS-OCR](MODELS-OCR/README.md) để quản lý riêng model điện v�
 
 Trợ lý văn bản B01, phân tích tiêu thụ B02 và phân loại sửa chữa B04 được giữ. Runtime/model văn bản Ollama ở `.runtime/ollama/`; `npm run dev` chỉ mở runtime đã chuẩn bị. Các lệnh `ai:check`, `ai:start`, `ai:stop` dùng cho trợ lý văn bản.
 
-Ảnh gốc, database, dataset ảnh, báo cáo thử nghiệm và giấy phép được giữ. [Báo cáo thử trước tích hợp](docs/test/VISIONSTATE-YOLO-TRIAL-20261031.md) ghi cả các trường hợp YOLO định vị chưa tốt; chưa có số liệu để công bố độ chính xác chung. Mọi dependency/runtime/cache/data/tmp riêng của Trozy phải nằm trong dự án theo [AGENTS.md](AGENTS.md).
+Ảnh gốc, database, dataset ảnh, báo cáo thử nghiệm và giấy phép được giữ. [Báo cáo thử trước tích hợp](docs/test/VISIONSTATE-YOLO-TRIAL-20261031.md) ghi cả các trường hợp YOLO định vị chưa tốt; chưa có số liệu để công bố độ chính xác chung. Mọi dependency/runtime/cache/data/tmp riêng của Trozy phải nằm trong dự án theo [hướng dẫn triển khai](docs/IMPLEMENTATION.md).
 
 ## Thành viên và trách nhiệm
 
