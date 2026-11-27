@@ -469,9 +469,13 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
             'x-goog-api-key': slot.key,
           },
           body: serialized,
-          redirect: 'error',
+          // Workers supports manual redirects. Keep the API key on the configured Google endpoint.
+          redirect: 'manual',
           signal: controller.signal,
         });
+        if (response.status >= 300 && response.status < 400) {
+          throw new GeminiError('unexpected_redirect', 'Gemini trả về chuyển hướng ngoài dự kiến.', 502);
+        }
         const rawText = await readBounded(response, MAX_RESPONSE_BYTES);
         const finishedTime = now();
         const elapsedMs = Math.max(0, finishedTime - attemptStart);

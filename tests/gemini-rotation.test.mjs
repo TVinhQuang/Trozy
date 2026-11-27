@@ -498,3 +498,23 @@ test('Gemini endpoint defaults to AI Studio (including AQ. keys), supports expli
   assert.equal(result.model, 'gemini-3.1-flash-lite');
   assert.deepEqual(keysSeen, ['bad-key', 'AQ.ValidStudioKey']);
 });
+
+test('Gemini requests use the Workers-compatible redirect mode and reject redirects', async () => {
+  const requests = [];
+  const client = createGeminiClient({
+    env: () => ({ GEMINI_API_KEY: 'fixture-key', GEMINI_MODELS: 'model-a' }),
+    fetchImpl: async (url, options) => {
+      requests.push({ url, redirect: options.redirect });
+      return new Response(null, { status: 302, headers: { Location: 'https://example.com/' } });
+    },
+  });
+
+  await assert.rejects(
+    () => client.geminiJson({ system: 'sys', prompt: 'prompt', schema: { type: 'object' } }),
+    { code: 'unexpected_redirect', status: 502 },
+  );
+  assert.deepEqual(requests, [{
+    url: 'https://generativelanguage.googleapis.com/v1beta/models/model-a:generateContent',
+    redirect: 'manual',
+  }]);
+});
