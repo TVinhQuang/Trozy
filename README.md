@@ -86,7 +86,7 @@ npm run build
 npm run cf:check
 ```
 
-GitHub Actions chạy kiểm thử Node, render trang và build production khi có PR hoặc push vào `main`. Bản ứng dụng `68f9714` qua cả ba job. Trên máy, bản tích hợp có **272/272 ca kiểm thử đạt** và **134 lượt render**. Build hiện có cảnh báo kích thước một số gói JavaScript. [Workflow CI](.github/workflows/ci.yml) · [Kết quả GitHub Actions](https://github.com/TVinhQuang/Trozy/actions/runs/45996008533) · [Chỉ mục kiểm thử](docs/test/README.md)
+GitHub Actions chạy kiểm thử Node, render trang, build production và đóng gói thử Cloudflare Worker khi có PR hoặc push vào `main`. Bản ứng dụng `68f9714` qua cả ba job ở thời điểm phát hành. Trên máy, bản tích hợp có **272/272 ca kiểm thử đạt** và **134 lượt render**. Build hiện có cảnh báo kích thước một số gói JavaScript. [Workflow CI](.github/workflows/ci.yml) · [Kết quả CI của bản ứng dụng](https://github.com/TVinhQuang/Trozy/actions/runs/45996008533) · [Chỉ mục kiểm thử](docs/test/README.md)
 
 Sau khi phát hành lên Cloudflare ngày 27/11/2026, trang chủ và các tệp JavaScript/CSS chính khớp bản build, `/api/health` xác nhận D1 hoạt động và API dữ liệu yêu cầu đăng nhập. Độ chính xác OCR trên tập ảnh thực tế, giao thư tới hộp thư và nghiệm thu từng luồng use case cần minh chứng riêng. [API health](https://trozy.nhom11.workers.dev/api/health)
 
