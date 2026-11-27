@@ -1,282 +1,115 @@
 # Trozy — Smart Rental Management System
 
-Trozy là ứng dụng web quản lý nhà trọ của **Nhóm 11**, môn **Nhập môn Công nghệ phần mềm — 24C01**. Hệ thống kết nối chủ trọ và người thuê trong các nghiệp vụ quản lý phòng, hợp đồng, điện nước, hóa đơn, thanh toán và sửa chữa.
+Trozy là ứng dụng web quản lý nhà trọ của **Nhóm 11**, môn **Nhập môn Công nghệ phần mềm — 24C01**. Chủ trọ quản lý cơ sở, phòng, hợp đồng, điện nước và thu chi. Người thuê xem thông tin phòng, gửi ảnh công tơ, báo thanh toán và theo dõi yêu cầu ngay trên web.
 
-Repository lưu mã nguồn, tài liệu dự án, minh chứng kiểm thử và bài nộp PA. **Jira quản lý công việc theo sprint; GitHub quản lý phiên bản và review thay đổi.**
-
-## Liên kết và tình trạng hiện tại
-
-| Nội dung | Địa chỉ / tình trạng |
+| Nội dung | Địa chỉ và tình trạng ngày 27/11/2026 |
 | --- | --- |
-| Repository | [TVinhQuang/Trozy](https://github.com/TVinhQuang/Trozy) |
-| Nhánh tích hợp | `main` |
-| Jira của nhóm | [Trozy — Jira (projectId 10001)](https://projectse-1.atlassian.net/welcome/software?projectId=10001) |
-| Kế hoạch tham chiếu | [Project Plan v2.0](<pa/PA2/rup_sdpln_sp (2.0).docx>) |
-| Prototype PA2 lịch sử | [UI PA2](pa/PA2/Trozy_UI_PA2_Team11.html) — bản tham chiếu cho PA2, không phải giao diện React hiện hành |
+| Demo PA4 | [Mở Trozy trên Cloudflare](https://trozy.nhom11.workers.dev) |
+| Mã nguồn | Nhánh [`main`](https://github.com/TVinhQuang/Trozy/tree/main) |
+| Phiên bản ứng dụng đang chạy | [`68f9714`](https://github.com/TVinhQuang/Trozy/commit/68f97146478d1f6df2c85bae916511d1a7a80d7a), gồm các bổ sung sau khi đối chiếu PA1–PA3 và chính sách UC67 đã chốt |
+| Phạm vi theo đặc tả | [23 module và 73 use case](docs/requirements/FEATURE-COVERAGE.md), kèm mã nguồn, kiểm thử và điều kiện vận hành |
+| Theo dõi công việc | [Jira của Nhóm 11](https://projectse-1.atlassian.net/welcome/software?projectId=10001) |
 
-### Trạng thái triển khai
+## Chức năng đang có
 
-Xem [tiến độ dự án](docs/PROJECT-STATUS.md) để tra phạm vi đang dùng, giới hạn OCR và kết quả kiểm tra theo ngày. [Bảng đối chiếu chức năng](docs/requirements/FEATURE-COVERAGE.md) liên kết các module với mã nguồn và bài kiểm thử tương ứng.
+| Module | Chủ trọ và người thuê có thể làm gì |
+| --- | --- |
+| **M01 · Tài khoản** | Đăng ký, xác thực email, liên kết tài khoản người thuê bằng lời mời, cập nhật hồ sơ và tùy chọn thông báo, đổi mật khẩu hoặc khôi phục qua OTP email. Dữ liệu được giới hạn theo vai trò, cơ sở và hồ sơ thuê. |
+| **M02–M03 · Cơ sở và phòng** | Quản lý nhiều cơ sở, khu/dãy, nội quy, trạng thái và lịch sử phòng. Nhớ cơ sở đang chọn theo tài khoản, lọc danh sách phòng, xuất Excel và ghi nhận bảo trì khi phòng còn người ở. |
+| **M04–M05 · Hồ sơ và hợp đồng** | Quản lý người đại diện và thành viên phòng, nhập tay số CCCD, mã hóa khi lưu và che khi hiển thị theo quyền. Lập hợp đồng nháp, kích hoạt lưu trú theo ngày, chuyển phòng có lịch sử, lập phụ lục đổi giá có ngày hiệu lực, tải PDF và ghi nhận đã đọc theo phiên bản. Người thuê gửi, theo dõi hoặc rút đề nghị gia hạn hay trả phòng. |
+| **M06–M07 · Điện nước và dịch vụ** | Cấu hình giá theo công tơ, theo người hoặc cố định. Tách sản lượng theo từng thiết bị khi thay công tơ giữa kỳ. Người thuê gửi ảnh gốc, chủ trọ mở ảnh, xác minh từng loại và chốt kỳ. Phí dịch vụ áp dụng theo phòng hoặc hợp đồng và có lịch sử giá. |
+| **M08–M09 · Hóa đơn, thanh toán và công nợ** | Lập nháp theo kỳ, kiểm tra dòng tiền, phát hành, điều chỉnh có lịch sử và tải PDF. Người thuê yêu cầu rà soát, dùng VietQR theo số còn nợ và báo đã chuyển khoản. Chủ trọ xác nhận tiền thực nhận, xử lý thu thiếu hoặc thu thừa, xuất biên nhận PDF và nhắc nợ theo bộ lọc. |
+| **M10–M11 · Cọc và thu chi** | Đối chiếu công nợ, khấu trừ hư hỏng có căn cứ và ghi chi khi hoàn cọc thực tế. Điều chỉnh biên nhận cập nhật hóa đơn và sổ thu chi có lưu lịch sử. Sổ hỗ trợ lọc, tổng hợp theo tháng, xuất Excel và in hoặc lưu PDF qua trình duyệt. |
+| **M12–M13 · Cổng người thuê và sửa chữa** | Xem phòng, hợp đồng, nội quy, dịch vụ, hóa đơn và biên nhận. Gửi phiếu sửa chữa kèm minh chứng rồi theo dõi, xác nhận kết quả, đánh giá hoặc phản hồi. Chủ trọ xem gợi ý phân loại sau khi phiếu đã được lưu. |
+| **M14–M15 · Tài sản và bàn giao** | Quản lý tài sản theo phòng. Biên bản nhận và trả phòng lưu tình trạng, chỉ số và danh sách tài sản tại thời điểm lập. Hai bên đối chiếu hư hỏng và quyết toán trước khi đóng lượt thuê. |
+| **M16–M17 · Thông báo và hỗ trợ** | Gửi thông báo theo cơ sở hoặc phòng, nhận nhắc theo hạn và xem trạng thái gửi. Người thuê mở phiếu hỗ trợ, chủ trọ phản hồi và hai bên theo dõi theo quyền. Gửi email cần cấu hình dịch vụ của môi trường. |
+| **M18–M19 · Tài liệu, phương tiện và tiện ích** | Tra cứu nội quy và tài liệu theo phiên bản, tải tài liệu đúng phạm vi phòng hoặc hợp đồng, xác nhận phương tiện trước khi tính phí và đặt tiện ích theo sức chứa. |
+| **M20–M21 · Báo cáo và dữ liệu** | Xem tổng quan theo cơ sở và chi phí cá nhân theo kỳ. Thiết lập mặc định theo cơ sở, xem trước khi nhập Excel/CSV, xuất hoặc sao lưu bản ghi JSON theo phạm vi. Có nhật ký nghiệp vụ và nhật ký truy cập riêng, cùng quy trình UC67 cho yêu cầu xóa dữ liệu. |
+| **M22–M23 · Phân tích và trợ lý** | So sánh tiêu thụ điện nước, xem và rà soát cảnh báo. Trợ lý trả lời theo dữ liệu được cấp quyền, giải thích hóa đơn và soạn nháp thông báo để người dùng kiểm tra trước khi gửi. |
 
-Các mốc Build trong README là **kế hoạch**, không phải xác nhận đã hoàn thành. Prototype PA2 không thay thế Build 0 và không có nghĩa là đã đủ toàn bộ bài nộp PA2.
+Luồng chính đi từ thiết lập cơ sở và phòng, tiếp nhận người thuê, lập hợp đồng và ghi cọc đến xác minh chỉ số, lập hóa đơn, xác nhận thu tiền, bàn giao và quyết toán. [Bảng đối chiếu chức năng](docs/requirements/FEATURE-COVERAGE.md)
 
-## Bản public trên Cloudflare
+### UC67 — Xuất, sao lưu và yêu cầu xóa dữ liệu
 
-Bản demo PA4 chạy trên tài khoản Cloudflare riêng của nhóm. [Mở Trozy](https://trozy.nhom11.workers.dev) · [Hướng dẫn chạy và phát hành](docs/CLOUDFLARE.md)
+- Chủ trọ chọn cơ sở và loại bản ghi, xem trước rồi xuất JSON. JSON chứa tham chiếu tệp, ảnh và tài liệu vẫn được lưu ở kho tệp riêng.
+- Người thuê có tài khoản liên kết gửi yêu cầu của mình trong **Tài khoản** và xem kết quả từng trường. Với người gửi bên ngoài hoặc thành viên chưa có tài khoản, chủ trọ chọn đúng hồ sơ, ghi nhận việc đối chiếu danh tính và quyền đại diện nếu có.
+- Phạm vi xóa là **số điện thoại và email liên hệ trong hồ sơ thuê**. Trozy xét từng trường khi người đó đã rời phòng, đã tất toán nghĩa vụ và trường liên hệ đã hết mục đích sử dụng cho yêu cầu đang xử lý. Email đăng nhập, hợp đồng, hóa đơn, biên nhận, cọc, bàn giao, minh chứng và nhật ký được giữ cùng lý do.
+- Chủ trọ xem trước kết quả, xác nhận rồi máy chủ kiểm tra lại điều kiện trong giao dịch. Có thể xử lý một phần, giữ dữ liệu, hủy hoặc từ chối. Nhật ký lưu người xử lý và kết quả. Với người gửi bên ngoài, chủ trọ có thể tải phiếu kết quả để giao trực tiếp và ghi nhận đã giao. [Quyết định UC67](docs/requirements/FEATURE-COVERAGE.md#uc67--quyết-định-ngày-27112026) · [Kiểm thử UC67](tests/privacy-requests.test.mjs)
 
-Trên điện thoại, mở Trozy bằng Safari trên iPhone hoặc Chrome trên Android. Sau khi đăng nhập trong trình duyệt, bảng **Thêm Trozy vào màn hình chính** hướng dẫn cách cài. Khi đóng bảng, Trozy ghi nhớ lựa chọn cho tài khoản trên trình duyệt đó. Có thể xem lại các bước ở mục **Tài khoản của tôi** hoặc trang đăng nhập. Bản PWA dùng kết nối mạng để tải dữ liệu và gửi ảnh công tơ.
+## Bản demo trên Cloudflare
 
-## Chạy ứng dụng
+Bản demo PA4 dùng **Cloudflare Workers** cho API và giao diện, **D1** cho dữ liệu nghiệp vụ, **Workers KV** cho tệp riêng tư. Ảnh công tơ giới hạn 5 MiB mỗi ảnh và được giữ một tháng. Bản ghi xác minh và hóa đơn lưu ở D1. Worker chạy mỗi giờ để xử lý nhắc hạn và hàng đợi thư. Trang đăng nhập cho phép bắt đầu đăng ký chủ trọ qua email. Ngày 27/11/2026, API health xác nhận D1 hoạt động và bản demo có cấu hình gửi thư. [Mở Trozy](https://trozy.nhom11.workers.dev) · [Đăng ký chủ trọ](https://trozy.nhom11.workers.dev/?action=register-landlord) · [Hướng dẫn Cloudflare](docs/CLOUDFLARE.md)
 
-Cài **Node.js 24 trở lên**, rồi chạy tại thư mục gốc repo:
+### Cài Trozy trên điện thoại
+
+Mở demo bằng **Safari trên iPhone** hoặc **Chrome trên Android**. Sau khi đăng nhập, làm theo bảng **Thêm Trozy vào màn hình chính**. Có thể mở lại hướng dẫn từ trang đăng nhập hoặc **Tài khoản của tôi**. PWA dùng mạng để tải dữ liệu và gửi ảnh công tơ.
+
+### AI, OCR và các điều kiện vận hành
+
+| Khả năng | Cloudflare | Node/SQLite trên máy |
+| --- | --- | --- |
+| **B01 · Trợ lý**, **B02 · Cảnh báo điện nước**, **B04 · Gợi ý phân loại sửa chữa** | Tra cứu theo quyền, quy tắc nghiệp vụ và thống kê. | Cùng luồng nghiệp vụ. B01/B04 có thể dùng Ollama cục bộ hoặc Gemini theo cấu hình và có cơ chế dự phòng. |
+| **B03 · Đọc công tơ** | Nhận ảnh và chủ trọ đối chiếu, nhập chỉ số thủ công. | OCR thử nghiệm cho công tơ cơ. Nhánh điện dùng PaddleOCR PP-OCRv6 small, nhánh nước dùng YOLO + VisionState Wheel Reader. Ảnh được đọc nền khi có runtime và model tương ứng. Có thể cấu hình Gemini Vision hỗ trợ khi kết quả cục bộ chưa rõ. |
+| **UC16 · Hợp đồng giấy** | Nhập dữ liệu hợp đồng bằng tay. | OCR bằng PaddleOCR khi có runtime. Chủ trọ xem trước kết quả và chọn từng trường để đưa vào biểu mẫu. |
+
+Người thuê chỉ gửi ảnh công tơ. Chủ trọ đối chiếu ảnh gốc và xác nhận trước khi ghi chỉ số. Kết quả đọc ảnh chỉ là đề xuất. OCR công tơ vẫn ở giai đoạn thử nghiệm, với lựa chọn chỉnh vùng hoặc nhập tay khi ảnh khó đọc. Ảnh CCCD được quản lý bên ngoài Trozy. [Quy trình công tơ](docs/METER-READER.md) · [Danh mục model và SHA-256](MODELS-OCR/README.md) · [Tích hợp AI](<docs/analysis and design/AI-INTEGRATION.md>)
+
+**UC64/B05** về dự báo công nợ, doanh thu và phòng trống là đề tài nghiên cứu tùy chọn. VietQR cung cấp thông tin chuyển khoản và chủ trọ xác nhận khoản thu. Ký số hợp đồng, đối soát ngân hàng tự động và ứng dụng native nằm ngoài phạm vi phát hành hiện tại.
+
+## Chạy trên máy
+
+Cần **Node.js 24 trở lên** và npm. Từ thư mục gốc của repo, chạy:
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
-Mở **http://127.0.0.1:5173**. API ở cổng 3001; SQLite được tạo tự động trong `data/`. Dữ liệu được lưu qua các lần khởi động. Tài khoản mẫu:
+Mở `http://127.0.0.1:5173`. API mặc định chạy ở cổng `3001`, SQLite lưu trong `data/trozy.sqlite`. Khi dữ liệu người dùng đang trống và seed demo được bật, bản Node tạo các tài khoản mẫu dưới đây.
 
-| Vai trò | Email | Mật khẩu |
+| Vai trò | Email | Mật khẩu mẫu trên máy |
 | --- | --- | --- |
 | Chủ trọ | `chu@trozy.vn` | `Trozy@2026` |
 | Người thuê | `thue@trozy.vn` | `Trozy@2026` |
-| Chủ trọ độc lập để kiểm tra quyền | `khac@trozy.vn` | `Trozy@2026` |
+| Chủ trọ độc lập để kiểm tra phân quyền | `khac@trozy.vn` | `Trozy@2026` |
+
+Chép `.env.example` thành `.env` khi cần cấu hình môi trường riêng. Có thể đặt `TROZY_DB_PATH` tới một tệp SQLite mới để thử với dữ liệu độc lập. Thư xác thực trên máy vào outbox cục bộ khi chưa thiết lập SMTP. Dependency, runtime, model, cache, tệp tạm và dữ liệu riêng của Trozy đặt trong thư mục dự án. [Cấu hình bản Node](docs/IMPLEMENTATION.md) · [Biến môi trường mẫu](.env.example)
+
+Để chạy bản đã build, dừng tiến trình dev rồi dùng `npm run build` và `npm start`. Mở `http://127.0.0.1:3001`. Để chạy Worker bằng D1/KV mô phỏng hoặc phát hành lên Cloudflare, làm theo hướng dẫn riêng. [Hướng dẫn Worker](docs/CLOUDFLARE.md)
+
+## Kiểm thử và phát hành
 
 ```powershell
 npm test
 npm run check:pages
 npm run build
-npm start
+npm run cf:check
 ```
 
-Sau build, `npm start` phục vụ ứng dụng tại **http://127.0.0.1:3001**. Không chạy đồng thời `npm start` và `npm run dev` trên cùng cổng API.
+GitHub Actions chạy kiểm thử Node, render trang và build production khi có PR hoặc push vào `main`. Bản ứng dụng `68f9714` qua cả ba job. Trên máy, bản tích hợp có **272/272 ca kiểm thử đạt** và **134 lượt render**. Build hiện có cảnh báo kích thước một số gói JavaScript. [Workflow CI](.github/workflows/ci.yml) · [Kết quả GitHub Actions](https://github.com/TVinhQuang/Trozy/actions/runs/45996008533) · [Chỉ mục kiểm thử](docs/test/README.md)
 
-- [Hướng dẫn cài đặt, cấu hình và nghiệp vụ](docs/IMPLEMENTATION.md)
-- [Đối chiếu chức năng và giới hạn](docs/requirements/FEATURE-COVERAGE.md)
-- [Hướng dẫn AI cục bộ B01–B04 và điểm mở rộng B05](<docs/analysis and design/AI-INTEGRATION.md>)
+Sau khi phát hành lên Cloudflare ngày 27/11/2026, trang chủ và các tệp JavaScript/CSS chính khớp bản build, `/api/health` xác nhận D1 hoạt động và API dữ liệu yêu cầu đăng nhập. Độ chính xác OCR trên tập ảnh thực tế, giao thư tới hộp thư và nghiệm thu từng luồng use case cần minh chứng riêng. [API health](https://trozy.nhom11.workers.dev/api/health)
 
-### AI cục bộ và xác minh công tơ — OCR đang hoàn thiện
+## Mã nguồn và tài liệu PA
 
-**B03/OCR hiện là bản thử nghiệm đang hoàn thiện.** Việc đã tích hợp API, giao diện và tác vụ nền không đồng nghĩa nhận dạng đủ ổn định để sử dụng tự động trên mọi ảnh. Người thuê vẫn chỉ gửi ảnh; chủ nhà phải kiểm tra đề xuất và xác minh ảnh trước khi lưu.
-
-Tách bộ đọc cho công tơ cơ: **PaddleOCR PP-OCRv6 small đọc điện**, **YOLO + VisionState Wheel Reader đọc nước**. Ảnh người thuê hoặc chủ nhà gửi tự xếp hàng xử lý nền, kể cả chưa thiết lập số bánh/phần lẻ. Bộ đọc tìm vùng, kiểm tra toàn bộ hàng số và suy ra phần lẻ khi ảnh có bằng chứng rõ. Chủ nhà mở **Chỉ số điện nước → Ảnh công tơ cần xác minh** để xem chỉ số đề xuất cùng lượng dùng dự kiến từ đầu kỳ đã xác minh, rồi đối chiếu ảnh và xác nhận trước khi lưu. Bố cục được ghi nhớ sau khi chủ nhà duyệt; **Bổ sung cách đọc công tơ / Chỉnh vùng / đọc thủ công** là dự phòng khi ảnh chưa đủ rõ. Chỉ số và hóa đơn không tự đổi.
-
-Đề xuất hiển thị đầy đủ số lẻ. Chỉ **Dùng chỉ số đề xuất** mới điền phần nguyên vào ô xác minh; chủ nhà vẫn cần đối chiếu ảnh, xác nhận phần lẻ và ghi chú trước khi lưu. Người thuê chỉ gửi ảnh/trạng thái. Gửi hoặc đọc ảnh không đổi chỉ số hay lập hóa đơn; kỳ chỉ chốt sau khi đã xác minh cả điện và nước. LCD/LED, mặt kim hoặc ảnh chưa rõ dùng nhập tay.
-
-[Hướng dẫn dùng, runtime và API hiện hành](docs/METER-READER.md). OCR dùng model điện/nước đã fine-tune theo [báo cáo 03/11/2026](docs/test/reports/METER-OCR-TRAINING-20261103.md). Runtime nước trong `.runtime/meter-digits/visionstate-yolo/`; Paddle trong `.runtime/paddleocr/` dùng chung Python/ONNX Runtime, giữ thư viện riêng. Máy mới chạy `npm run ai:setup-meter-reader` rồi `npm run ai:setup-paddle-meter`, sau đó chép các artifact fine-tune và cấu hình đúng đường dẫn/hash trong hướng dẫn; setup chỉ chuẩn bị model gốc và thư viện. Máy hiện tại tái sử dụng bộ đã có. Không tải model khi nhận dạng. `npm run ai:meter-split-check` kiểm chứng hai nhánh qua HTTP trên SQLite RAM; không dùng database thật. Tắt bằng `TROZY_METER_READER_ENABLED=false`; nhập tay vẫn hoạt động.
-
-Tra [danh mục model điện và nước](MODELS-OCR/README.md) để chuẩn bị runtime trên máy mới và kiểm SHA-256 của từng tệp trọng số, cấu hình và bảng ký tự.
-
-Trợ lý văn bản B01, phân tích tiêu thụ B02 và phân loại sửa chữa B04 được giữ. Runtime/model văn bản Ollama ở `.runtime/ollama/`; `npm run dev` chỉ mở runtime đã chuẩn bị. Các lệnh `ai:check`, `ai:start`, `ai:stop` dùng cho trợ lý văn bản.
-
-Ảnh gốc, database, dataset ảnh, báo cáo thử nghiệm và giấy phép được giữ. [Báo cáo thử trước tích hợp](docs/test/reports/VISIONSTATE-YOLO-TRIAL-20261031.md) ghi cả các trường hợp YOLO định vị chưa tốt; chưa có số liệu để công bố độ chính xác chung. Mọi dependency/runtime/cache/data/tmp riêng của Trozy phải nằm trong dự án theo [hướng dẫn triển khai](docs/IMPLEMENTATION.md).
-
-## Thành viên và trách nhiệm
-
-Theo Project Plan v2.0, mỗi thành viên có vai trò chính và cùng tham gia review, phát triển, kiểm thử.
-
-| Thành viên | Vai trò chính | Phạm vi phụ trách |
-| --- | --- | --- |
-| Trần Vinh Quang | PM / Scrum Master / AI Lead | Kế hoạch, Jira, tiến độ, báo cáo, phối hợp nhóm; B01–B04 và nghiên cứu B05 |
-| Phạm Đặng Thiên Quốc | PO / Business Analyst | Yêu cầu, Vision, quy tắc nghiệp vụ, use case và ưu tiên tính năng |
-| Phạm Nguyễn Trường Huy | Architect / Backend Developer | Kiến trúc, database, API, xác thực, phân quyền và nghiệp vụ backend |
-| Nguyễn Đức Dũng | Frontend / UI/UX Developer | Giao diện chủ trọ, cổng người thuê, responsive và tích hợp API |
-| Đặng Biên Phúc Lâm | QA / Documentation | Test plan, test case, kiểm thử, ghi nhận lỗi và rà soát tài liệu |
-
-## Phạm vi sản phẩm
-
-Trozy phục vụ đúng hai vai trò nghiệp vụ:
-
-- **Chủ trọ:** quản lý nhiều cơ sở, phòng, người thuê, hợp đồng, chỉ số điện nước, hóa đơn, công nợ, tiền cọc và vận hành.
-- **Người thuê:** xem dữ liệu được cấp quyền của mình, theo dõi hóa đơn/thanh toán, nhận thông báo và gửi yêu cầu sửa chữa, gia hạn hoặc trả phòng.
-
-Danh mục chức năng chính sử dụng mã **M01–M23**, chia thành năm nhóm:
-
-| Nhóm | Module | Nội dung |
-| --- | --- | --- |
-| A | M01–M05 | Tài khoản, cơ sở, phòng, người thuê, hợp đồng |
-| B | M06–M11 | Điện nước, dịch vụ, hóa đơn, thanh toán/công nợ, tiền cọc, thu chi |
-| C | M12–M19 | Cổng người thuê, bảo trì, tài sản, bàn giao, thông báo, yêu cầu hỗ trợ, tài liệu, phương tiện |
-| D | M20–M21 | Dashboard, báo cáo, cấu hình và quản trị dữ liệu |
-| E | M22–M23 | Smart Utility Insights và AI Rental Assistant |
-
-Luồng nghiệp vụ xuyên suốt: **thiết lập phòng → thêm người thuê → hợp đồng và tiền cọc → ghi chỉ số → phát hành hóa đơn → xác nhận thu tiền → bảo trì → trả phòng và quyết toán**.
-
-Các hướng mở rộng AI được tích hợp vào nghiệp vụ hiện có:
-
-| Mã | Tính năng | Ưu tiên theo kế hoạch PA2 |
-| --- | --- | --- |
-| B01 | AI Operations Copilot | MVP giới hạn, chỉ làm khi Build 2 ổn định và còn nguồn lực |
-| B02 | Cảnh báo tiêu thụ điện nước bất thường | Dự kiến Build 2 |
-| B03 | OCR hỗ trợ nhập chỉ số công tơ / tài liệu | OCR công tơ dự kiến Build 2; phạm vi giấy tờ cần BA/PM thống nhất |
-| B04 | AI phân loại yêu cầu sửa chữa | Dự kiến Build 3 |
-| B05 | Dự báo công nợ, doanh thu, phòng trống | Nghiên cứu tính khả thi; triển khai đầy đủ thuộc hướng phát triển sau |
-
-Chỉ số OCR cần người dùng kiểm tra trước khi tính tiền. VietQR hỗ trợ thông tin chuyển khoản; chủ trọ xác nhận đã nhận tiền trong bản cơ bản. AI không tự quyết định thanh toán, hợp đồng hoặc khấu trừ tiền cọc.
-
-Phạm vi hiện tại không gồm đăng tin/tìm phòng, môi giới, nhân viên, cổng thanh toán thật, ký số hợp đồng hoặc chat thời gian thực. Sản phẩm chính là web, chưa triển khai ứng dụng native. Kế hoạch PA2 loại trừ lưu ảnh CCCD; phần OCR giấy tờ trong tài liệu chức năng cần được đối chiếu lại trước khi triển khai. Tài liệu chức năng còn một số tham chiếu M24; BA sẽ thống nhất mã module khi chốt baseline yêu cầu.
-
-## Cấu trúc repository
-
-Cấu trúc tuân theo đề PA0 và kế hoạch quản lý cấu hình của nhóm:
-
-```text
-Trozy/
-├── src/
-│   ├── frontend/             # Giao diện React, hướng dẫn cài PWA
-│   ├── backend/              # HTTP API, SQLite, phân quyền và nghiệp vụ
-│   ├── ai/                   # Trợ lý và bộ đọc công tơ
-│   └── shared/               # Mã dùng chung
-├── public/                   # Manifest, biểu tượng PWA và tài nguyên web
-├── MODELS-OCR/               # Danh mục model, đường dẫn tương đối và SHA-256
-├── licenses/                 # Giấy phép của bên thứ ba
-├── scripts/                  # Chạy dự án, kiểm tra, chuẩn bị dữ liệu và train
-│   └── archive/              # Hai công cụ di chuyển môi trường Windows trước đây
-├── tests/                    # Kiểm thử tự động và fixture
-├── docs/
-│   ├── management/           # Dành cho tài liệu quản lý
-│   ├── requirements/         # Yêu cầu và đối chiếu chức năng
-│   ├── analysis and design/  # Hợp đồng kỹ thuật và thiết kế lịch sử trong archive/
-│   ├── implementation/       # Ghi chú triển khai theo nghiệp vụ
-│   ├── design/               # Tài nguyên thiết kế
-│   ├── research/             # Nghiên cứu và thử nghiệm OCR
-│   ├── test/                 # Chỉ mục báo cáo, minh chứng và fixture
-│   └── templates/            # Biểu mẫu đồ án
-└── pa/                       # PA0, PA1, PA2, PA3 và PA4
-```
-
-[Chỉ mục kiểm thử](docs/test/README.md) dẫn đến báo cáo theo mốc, bằng chứng OCR lịch sử và dữ liệu mẫu đang dùng.
-
-- `docs/`: nơi duy trì tài liệu làm việc, có version và revision history.
-- `pa/PAx/`: lưu riêng bản chốt phục vụ từng lần nộp; không ghi đè bản đã nộp bằng bản đang chỉnh sửa. Các file PA1/PA2 hiện được giữ nguyên vị trí để nhóm tiếp tục đối chiếu và chốt bài.
-- Mẫu trong `docs/templates/` cần được điền và review trước khi tính là deliverable.
-
-## Tài liệu và sản phẩm hiện có
-
-| Artifact | Vị trí |
+| Vị trí | Nội dung |
 | --- | --- |
-| Đề PA0 — đăng ký nhóm và thiết lập công cụ | [PA0 specification](<pa/PA0/PA0-24C01-Group registration-Tools setup.pdf>) |
-| Tài liệu PA0 của nhóm | [PA0.pdf](pa/PA0/PA0.pdf) |
-| Đề PA1 | [PA1 specification](pa/PA1/PA1-24C01.pdf) |
-| Project Plan v1.0 | [Kế hoạch PA1](<pa/PA1/rup_sdpln_sp (1.0).docx>) |
-| Vision v1.0 | [Vision Document](<pa/PA1/Vision_Document (1.0).docx>) |
-| UI phác thảo PA1 | [UI.html](pa/PA1/UI.html) |
-| Đề PA2 | [PA2 specification](pa/PA2/PA2-24C01.pdf) |
-| Project Plan v2.0 | [Kế hoạch PA2](<pa/PA2/rup_sdpln_sp (2.0).docx>) |
-| UI tương tác PA2 | [Trozy_UI_PA2_Team11.html](pa/PA2/Trozy_UI_PA2_Team11.html) |
-| Tổng hợp chức năng | [Chức năng chi tiết của web](<docs/requirements/Chức năng chi tiết của web.docx>) |
-| Kiến trúc, sơ đồ và báo cáo tuần PA3 | [Thư mục PA3](pa/PA3/) |
-| Đề PA4 | [PA4.pdf](pa/PA4/PA4.pdf) |
-| Biểu mẫu Word và Excel | [docs/templates](docs/templates/) |
+| [`src/frontend/`](src/frontend/) · [`public/`](public/) | Giao diện React/TypeScript, manifest và biểu tượng PWA. |
+| [`src/backend/`](src/backend/) · [`src/shared/`](src/shared/) | API Node/SQLite, quyền truy cập, nghiệp vụ và các quy tắc dùng chung. |
+| [`src/cloudflare/`](src/cloudflare/) · [`cloudflare/migrations/`](cloudflare/migrations/) | Worker, xác thực, email, D1, KV và migration. |
+| [`src/ai/`](src/ai/) · [`scripts/`](scripts/) · [`tests/`](tests/) | Trợ lý, OCR, lệnh chạy dự án và bộ kiểm thử. |
+| [`docs/`](docs/) | Yêu cầu, thiết kế, hướng dẫn và kiểm thử. [Mốc tiến độ 26/11](docs/PROJECT-STATUS.md) lưu kết quả lịch sử. |
+| [PA0](pa/PA0/) · [PA1](pa/PA1/) · [PA2](pa/PA2/) | Thiết lập nhóm, kế hoạch, Vision, đặc tả, prototype và báo cáo. Kế hoạch v2.0 ở [Project Plan PA2](<pa/PA2/rup_sdpln_sp (2.0).docx>). |
+| [PA3](pa/PA3/) · [PA4](pa/PA4/) | Kiến trúc, sơ đồ, UI và báo cáo PA3. Đề PA4 và hướng dẫn demo. [Thay đổi đặc tả PA3 v2](pa/PA3/Changes.md) · [Hướng dẫn demo](docs/CLOUDFLARE.md) |
 
-## Chạy prototype PA2
+Jira dùng để quản lý sprint và truy vết module, use case, task, test case. GitHub lưu mã nguồn, Pull Request và kết quả CI. Khi sửa tài liệu hoặc mã nguồn, ghi rõ phạm vi và minh chứng kiểm tra trong PR. Giữ dữ liệu demo ở dạng giả lập và để secret, `.env`, dữ liệu thật, ảnh định danh và runtime ngoài Git.
 
-Cần Git để clone và một trình duyệt hiện đại. Prototype tự chứa HTML/CSS/JavaScript, không cần cài package, database hay API key.
+## Nhóm 11
 
-```bash
-git clone https://github.com/TVinhQuang/Trozy.git
-cd Trozy
-```
-
-Trên Windows PowerShell, mở demo bằng:
-
-```powershell
-Start-Process ".\pa\PA2\Trozy_UI_PA2_Team11.html"
-```
-
-Hoặc mở trực tiếp file `pa/PA2/Trozy_UI_PA2_Team11.html` bằng trình duyệt. Trang xem mã HTML trên GitHub không chạy demo.
-
-Ba luồng trình bày chính:
-
-1. **UC01 — Quản lý phòng:** chọn vai trò Chủ trọ, thêm/sửa phòng; thử mã phòng trùng để xem xử lý lỗi.
-2. **UC02 — Lập hóa đơn tháng:** chọn phòng và kỳ, nhập điện nước, xem trước rồi phát hành; thử tạo trùng kỳ và ghi nhận thu một phần.
-3. **UC03 — Gửi yêu cầu sửa chữa:** chuyển sang Người thuê để tạo phiếu; chuyển sang Chủ trọ để tiếp nhận và báo đã sửa; quay lại Người thuê để xác nhận hoàn tất.
-
-Dữ liệu demo lưu trên trình duyệt/máy đang dùng, không đồng bộ giữa các thành viên. Có thể khôi phục dữ liệu mẫu trong **Hướng dẫn demo → Đặt lại dữ liệu mẫu**. OCR, vai trò và thông tin thanh toán trong prototype là mô phỏng; chỉ dùng dữ liệu giả.
-
-## Lộ trình và mốc PA
-
-Theo Project Plan v2.0, dự án gồm năm sprint, mỗi sprint hai tuần, từ 05/10 đến 13/12/2026.
-
-| Sprint | Thời gian | Mốc | Mục tiêu dự kiến |
-| --- | --- | --- | --- |
-| 1 | 05/10–18/10/2026 | PA1 — 18/10 | Khởi tạo dự án, Plan/Vision v1, UI phác thảo, báo cáo tuần |
-| 2 | 19/10–01/11/2026 | PA2 / Build 0 — 01/11 | Yêu cầu/use case, kiến trúc ban đầu, prototype, nền tảng kỹ thuật và smoke test |
-| 3 | 02/11–15/11/2026 | PA3 / Build 1 — 15/11 | Thiết kế chi tiết, test plan, nghiệp vụ thuê cốt lõi và hóa đơn từ chỉ số nhập tay |
-| 4 | 16/11–29/11/2026 | PA4 / Build 2 — 29/11 | OCR, hóa đơn, VietQR, theo dõi thanh toán, cảnh báo bất thường, test case/report |
-| 5 | 30/11–13/12/2026 | PA5 / Build 3 — 13/12 | Sửa chữa có AI, dashboard/báo cáo, kiểm thử cuối, hướng dẫn sử dụng và demo |
-
-Phạm vi và thời hạn nộp chính thức phải đối chiếu đề PA và thông báo Moodle. Bảng trên phản ánh kế hoạch nội bộ; tiến độ thực tế được cập nhật trên Jira và báo cáo tuần. Tên Build 0–3 và mục tiêu kỹ thuật đi kèm do nhóm xác định trong Project Plan; đề PA2 không liệt kê riêng Build 0 là một mục bài nộp.
-
-### Đối chiếu yêu cầu bài nộp
-
-- **PA1:** Project Plan và Vision bản đầu; 3–6 màn hình UI chính; hai báo cáo tuần của Sprint 1; minh chứng thiết lập công cụ, phân công và theo dõi tiến độ.
-- **PA2:** cập nhật Plan/Vision theo phản hồi TA; ghi Revision History và tô xanh phần thay đổi theo đề; use-case diagram/model và đặc tả **mọi use case trên diagram**; UI cho ít nhất ba use case quan trọng, nhất quán với đặc tả; báo cáo tuần và minh chứng theo dõi dự án.
-- Đặc tả use case cần tên, basic/main flow, alternative flows, preconditions và postconditions theo template được cung cấp.
-- Execution and Tracking chiếm **20 điểm** ở cả PA1 và PA2: cần thể hiện hoạt động của các thành viên, task/sprint, tiến độ, báo cáo và phối hợp thực tế. README hoặc một lần upload file không thay thế các minh chứng này.
-- Khi nộp, đóng gói theo tên đề bài: `PA1-Group11.zip`, `PA2-Group11.zip` (hoặc RAR nếu dùng định dạng được đề cho phép), rồi nộp qua Moodle. GitHub lưu bản đối chiếu và lịch sử, không thay thế thao tác nộp Moodle.
-
-Theo đề PA0, nhóm còn cần ít nhất năm cuộc phỏng vấn người dùng/khách hàng tiềm năng và bằng chứng. Proposal hiện có mô tả kế hoạch phỏng vấn; repository chưa có kết quả phỏng vấn để xác nhận đã hoàn thành.
-
-## Theo dõi công việc và quản lý phiên bản
-
-### Jira và báo cáo
-
-- Dùng một board Jira của nhóm, tổ chức công việc theo sprint. Mỗi task/bug/change request có người phụ trách, hạn hoàn thành và trạng thái **To Do → In Progress → Done**.
-- Gắn mã module `Mxx`, tính năng `Bxx`, use case `UCxx` khi phù hợp. Đưa liên kết Jira vào PR để truy ngược từ yêu cầu đến thay đổi mã/tài liệu.
-- Duy trì truy vết **module/tính năng → use case → Jira task → test case**, cập nhật tại sprint review. Có thể lưu bảng truy vết trong `docs/requirements/` khi nhóm lập tài liệu này.
-- PM tổng hợp báo cáo tuần vào `docs/management/`: việc đã làm, việc đang làm, khó khăn và kế hoạch tuần sau. Các thành viên cập nhật Jira trước buổi họp nhóm.
-- Theo kế hoạch: sprint planning ở đầu sprint, hai buổi họp ngắn mỗi tuần, review/retrospective cuối sprint. Sau baseline yêu cầu ngày 01/11/2026, thay đổi phạm vi được ghi nhận trên Jira và BA/PM đánh giá tác động trước khi nhóm thống nhất.
-
-GitHub cung cấp lịch sử commit, PR và release làm minh chứng. GitHub Issues/Projects không phải board đã được thiết lập cho dự án và không thay thế Jira trong kế hoạch hiện tại.
-
-### Branch, commit và pull request
-
-Theo Project Plan, thay đổi mã nguồn đi qua **branch → pull request → review → `main`**. Nhóm áp dụng cùng cách này cho tài liệu để dễ đối chiếu. Sau lần khởi tạo repository, thành viên làm trên nhánh riêng; PM/BE cấu hình bảo vệ `main` và yêu cầu review trên GitHub. Các thiết lập bảo vệ nhánh, CI và staging cần được thiết lập riêng, không được bật chỉ bằng README.
-
-Quy ước tên dưới đây là hướng dẫn nhóm đề xuất, không phải quy định riêng của giảng viên:
-
-- Nhánh: `feature/<jira-key>-<mo-ta>`, `fix/<jira-key>-<mo-ta>`, `docs/<jira-key>-<mo-ta>`; thay `<jira-key>` bằng mã task thật.
-- Commit nhỏ, mô tả đúng thay đổi; ví dụ `docs: update PA2 project plan` hoặc `feat: add monthly invoice validation`. Khi có task Jira, ghi mã task để truy vết.
-- PR nêu mục đích, liên kết task/use case, nội dung thay đổi, cách kiểm tra và ảnh minh chứng nếu đổi giao diện. Người thực hiện gửi review trước khi merge.
-- Với Word/Excel, phân công rõ người đang sửa để hạn chế xung đột; PR cần tóm tắt phần nội dung đã thay đổi.
-
-Ví dụ bắt đầu một thay đổi sau khi đã clone repository:
-
-```bash
-git switch main
-git pull --ff-only origin main
-git switch -c docs/update-weekly-report
-# Chỉnh sửa và kiểm tra các file thuộc task của mình
-git add <duong-dan-file>
-git commit -m "docs: update weekly report"
-git push -u origin docs/update-weekly-report
-```
-
-Sau đó mở pull request về `main` trên GitHub. Không dùng tài khoản Git chung cho cả nhóm; mỗi thành viên đóng góp bằng tài khoản của mình để lưu được lịch sử tham gia.
-
-### Build và bản nộp
-
-- Build 0–3 được kiểm tra theo phạm vi đã thống nhất, có phiên bản/tag nhận diện trên GitHub. Đề xuất dùng `build-0`, `build-1`, `build-2`, `build-3` khi build tương ứng được xác nhận; hiện chưa có build/release được xác nhận trong repository.
-- Khi có ứng dụng chạy được, phối hợp triển khai staging và smoke test theo kế hoạch; lỗi được ghi trên Jira, kết quả kiểm thử lưu trong `docs/test/`.
-- Trước khi chốt PA, đối chiếu tài liệu, mã, kiểm thử và yêu cầu đề bài; giữ bản nộp chính thức trong `pa/PAx/`. ZIP bài nộp không bị loại bởi `.gitignore`.
-- Cập nhật version/revision history của tài liệu và ghi commit/tag liên quan trong báo cáo để xác định đúng trạng thái đã nộp.
-
-## Các việc nhóm cần cập nhật tiếp
-
-- [x] Bổ sung đường dẫn Jira của nhóm.
-- [ ] Xác nhận quyền truy cập Jira của các thành viên/giảng viên theo yêu cầu môn học.
-- [ ] Thiết lập bảo vệ `main` và quy trình review PR trên GitHub.
-- [ ] Bổ sung báo cáo tuần, biên bản và tài liệu làm việc vào đúng thư mục `docs/`.
-- [ ] Rà soát PA2: cập nhật Vision, use-case model/specifications, yêu cầu bổ sung, kiến trúc/thiết kế ban đầu và các artifact theo đề bài.
-- [x] Xây dựng nền tảng React/Node/SQLite, bổ sung hướng dẫn cài đặt/build/test; nghiệm thu Build 0 theo quy trình nhóm là bước riêng.
-- [ ] Thống nhất các tham chiếu M23/M24 và phạm vi OCR giấy tờ giữa tài liệu chức năng, Vision và kế hoạch.
-
-## Dữ liệu và file đưa lên Git
-
-Chỉ sử dụng dữ liệu giả cho test/demo. Không commit mật khẩu, API key, file `.env`, thông tin cá nhân thật hoặc ảnh giấy tờ tùy thân. Dùng `.env.example` với giá trị mẫu khi cần chia sẻ cấu hình.
-
-`.gitignore` loại file tạm, cache, dependencies, output build và cấu hình riêng. Tài liệu Word/PDF/Excel, lockfile của trình quản lý package, ảnh minh chứng và ZIP bài nộp vẫn có thể được theo dõi. Kiểm tra `git status` và diff trước mỗi commit; `.gitignore` không tự loại file đã được Git theo dõi.
-
-Báo cáo lịch sử trước khi gỡ OCR/vision: [kết quả model thật, kiểm thử và giới hạn](docs/test/archive/meter-ocr/METER-VISION-FALLBACK-VALIDATION.md).
+| Thành viên | Vai trò theo Project Plan v2.0 |
+| --- | --- |
+| Trần Vinh Quang | PM / Scrum Master / AI Lead |
+| Phạm Đặng Thiên Quốc | PO / Business Analyst |
+| Phạm Nguyễn Trường Huy | Architect / Backend Developer |
+| Nguyễn Đức Dũng | Frontend / UI/UX Developer |
+| Đặng Biên Phúc Lâm | QA / Documentation |
