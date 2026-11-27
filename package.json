@@ -7,6 +7,11 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "cf:init": "node scripts/cloudflare.mjs init",
+    "cf:dev": "node scripts/cloudflare.mjs dev",
+    "cf:seed": "node scripts/cloudflare.mjs seed",
+    "cf:check": "npm run build && node scripts/cloudflare.mjs check",
+    "cf": "node scripts/cloudflare.mjs cli",
     "dev": "node scripts/run-project.mjs scripts/dev.mjs",
     "dev:api": "node scripts/run-project.mjs --watch src/backend/server.mjs",
     "dev:web": "node scripts/run-project.mjs node_modules/vite/bin/vite.js --host 127.0.0.1",
@@ -51,6 +56,7 @@
     "exceljs": "^4.4.0",
     "lucide-react": "^0.468.0",
     "nodemailer": "^10.2.1",
+    "pdfmake": "^0.2.23",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sharp": "^0.35.5"
@@ -67,6 +73,7 @@
     "@vitejs/plugin-react": "^5.0.0",
     "jsdom": "^30.1.3",
     "typescript": "^5.9.0",
-    "vite": "^7.1.0"
+    "vite": "^7.1.0",
+    "wrangler": "^4.168.0"
   }
 }

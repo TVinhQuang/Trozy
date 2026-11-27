@@ -215,7 +215,7 @@ export function validateReaderProposalForReview(store,user,row,input,selectedFil
  must(stringId(input.proposalId),'Mã đề xuất công tơ không hợp lệ.');
  const record=store.db.prepare('SELECT * FROM meter_reader_proposals WHERE id=? AND owner_id=? AND submission_id=?').get(input.proposalId,user.id,row.id);
  must(record&&!record.used_at&&record.expires_at>Date.now()&&record.submission_version===row.version&&record.file_id===selectedFileId,'Đề xuất đã hết hạn hoặc không còn khớp ảnh/phiên bản đang xem. Hãy đọc lại ảnh.',409);
- const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=?').get(selectedFileId,user.id);
+ const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=? AND (expires_at IS NULL OR expires_at>unixepoch())').get(selectedFileId,user.id);
  must(file&&hash(file.bytes)===record.file_hash,'Ảnh nguồn của đề xuất đã thay đổi. Hãy đọc lại ảnh.',409);
  const proposal=JSON.parse(record.result);
  const isGemini=proposal.engine==='gemini-vision';
@@ -259,7 +259,7 @@ export function createMeterReaderService(store,options={}){
    }
   }
   must((row.photos||[]).some(photo=>photo.fileId===fileId),'Ảnh không thuộc bộ gửi đang xem.',403);
-  const file=store.db.prepare('SELECT * FROM files WHERE id=? AND owner_id=?').get(fileId,user.id);
+  const file=store.db.prepare('SELECT * FROM files WHERE id=? AND owner_id=? AND (expires_at IS NULL OR expires_at>unixepoch())').get(fileId,user.id);
   must(file&&file.property_id===row.propertyId&&(!file.room_id||file.room_id===row.roomId)&&(!file.tenant_id||file.tenant_id===row.tenantId),'Ảnh không thuộc quyền hoặc phòng đang xem.',403);
   return {row,file,fileHash:hash(file.bytes)};
  }
@@ -308,7 +308,7 @@ export function createMeterReaderService(store,options={}){
   const normStart=performance.now(),decoded=await normalize(scoped.file);
   const photoEntry=(scoped.row.photos||[]).find(photo=>photo.fileId===input.fileId);
   trace.push({stage:'normalize',label:'Bước 1 · Chuẩn hóa ảnh đầu vào',engine:null,model:null,status:'ok',durationMs:Math.round(performance.now()-normStart),reading:null,summary:`${decoded.width}×${decoded.height} px · PNG sRGB${photoEntry?.guideBox?' · có khung camera ROI':''}`,details:photoEntry?.guideBox?[`Khung gợi ý camera: x=${Math.round(photoEntry.guideBox.left*100)}%, y=${Math.round(photoEntry.guideBox.top*100)}%, rộng ${Math.round(photoEntry.guideBox.width*100)}%, cao ${Math.round(photoEntry.guideBox.height*100)}%`]:[]});
-  const localStatus=status(scoped.row.utility),allowVision=Boolean(visionEnabled());
+  const localStatus=await status(scoped.row.utility),allowVision=Boolean(visionEnabled());
   const shouldRunLocal=Boolean(options.run)||localStatus.automaticAvailable||!allowVision;
   const isElectric=scoped.row.utility==='electric',unitLabel=isElectric?'kWh':'m³';
   let result=null,resultWarnings=[],configuration=null,accepted=null,layoutEvidence=null,localUnavailableError=null;
@@ -403,5 +403,16 @@ export function createMeterReaderService(store,options={}){
    onPersist(outcome,current.row);return outcome;
   });
  }
- return {status:async(user,utility)=>{owner(user);must(utility===undefined||['electric','water'].includes(utility),'Loại công tơ không hợp lệ.');const local=status(utility),visionFallbackAvailable=Boolean(visionEnabled());return {...local,visionFallbackAvailable,automaticAvailable:local.automaticAvailable||visionFallbackAvailable,message:local.automaticAvailable?(visionFallbackAvailable?`${local.message} Có dự phòng Gemini Vision tự xoay model miễn phí.`:local.message):visionFallbackAvailable?'Bộ đọc cục bộ đang tắt; đọc tự động dự phòng bằng Gemini Vision (tự xoay model miễn phí) đã sẵn sàng.':local.message};},preview,locate,read,automatic,scope};
+ return {
+  async status(user,utility){
+   owner(user);
+   must(utility===undefined||['electric','water'].includes(utility),'Loại công tơ không hợp lệ.');
+   const local=await status(utility),visionFallbackAvailable=Boolean(visionEnabled());
+   return {
+    ...local,visionFallbackAvailable,automaticAvailable:local.automaticAvailable||visionFallbackAvailable,
+    message:local.automaticAvailable?(visionFallbackAvailable?`${local.message} Có dự phòng Gemini Vision tự xoay model miễn phí.`:local.message):visionFallbackAvailable?'Bộ đọc cục bộ đang tắt; đọc tự động dự phòng bằng Gemini Vision (tự xoay model miễn phí) đã sẵn sàng.':local.message
+   };
+  },
+  preview,locate,read,automatic,scope
+ };
 }

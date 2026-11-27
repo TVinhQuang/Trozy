@@ -36,10 +36,12 @@ async function setup(t,run=async input=>ready(input)){
 }
 
 test('automatic HTTP status/profile/retry are owner-only and jobs never leak into tenant receipt, bootstrap or export',async t=>{
- const f=await setup(t),submission=await f.submit(),{sent,fileId,path}=submission;
- assert.equal((await f.anonymous(path)).status,401);assert.equal((await f.tenant(path)).status,403);assert.equal((await f.other(path)).status,404);
+ const f=await setup(t);
+ // Check endpoint dispatch before submitting a photo, whose background job also requests status.
  assert.equal((await f.owner('/meter/reader/status?utility=electric')).body.engine,'paddleocr');assert.equal((await f.owner('/meter/reader/status?utility=water')).body.engine,'visionstate');assert.deepEqual(f.statusCalls,['electric','water']);
  assert.equal((await f.tenant('/meter/reader/status?utility=electric')).status,403);assert.equal((await f.owner('/meter/reader/status?utility=gas')).status,400);
+ const submission=await f.submit(),{sent,fileId,path}=submission;
+ assert.equal((await f.anonymous(path)).status,401);assert.equal((await f.tenant(path)).status,403);assert.equal((await f.other(path)).status,404);
  const inferred=await poll(f.owner,path);assert.equal(inferred.status,'ready');assert.equal(inferred.profile,null);assert.equal(inferred.proposal.profileSource,'image');assert.equal(inferred.proposal.profileVersion,null);assert.equal(f.calls.length,1);assert.equal(f.calls[0].profile,null);
  assert.deepEqual(Object.keys(sent).sort(),['createdAt','id','period','photos','propertyId','roomId','status','tenantId','updatedAt','utility'].sort());
  assert.equal((await f.tenant('/meter/profile?roomId=room_101&utility=electric')).status,403);

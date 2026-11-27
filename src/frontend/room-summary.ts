@@ -10,6 +10,7 @@ export type RoomSummary = {
   code: string;
   floor: number | string;
   status: string;
+  maintenanceDuringStay: boolean;
   listedRent: number;
   contractRent: number | null;
   area: number;
@@ -42,7 +43,7 @@ export function buildRoomSummaries(data: AppData, rooms: RecordData[], asOf = to
   return rooms.map(room => {
     const contracts = data.contracts.filter(row => belongsTo(row, room));
     const activeContracts = contracts.filter(row => row.status === 'active').sort(newestContract);
-    const handoverContracts = room.status === 'handover' ? contracts.filter(row => row.status === 'ended').sort(newestContract) : [];
+    const handoverContracts = room.status === 'handover' ? contracts.filter(row => ['terminating','ended'].includes(row.status)).sort(newestContract) : [];
     const contract = activeContracts[0] || handoverContracts[0];
     const tenants = data.tenants.filter(row => belongsTo(row, room) && row.status === 'active');
     const currentTenant = contract && tenants.find(row => row.id === contract.tenantId);
@@ -56,7 +57,7 @@ export function buildRoomSummaries(data: AppData, rooms: RecordData[], asOf = to
     const heldDeposit = netDeposit(ledger);
     // Draft contracts can hold real reservation receipts. Keep those separate
     // from the present tenancy and never treat a promised contract deposit as cash.
-    const reservationContracts = contracts.filter(row => row.status === 'draft');
+    const reservationContracts = contracts.filter(row => ['draft','scheduled'].includes(row.status));
     const reservationDeposit = netDeposit(data.deposits.filter(row => belongsTo(row, room) && reservationContracts.some(reservation => row.contractId === reservation.id && row.tenantId === reservation.tenantId)));
     const unpaid = data.invoices.filter(row => belongsTo(row, room) && row.status === 'issued');
     const remaining = (invoice: RecordData) => Math.max(0, amount(invoice.total) - amount(invoice.paid));
@@ -75,9 +76,9 @@ export function buildRoomSummaries(data: AppData, rooms: RecordData[], asOf = to
       propertyName: String(data.properties.find(row => row.id === room.propertyId)?.name || 'Chưa có tên cơ sở'),
       code: String(room.code ?? ''),
       floor: room.floor ?? 0,
-      status: String(room.status || 'vacant'),
+      status: String(room.status || 'vacant'), maintenanceDuringStay:!!room.maintenanceDuringStay,
       listedRent: amount(room.price),
-      contractRent: contract ? readingValue(contract.rent) : null,
+      contractRent: contract ? readingValue(contract.currentRent??contract.rent) : null,
       area: amount(room.area),
       capacity: amount(room.capacity),
       tenantNames: currentTenants.map(row => String(row.name || 'Chưa có tên')),

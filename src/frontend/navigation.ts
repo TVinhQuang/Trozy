@@ -12,7 +12,7 @@ export const allNav: NavigationItem[] = [
   { id:'tenants', label:'Người thuê', icon:Users },
   { id:'issues', label:'Bảo trì & sự cố', icon:Wrench, tenant:true },
   { id:'properties', label:'Cơ sở nhà trọ', icon:Building2 },
-  { id:'services', label:'Dịch vụ & phụ phí', icon:Layers },
+  { id:'services', label:'Dịch vụ & phụ phí', icon:Layers, tenant:true },
   { id:'assets', label:'Tài sản & thiết bị', icon:Package, tenant:true },
   { id:'vehicles', label:'Phương tiện', icon:Car, tenant:true },
   { id:'amenities', label:'Tiện ích chung', icon:Coffee, tenant:true },

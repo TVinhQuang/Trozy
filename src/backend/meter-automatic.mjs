@@ -57,7 +57,7 @@ export function createMeterAutomaticService(store,reader,options={}){
   wake();
  }
  function queueRow(row,fileId,{replace=false}={}){
-  const file=store.db.prepare('SELECT * FROM files WHERE id=? AND owner_id=?').get(fileId,row.ownerId);
+  const file=store.db.prepare('SELECT * FROM files WHERE id=? AND owner_id=? AND (expires_at IS NULL OR expires_at>unixepoch())').get(fileId,row.ownerId);
   must(file&&(row.photos||[]).some(photo=>photo.fileId===fileId),'Ảnh không thuộc bộ gửi.',403);
   const existing=store.db.prepare('SELECT * FROM meter_reader_jobs WHERE submission_id=? AND file_id=?').get(row.id,fileId);
   const profile=confirmedMeterProfile(store,row.ownerId,row.roomId,row.utility),fileHash=hash(file.bytes);
@@ -111,7 +111,7 @@ export function createMeterAutomaticService(store,reader,options={}){
   let state=job?.status||'unavailable',reason=job?.reason||'Ảnh này chưa có tác vụ tự động. Hãy bấm thử lại.',proposal=null,trace=null;
   if(job){
    if(job.trace)try{const parsed=JSON.parse(job.trace);if(Array.isArray(parsed))trace=parsed;}catch{}
-   const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=?').get(fileId,user.id);
+   const file=store.db.prepare('SELECT bytes FROM files WHERE id=? AND owner_id=? AND (expires_at IS NULL OR expires_at>unixepoch())').get(fileId,user.id);
    if(job.engine!==meterEngine(row.utility)||row.status!=='pending'||job.submission_version!==row.version||job.profile_version!==(profile?.version??null)||!file||hash(file.bytes)!==job.file_hash){state='needs_review';reason=REASONS.stale;trace=null;}
    else if(job.proposal_id){
     const record=store.db.prepare('SELECT * FROM meter_reader_proposals WHERE id=? AND owner_id=? AND submission_id=?').get(job.proposal_id,user.id,key);

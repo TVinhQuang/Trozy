@@ -5,8 +5,11 @@ import { createApp } from '../src/backend/server.mjs';
 
 // Integration tests use deterministic local behavior and never call a model service.
 const previousEnabled=process.env.TROZY_AI_ENABLED;
+const previousProvider=process.env.TROZY_AI_PROVIDER;
 process.env.TROZY_AI_ENABLED='0';
+process.env.TROZY_AI_PROVIDER='ollama';
 after(()=>{if(previousEnabled===undefined)delete process.env.TROZY_AI_ENABLED;else process.env.TROZY_AI_ENABLED=previousEnabled;});
+after(()=>{if(previousProvider===undefined)delete process.env.TROZY_AI_PROVIDER;else process.env.TROZY_AI_PROVIDER=previousProvider;});
 
 async function fixture(t){
  const app=createApp({dbPath:':memory:',seed:true});

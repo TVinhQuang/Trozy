@@ -23,7 +23,7 @@ export type MeterAutomaticResult = {
 export type MeterUsagePreview = {
   status: 'available' | 'missing_baseline' | 'decreased'; previousValue: number | null;
   proposedValue: number | null; consumption: number | null; unit: 'kWh' | 'm3';
-  baselineSource: 'previous-reading' | 'handover' | null;
+  baselineSource: 'previous-reading' | 'handover' | 'replacement' | null;
 };
 const pending = (status?: string) => status === 'queued' || status === 'processing';
 

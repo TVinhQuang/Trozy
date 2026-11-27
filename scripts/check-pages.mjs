@@ -22,7 +22,7 @@ try {
   assert.equal(response.status,200);
   const cookie=response.headers.get('set-cookie').split(';')[0];
   const bootstrap=await fetch(`${base}/api/bootstrap`,{headers:{cookie}}).then(res=>res.json());
-  const scopedPages=bootstrap.user.role==='tenant'?pages.filter(page=>!['properties','tenants','services','transactions','reports','settings'].includes(page)):pages;
+  const scopedPages=bootstrap.user.role==='tenant'?pages.filter(page=>!['properties','tenants','transactions','reports','settings'].includes(page)):pages;
   for(const propertyId of ['',bootstrap.data.properties[0]?.id].filter((v,i,a)=>v!==undefined&&a.indexOf(v)===i)){
    for(const page of scopedPages){
     const context={bootstrap,...bootstrap,propertyId,page,setPropertyId(){},navigate(){},notify(){},refresh:async()=>{},mutate:async()=>{},action:async()=>{},remove:async()=>{}};

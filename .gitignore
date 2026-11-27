@@ -4,6 +4,9 @@
 !.env.example
 !.env.*.example
 /.secrets/
+/.dev.vars
+/.dev.vars.*
+/.wrangler/
 /secrets/
 /credentials/
 /.aws/

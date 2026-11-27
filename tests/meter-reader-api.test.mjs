@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, {after} from 'node:test';
 import assert from 'node:assert/strict';
 import sharp from 'sharp';
 import {fixture,note,status} from './fixtures/manual-meter-fixture.mjs';
@@ -6,6 +6,11 @@ import {dataFor} from '../src/backend/domain.mjs';
 import {createMeterReaderService} from '../src/backend/meter-reader-service.mjs';
 import {createApp} from '../src/backend/server.mjs';
 import {meterReaderModelDigests} from '../src/ai/meter-reader.mjs';
+
+// These tests inject the local reader and must not inherit a cloud fallback from .env.
+const previousVisionFallback=process.env.TROZY_METER_VISION_FALLBACK;
+process.env.TROZY_METER_VISION_FALLBACK='off';
+after(()=>{if(previousVisionFallback===undefined)delete process.env.TROZY_METER_VISION_FALLBACK;else process.env.TROZY_METER_VISION_FALLBACK=previousVisionFallback;});
 
 const corners=[[.1,.2],[.9,.2],[.9,.8],[.1,.8]];
 const quality={canRead:true,checks:{resolution:true,exposure:true,contrast:true,sharpness:true},metrics:{width:200,height:60,cellWidth:33.33,meanLuma:120,contrast:50,edgeEnergy:150}};
@@ -22,9 +27,22 @@ async function setup(t,run,utility='electric'){
  return {...f,bytes,fileId,receipt,input,calls,reader};
 }
 
+test('reader status awaits asynchronous local capabilities before reporting availability',async t=>{
+ const f=await setup(t);
+ const reader=createMeterReaderService(f.store,{
+  status:async()=>({available:true,automaticAvailable:true,engine:'paddleocr',message:'Local reader ready'}),
+  visionEnabled:()=>false
+ });
+ const result=await reader.status(f.owner,'electric');
+ assert.equal(result.available,true);
+ assert.equal(result.engine,'paddleocr');
+ assert.equal(result.automaticAvailable,true);
+ assert.equal(result.visionFallbackAvailable,false);
+});
+
 test('owner-guided proposals remain private evidence until explicit image and fractional confirmation',async t=>{
  const f=await setup(t),before=JSON.stringify([f.store.list('readings'),f.store.list('invoices')]);
- assert.deepEqual(await f.reader.status(f.owner),statusResult);await assert.rejects(()=>f.reader.status(f.tenant),status(403));
+ assert.deepEqual(await f.reader.status(f.owner),{...statusResult,visionFallbackAvailable:false,automaticAvailable:false});await assert.rejects(()=>f.reader.status(f.tenant),status(403));
  const {proposal}=await f.reader.read(f.owner,f.receipt.id,f.input);
  assert.equal(proposal.status,'ready');assert.equal(proposal.reading.integerValue,f.prior.electricNew+10);assert.equal(proposal.config.decimals,1);assert.equal(proposal.submissionVersion,1);
  assert.equal(f.store.get('meterSubmissions',f.receipt.id).version,1);assert.equal(JSON.stringify([f.store.list('readings'),f.store.list('invoices')]),before);
@@ -185,7 +203,7 @@ test('water stays on wheel evidence, and status/locate dispatch uses server-scop
  const f=fixture(t),bytes=await pixels(),fileId=f.file({bytes}),receipt=f.service.submitPhotos(f.tenant,f.request('water',fileId));
  const value=f.prior.waterNew+5,calls=[],statusCalls=[],reader=createMeterReaderService(f.store,{status:async utility=>{statusCalls.push(utility);return {utility};},run:async input=>{calls.push(input);return input.mode==='locate'?{width:240,height:90,status:'selected',candidates:[{corners,confidence:.9}],warnings:[]}:ready(input,{integerValue:value});}});
  f.store.put('meterProfiles',{id:'test-water-profile',ownerId:f.owner.id,propertyId:'property_01',roomId:'room_101',utility:'water',digits:6,decimals:1,meterType:'mechanical',confirmed:true,reader:'visionstate-v2',version:1});
- assert.deepEqual(await reader.status(f.owner,'electric'),{utility:'electric'});assert.deepEqual(await reader.status(f.owner,'water'),{utility:'water'});assert.deepEqual(statusCalls,['electric','water']);
+ assert.equal((await reader.status(f.owner,'electric')).utility,'electric');assert.equal((await reader.status(f.owner,'water')).utility,'water');assert.deepEqual(statusCalls,['electric','water']);
  await assert.rejects(()=>reader.status(f.tenant,'water'),status(403));await assert.rejects(()=>reader.status(f.owner,'gas'),status(400));
  await reader.locate(f.owner,receipt.id,{fileId,version:1});assert.equal(calls.at(-1).utility,'water');assert.deepEqual(calls.at(-1).profile,{digits:6,decimals:1});
  await reader.locate(f.owner,receipt.id,{fileId,version:1,digits:5,decimals:0});assert.deepEqual(calls.at(-1).profile,{digits:5,decimals:0});assert.equal(f.store.get('meterProfiles','test-water-profile').digits,6);

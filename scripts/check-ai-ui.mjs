@@ -665,6 +665,22 @@ try {
   }
 
   {
+    const fixture=context('readings');
+    fixture.value.bootstrap.capabilities.meterReader=false;
+    const submission={id:'expired',version:1,roomId:'room_101',utility:'electric',period:'2026-11',status:'pending',
+      photos:[{fileId:'expired-photo',expiresAt:'2000-01-01T00:00:00Z'}]};
+    const requests=mockAPI((path,body)=>{assert.equal(path,'/api/meter/submissions/expired/review');assert.equal(body.decision,'reject');return {};});
+    mount(MeterSubmissionReview,{submission,onClose(){},onSaved:async()=>{}},fixture);
+    assert(screen.getByText('Ảnh đã hết thời hạn lưu một tháng.'));
+    assert.equal(screen.queryByRole('img'),null);
+    assert(screen.getByRole('button',{name:'Xác minh chỉ số này'}).disabled);
+    fireEvent.change(screen.getByRole('textbox'),{target:{value:'Ảnh đã hết hạn, vui lòng chụp lại.'}});
+    fireEvent.click(screen.getByRole('button',{name:'Yêu cầu chụp lại'}));
+    await waitFor(()=>assert.equal(requests.length,1));
+    pass('Expired cloud evidence offers a retake without an image, OCR request or approval');cleanup();
+  }
+
+  {
     const fixture = context('readings'), submission = { id: 'manual-review', version: 2, roomId: 'room_101', utility: 'electric', period: '2026-11', status: 'pending', selectedFileId: 'original-photo', photos: [{ fileId: 'original-photo', result: { rawText: 'PRIVATE-MACHINE', suggestedValue: 77777 } }] };
     let saved = 0;
     const requests = mockAPI((path, body) => { if (path.startsWith('/api/meter/submissions/manual-review/automatic?')) return automaticResult(submission); assert.equal(path, '/api/meter/submissions/manual-review/review'); assert.equal(body.selectedFileId, 'original-photo'); assert.equal(body.value, 13001); assert.equal(body.imageChecked, true); assert.equal(body.version, 2); assert.equal(body.analysisId, undefined); return { submission: { status: 'approved' } }; });
@@ -759,8 +775,8 @@ try {
     assert(screen.getByRole('dialog', { name: 'Đọc ảnh công tơ của chủ nhà' })); assert.equal(screen.queryByRole('option', { name: /UI-OTHER/ }), null);
     fireEvent.change(screen.getByLabelText(/Phòng của ảnh công tơ/), { target: { value: 'room_101' } }); fireEvent.change(screen.getByLabelText(/Kỳ của ảnh công tơ/), { target: { value: '2026-12' } }); fireEvent.change(screen.getByLabelText('Loại công tơ trong ảnh'), { target: { value: 'water' } });
     const upload = screen.getByLabelText('Ảnh công tơ chủ nhà cần xác minh'), create = screen.getByRole('button', { name: 'Tạo bộ ảnh & đọc tự động' });
-    fireEvent.change(upload, { target: { files: [new File([new Uint8Array(3 * 1024 * 1024 + 1)], 'too-large.png', { type: 'image/png' })] } });
-    await screen.findByText('Chọn JPG, PNG hoặc WebP có dữ liệu, tối đa 3 MB mỗi ảnh.'); assert.equal(requests.length, 0); assert.equal(create.disabled, true);
+    fireEvent.change(upload, { target: { files: [new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'too-large.png', { type: 'image/png' })] } });
+    await screen.findByText('Chọn JPG, PNG hoặc WebP có dữ liệu, tối đa 5 MiB mỗi ảnh.'); assert.equal(requests.length, 0); assert.equal(create.disabled, true);
     fireEvent.change(upload, { target: { files: [new File([new Uint8Array([137, 80, 78, 71, 4])], 'owner-meter.png', { type: 'image/png' })] } });
     await waitFor(() => assert.equal(create.disabled, false)); assert.equal(requests.length, 1); assert.equal(requests[0].path, '/api/files'); assert.equal(fixture.mutations.length, 0);
     fireEvent.click(create); await screen.findByRole('dialog', { name: 'Minh chứng nước · 2026-12' }); await screen.findByRole('button', { name: 'Dùng chỉ số đề xuất' });
@@ -791,36 +807,21 @@ try {
     pass('Switching property aborts owner photo uploads, and closing owner creation rejects a late pending response instead of attaching it to another review'); cleanup();
   }
 
-  // B04: a suggestion stays a suggestion until Apply, then normal form submission.
+  // UC45/46: review the tenant's submitted values before the server classifies the saved ticket.
   {
-    const fixture = context('issues');
-    const requests = mockAPI((path, body) => {
-      if (path === '/api/extensions/B04') { assert.equal(body.roomId, 'room_101'); assert.match(body.description, /Máy lạnh/); return { result: { feature: 'B04', engine: 'rules', category: 'Thiết bị', priority: 'urgent', confidence: 88, reasons: ['Mô tả có máy lạnh và rò nước.'], suggestedTitle: 'Kiểm tra máy lạnh', safetyAdvice: ['Tránh tiếp xúc vị trí nghi có điện.'], suggestedSteps: ['Báo chủ trọ kiểm tra.'], warnings: [], requiresConfirmation: true } }; }
-    });
-    mount(OperationsPages, { page: 'issues' }, fixture);
-    fireEvent.click(screen.getByRole('button', { name: 'Tạo phiếu sửa chữa' }));
-    const dialog = screen.getByRole('dialog');
-    fireEvent.change(within(dialog).getByLabelText(/Tiêu đề/), { target: { value: 'Máy lạnh phòng tôi bị hỏng' } });
-    fireEvent.change(within(dialog).getByLabelText(/Mô tả sự cố/), { target: { value: 'Máy lạnh phòng 101 bị chảy nước và không mát.' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Gợi ý loại sự cố & mức ưu tiên' }));
-    await within(dialog).findByText('Phân loại theo quy tắc');
-    assert.equal(within(dialog).getByLabelText(/Loại sự cố/).value, 'Khác');
-    assert.equal(fixture.mutations.length, 0);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Áp dụng gợi ý vào phiếu' }));
-    assert.equal(within(dialog).getByLabelText(/Loại sự cố/).value, 'Thiết bị');
-    assert.equal(within(dialog).getByLabelText(/Mức ưu tiên/).value, 'urgent');
-    assert.equal(within(dialog).getByLabelText(/Tiêu đề/).value, 'Máy lạnh phòng tôi bị hỏng');
-    assert.equal(fixture.mutations.length, 0); assert.equal(fixture.actions.length, 0);
-    pass('B04 previews truthful rule engine output and only Apply edits the form');
-    fireEvent.change(within(dialog).getByLabelText(/Mức ưu tiên/), { target: { value: 'normal' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Gửi yêu cầu', exact: true }));
-    await waitFor(() => assert.equal(fixture.mutations.length, 1));
-    assert.equal(fixture.mutations[0][0], 'issues');
-    assert.equal(fixture.mutations[0][1].category, 'Thiết bị'); assert.equal(fixture.mutations[0][1].priority, 'normal');
-    assert.equal(fixture.mutations[0][1].status, 'new'); assert.equal(fixture.actions.length, 0);
-    assert.equal(requests.length, 1);
-    pass('B04 remains editable and creates a new request only on normal explicit submission');
-    cleanup();
+    const fixture=context('issues');fixture.value.user={...fixture.value.user,id:'user_tenant',role:'tenant',tenantId:'tenant_01'};const requests=mockAPI(()=>undefined);
+    mount(OperationsPages,{page:'issues'},fixture);
+    fireEvent.click(screen.getByRole('button',{name:'Gửi yêu cầu sửa chữa'}));
+    const dialog=screen.getByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText(/Tiêu đề/),{target:{value:'Máy lạnh phòng tôi bị hỏng'}});
+    fireEvent.change(within(dialog).getByLabelText(/Mô tả sự cố/),{target:{value:'Máy lạnh bị rò nước khi đang hoạt động.'}});
+    fireEvent.click(within(dialog).getByRole('button',{name:'Kiểm tra phiếu'}));
+    assert.equal(fixture.mutations.length,0);assert.equal(requests.length,0);
+    pass('Maintenance review preserves the unsubmitted report without invoking AI');
+    fireEvent.click(within(dialog).getByRole('button',{name:'Xác nhận gửi phiếu'}));
+    await waitFor(()=>assert.equal(fixture.mutations.length,1));
+    assert.equal(fixture.mutations[0][1].priority,'normal');assert(fixture.mutations[0][1].submissionId);
+    pass('Confirmed maintenance report is submitted once with original classification');cleanup();
   }
 
   // B01: persisted history, escaped model output, citations and explicit draft confirmation.
@@ -858,11 +859,11 @@ try {
     assert.equal(within(dialog).getByRole('checkbox', { name: 'Phòng 101' }).checked, true);
     fireEvent.change(within(dialog).getByLabelText(/Nội dung thông báo/), { target: { value: 'Nội dung đã được chủ trọ kiểm tra.' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận gửi thông báo' }));
-    await waitFor(() => assert.equal(fixture.mutations.length, 1));
-    assert.equal(fixture.mutations[0][0], 'notifications');
-    assert.deepEqual(fixture.mutations[0][1].roomIds, ['room_101']);
-    assert.equal(fixture.mutations[0][1].propertyId, 'property_01');
-    assert.equal(fixture.mutations[0][1].body, 'Nội dung đã được chủ trọ kiểm tra.');
+    await waitFor(() => assert.equal(fixture.actions.length, 1));
+    assert.equal(fixture.actions[0][0], 'notification-send');
+    assert.deepEqual(fixture.actions[0][1].roomIds, ['room_101']);
+    assert.equal(fixture.actions[0][1].propertyId, 'property_01');
+    assert.equal(fixture.actions[0][1].body, 'Nội dung đã được chủ trọ kiểm tra.');
     pass('B01 draft preview never sends; explicit confirmation sends reviewed targeted content');
     fireEvent.click(screen.getByRole('button', { name: 'Xóa lịch sử của tôi' }));
     assert(!requests.some(request => request.path === '/api/ai/history/clear'));

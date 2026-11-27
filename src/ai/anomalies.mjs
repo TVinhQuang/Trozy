@@ -1,3 +1,4 @@
+import {meterConsumption} from '../shared/meter-consumption.mjs';
 /** Explainable B02 statistics. It never changes readings, invoices or money. */
 const round=(value,digits=2)=>Number(value.toFixed(digits));
 const median=values=>{const sorted=[...values].sort((a,b)=>a-b),middle=Math.floor(sorted.length/2);return sorted.length%2?sorted[middle]:(sorted[middle-1]+sorted[middle])/2;};
@@ -19,16 +20,18 @@ export function analyzeUtilities({data,input={}}){
   const threshold=Number.isFinite(Number(settings.anomalyThreshold))?Math.min(1000,Math.max(5,Number(settings.anomalyThreshold))):50;
   for(const utility of ['electric','water']){
    const oldField=utility==='electric'?'electricOld':'waterOld',newField=utility==='electric'?'electricNew':'waterNew',unit=utility==='electric'?'kWh':'m³',label=utility==='electric'?'điện':'nước';
-   const from=indexValue(current[oldField]),to=indexValue(current[newField]),usage=to-from;
-   const eligible=earlier.filter((row,index)=>Number.isFinite(indexValue(row[newField]))&&Number.isFinite(indexValue(row[oldField]))&&indexValue(row[newField])>=indexValue(row[oldField])&&(!index||nextMonth(earlier[index-1].period)===row.period));
-   const trace=[...eligible,current].filter(row=>Number.isFinite(indexValue(row[newField])-indexValue(row[oldField]))).map(row=>({period:row.period,usage:round(indexValue(row[newField])-indexValue(row[oldField]))}));
+   const from=indexValue(current[oldField]),to=indexValue(current[newField]),usage=meterConsumption(current,utility);
+   const firstSegment=current.meterBreakdown?.find(part=>part.utility===utility);
+   const opening=firstSegment?Number(firstSegment.oldOpening):from;
+   const eligible=earlier.filter((row,index)=>Number.isFinite(indexValue(row[newField]))&&Number.isFinite(indexValue(row[oldField]))&&meterConsumption(row,utility)>=0&&(!index||nextMonth(earlier[index-1].period)===row.period));
+   const trace=[...eligible,current].filter(row=>Number.isFinite(meterConsumption(row,utility))).map(row=>({period:row.period,usage:round(meterConsumption(row,utility))}));
    const common={propertyId:room.propertyId,roomId:room.id,roomCode:room.code,period:current.period,utility,currentUsage:Number.isFinite(usage)?round(usage):0,threshold,readingId:current.id,reviewed:false,history:trace};
    const previous=earlier.at(-1),prior=previous?indexValue(previous[newField]):undefined;
-   if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<from||(prior!==undefined&&from!==prior)){
-    alerts.push({...common,id:idOf(current,utility,'invalid'),kind:'invalid',severity:'critical',baseline:Number.isFinite(prior)?prior:0,changePercent:null,explanation:!Number.isFinite(from)||!Number.isFinite(to)?`Chỉ số ${label} không phải số hợp lệ.`:to<from?`Chỉ số ${label} mới (${to}) nhỏ hơn chỉ số cũ (${from}).`:`Chỉ số ${label} đầu kỳ (${from}) không nối tiếp chỉ số cuối kỳ trước (${prior}).`,recommendation:'Đối chiếu ảnh công tơ và lịch sử chỉ số; nếu thay công tơ, ghi rõ biên bản trước khi điều chỉnh.'});continue;
+   if(!Number.isFinite(from)||!Number.isFinite(to)||from<0||to<from||!Number.isFinite(usage)||usage<0||(prior!==undefined&&opening!==prior)){
+    alerts.push({...common,id:idOf(current,utility,'invalid'),kind:'invalid',severity:'critical',baseline:Number.isFinite(prior)?prior:0,changePercent:null,explanation:!Number.isFinite(from)||!Number.isFinite(to)?`Chỉ số ${label} không phải số hợp lệ.`:to<from?`Chỉ số ${label} mới (${to}) nhỏ hơn chỉ số cũ (${from}).`:`Chỉ số ${label} đầu kỳ (${opening}) không nối tiếp chỉ số cuối kỳ trước (${prior}).`,recommendation:'Đối chiếu ảnh công tơ và lịch sử chỉ số; nếu thay công tơ, ghi rõ biên bản trước khi điều chỉnh.'});continue;
    }
    if(eligible.length<3||!previous||nextMonth(previous.period)!==current.period){insufficientRooms.add(room.id);continue;}
-   const rates=eligible.map(row=>(Number(row[newField])-Number(row[oldField]))/days(row.period));
+   const rates=eligible.map(row=>meterConsumption(row,utility)/days(row.period));
    const center=median(rates),baseline=center*days(current.period),difference=usage-baseline;
    const absoluteFloor=utility==='electric'?20:3;
    const mad=median(rates.map(rate=>Math.abs(rate-center)))*days(current.period);

@@ -38,18 +38,17 @@ function fixture({role='landlord',existing=false}={}) {
   data.rooms=[{id:'r1',propertyId:'p1',code:'101',status:'occupied',area:24,price:3000000,capacity:2}];
   data.tenants=[{id:'t1',propertyId:'p1',roomId:'r1',userId:'tenant-user',status:'active',name:'Người thuê mẫu'}];
   data.readings=[{id:'previous',propertyId:'p1',roomId:'r1',period:'2020-10',electricOld:1000,electricNew:9000,waterOld:110,waterNew:120,confirmed:true}];
-  if(existing)data.readings.push({id:'current',propertyId:'p1',roomId:'r1',period:'2020-11',electricOld:9000,electricNew:10200,waterOld:120,waterNew:123,confirmed:true});
+  if(existing)data.readings.push({id:'current',propertyId:'p1',roomId:'r1',period:'2020-11',electricOld:9000,electricNew:10200,waterOld:120,waterNew:123,confirmed:false});
   const user={id:role==='landlord'?'owner-user':'tenant-user',name:'Người dùng thử',role,tenantId:role==='tenant'?'t1':undefined};
-  const mutations=[],notifications=[];
-  const value={user,data,bootstrap:{user,data},page:'readings',propertyId:'p1',setPropertyId(){},navigate(){},refresh:async()=>{},notify(...args){notifications.push(args);},mutate:async(...args)=>{mutations.push(structuredClone(args));return{id:'saved',...args[1]};},remove:async()=>assert.fail('No deletion expected'),action:async()=>assert.fail('No business action expected')};
-  return {value,mutations,notifications};
+  const mutations=[],notifications=[],actions=[];
+  const value={user,data,bootstrap:{user,data},page:'readings',propertyId:'p1',setPropertyId(){},navigate(){},refresh:async()=>{},notify(...args){notifications.push(args);},mutate:async(...args)=>{mutations.push(structuredClone(args));return{id:'saved',...args[1]};},remove:async()=>assert.fail('No deletion expected'),action:async(...args)=>{actions.push(args);return {};}};
+  return {value,mutations,notifications,actions};
 }
 const mount=ctx=>render(h(AppContext.Provider,{value:ctx.value},h(Readings)));
 const field=label=>screen.getByLabelText(label,{exact:false});
 const change=(label,value)=>fireEvent.change(field(label),{target:{value:String(value)}});
 const dialog=()=>screen.getByRole('dialog');
-const checkbox=()=>within(dialog()).getByRole('checkbox');
-const save=()=>within(dialog()).getByRole('button',{name:'Lưu chỉ số',exact:true});
+const save=()=>within(dialog()).getByRole('button',{name:'Lưu bản nháp',exact:true});
 const openNew=()=>fireEvent.click(screen.getByRole('button',{name:'Ghi chỉ số',exact:true}));
 
 try {
@@ -59,11 +58,9 @@ try {
   assert.equal(field('Chỉ số điện cuối kỳ (kWh)').value,'9000');
   assert.equal(field('Chỉ số nước đầu kỳ (m³)').value,'120');
   assert.equal(field('Chỉ số nước cuối kỳ (m³)').value,'120');
-  assert.equal(save().disabled,true);
-  fireEvent.submit(dialog().querySelector('form'));
-  await waitFor(()=>assert.match(screen.getByRole('alert').textContent,/kiểm tra.*xác nhận/i));
-  assert.deepEqual(ctx.mutations,[]);
-  pass('Default entry identifies cumulative start/end readings and requires explicit confirmation before saving');
+  assert.equal(save().disabled,false);
+  assert.deepEqual(ctx.actions,[]);
+  pass('Default entry identifies cumulative readings and offers a draft save');
 
   change('Cách nhập điện nước','consumption');
   assert.equal(screen.queryByRole('alert'),null,'Changing the entry method removes the stale validation message');
@@ -76,9 +73,7 @@ try {
   assert.equal(field('Chỉ số nước đầu kỳ (m³)').readOnly,true);
   assert.equal(field('Chỉ số điện cuối kỳ được tính (kWh)').readOnly,true);
   assert.equal(field('Chỉ số nước cuối kỳ được tính (m³)').readOnly,true);
-  assert.equal(save().disabled,true);
   assert.deepEqual(ctx.mutations,[]);
-  fireEvent.click(checkbox());
   fireEvent.click(save());
   await waitFor(()=>assert.equal(ctx.mutations.length,1));
   const [collection,payload,id]=ctx.mutations[0];
@@ -88,7 +83,7 @@ try {
   assert.equal(payload.waterOld,120);assert.equal(payload.waterNew,123);
   assert.equal(payload.electricNew-payload.electricOld,1200);
   assert.ok(1200<ctx.value.data.readings[0].electricNew-ctx.value.data.readings[0].electricOld,'Fixture usage must be lower than the prior month');
-  assert.equal(payload.confirmed,true);
+  assert.equal(payload.confirmed,false);assert.deepEqual(ctx.actions,[]);
   await waitFor(()=>assert.equal(screen.queryByRole('dialog'),null));
   view.unmount();
   pass('A lower monthly usage of 1200 after 8000 saves only the equivalent positive cumulative interval, never 1200 as the ending counter');
@@ -102,21 +97,22 @@ try {
   change('Cách nhập điện nước','consumption');
   assert.equal(field('Điện tiêu thụ kỳ này (kWh)').value,'1200');
   assert.equal(field('Nước tiêu thụ kỳ này (m³)').value,'3');
-  fireEvent.click(checkbox());assert.equal(save().disabled,false);
+  assert.equal(save().disabled,false);
   change('Điện tiêu thụ kỳ này (kWh)',100);
-  assert.equal(checkbox().checked,false);assert.equal(save().disabled,true);
+  assert.deepEqual(ctx.actions,[]);
   assert.equal(field('Chỉ số điện cuối kỳ được tính (kWh)').value,'9100');
   assert.deepEqual(ctx.mutations,[]);
-  pass('Switching entry methods retains the same interval; changing monthly usage revokes prior confirmation without saving');
+  pass('Switching entry methods retains the same interval; changing monthly usage leaves the draft unsaved');
 
   change('Điện tiêu thụ kỳ này (kWh)','');
   assert.equal(field('Điện tiêu thụ kỳ này (kWh)').value,'');
   assert.equal(field('Chỉ số điện cuối kỳ được tính (kWh)').value,'');
-  assert.equal(save().disabled,true);
+  fireEvent.submit(dialog().querySelector('form'));
+  await waitFor(()=>assert.ok(screen.getByRole('alert')));
+  assert.deepEqual(ctx.mutations,[]);
   change('Điện tiêu thụ kỳ này (kWh)',-1);
   assert.equal(field('Điện tiêu thụ kỳ này (kWh)').min,'0');
   assert.equal(field('Điện tiêu thụ kỳ này (kWh)').validity.rangeUnderflow,true);
-  fireEvent.click(checkbox());fireEvent.click(save());
   fireEvent.submit(dialog().querySelector('form'));
   await waitFor(()=>assert.ok(screen.getByRole('alert')));
   assert.deepEqual(ctx.mutations,[]);
@@ -129,18 +125,19 @@ try {
   change('Cách nhập điện nước','consumption');
   assert.equal(field('Điện tiêu thụ kỳ này (kWh)').value,'0','A decreasing cumulative draft cannot silently become a negative usage');
   assert.equal(field('Chỉ số điện cuối kỳ được tính (kWh)').value,'9000');
-  fireEvent.click(checkbox());
   change('Kỳ ghi chỉ số','2020-09');
   assert.equal(field('Cách nhập điện nước').value,'cumulative');
   assert.equal(field('Chỉ số điện đầu kỳ (kWh)').value,'0');
-  assert.equal(checkbox().checked,false);
+  assert.deepEqual(ctx.actions,[]);
   assert.deepEqual(ctx.mutations,[]);
   view.unmount();
   pass('Blank or negative monthly usage cannot submit; zero is valid, invalid drafts normalize safely and a period change resets entry context');
 
   ctx=fixture({existing:true});view=mount(ctx);
   const currentRow=[...document.querySelectorAll('tbody tr')].find(row=>row.textContent.includes('2020-11'));
-  assert.ok(currentRow);fireEvent.click(within(currentRow).getByRole('button',{name:'Chỉnh sửa',exact:true}));
+  assert.ok(currentRow);fireEvent.click(within(currentRow).getByRole('button',{name:'Chốt kỳ',exact:true}));
+  await waitFor(()=>assert.deepEqual(ctx.actions,[['reading-finalize',{id:'current'}]]));
+  fireEvent.click(within(currentRow).getByRole('button',{name:'Sửa nháp',exact:true}));
   assert.equal(field('Cách nhập điện nước').value,'cumulative');
   assert.equal(field('Chỉ số điện đầu kỳ (kWh)').value,'9000');
   assert.equal(field('Chỉ số điện cuối kỳ (kWh)').value,'10200');
@@ -150,14 +147,29 @@ try {
   assert.deepEqual(ctx.mutations,[]);view.unmount();
   pass('Editing historical readings preserves their stored cumulative values and derives monthly usage without reinterpreting history');
 
+  ctx=fixture({existing:true});
+  Object.assign(ctx.value.data.readings.at(-1),{electricOld:5,electricNew:15,meterBreakdown:[{utility:'electric',oldOpening:9000,oldClosing:9030,newOpening:5}]});
+  view=mount(ctx);fireEvent.click(screen.getByRole('button',{name:'Sửa nháp'}));
+  change('Cách nhập điện nước','consumption');
+  assert.equal(field('Điện tiêu thụ kỳ này (kWh)').value,'40');
+  change('Điện tiêu thụ kỳ này (kWh)',45);
+  assert.equal(field('Chỉ số điện cuối kỳ được tính (kWh)').value,'20');
+  assert.equal(field('Điện tiêu thụ kỳ này (kWh)').min,'30');
+  fireEvent.click(save());await waitFor(()=>assert.equal(ctx.mutations.length,1));
+  assert.equal(ctx.mutations[0][1].electricNew,20);view.unmount();
+  pass('Replacement-month entry totals old and new equipment once and saves the new meter closing index');
+
   ctx=fixture({role:'tenant'});view=mount(ctx);
   assert.equal(screen.queryByRole('button',{name:'Ghi chỉ số',exact:true}),null);
-  assert.equal(screen.queryByRole('button',{name:'Chỉnh sửa',exact:true}),null);
+  assert.equal(screen.queryByRole('button',{name:'Sửa nháp',exact:true}),null);
   assert.equal(screen.queryByLabelText('Cách nhập điện nước',{exact:true}),null);
   assert.deepEqual(ctx.mutations,[]);assert.deepEqual(requests,[]);view.unmount();
   pass('Tenant access exposes no owner manual reading editor or numeric consumption entry and never requests recognition or persistence');
   console.log(`PASS: ${checks} manual reading-entry groups with synthetic records and intercepted saves. No browser layout or real meter evidence was verified.`);
 } finally {
-  cleanup();await vite.close();dom.window.close();globalThis.fetch=nativeFetch;
+  cleanup();await vite.close();
+  // React schedules work on the next event-loop turn even after unmount.
+  await new Promise(resolve=>setImmediate(resolve));
+  dom.window.close();globalThis.fetch=nativeFetch;
   for(const[name,descriptor]of previous){if(descriptor)Object.defineProperty(globalThis,name,descriptor);else delete globalThis[name];}
 }

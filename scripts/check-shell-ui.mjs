@@ -152,7 +152,7 @@ const secondaryGroups = [
   { label: 'Tài chính & báo cáo', items: ['Sổ thu chi', 'Tiền cọc', 'Báo cáo', 'Tiêu thụ điện nước'] },
   { label: 'Trao đổi & tài liệu', items: ['Thông báo', 'Yêu cầu hỗ trợ', 'Tài liệu & nội quy'] },
 ];
-const ownerOnlyLabels = ['Cơ sở nhà trọ', 'Người thuê', 'Dịch vụ & phụ phí', 'Sổ thu chi', 'Báo cáo', 'Cài đặt'];
+const ownerOnlyLabels = ['Cơ sở nhà trọ', 'Người thuê', 'Sổ thu chi', 'Báo cáo', 'Cài đặt'];
 async function resize(nextWidth) {
   await act(async () => {
     const previousMatches = new Map([...mediaQueries].map(([query, media]) => [query, media.matches]));
@@ -239,7 +239,7 @@ function assertRoutePartition(userRole) {
   for (const label of userRole === 'landlord' ? ['Trợ lý Trozy', 'Cài đặt'] : ['Trợ lý Trozy']) {
     assert.ok(secondary.getByRole('button', { name: label, exact: true })); reachable.add(label);
   }
-  assert.equal(reachable.size, userRole === 'landlord' ? 23 : 17);
+  assert.equal(reachable.size, userRole === 'landlord' ? 23 : 18);
   return reachable;
 }
 
@@ -703,7 +703,7 @@ try {
   view.unmount();
   assert.equal(screen.queryByRole('menu', { name: 'Chức năng khác' }), null);
   assert.equal(resizeObservers.size, 0, 'Unmount disconnects every layout observer');
-  pass('Tenant navigation covers its 17 permitted routes across both regions, excludes owner pages and never starts owner meter polling');
+  pass('Tenant navigation covers its 18 permitted routes across both regions, excludes owner pages and never starts owner meter polling');
 
   // A saved workspace belongs to the signed-in account and must remain selectable.
   await resizeQuick(1200); role = 'landlord'; location.hash = '#rooms';
@@ -819,6 +819,48 @@ try {
   view.unmount(); allowPropertyCreation = false; fixtureProperties = standardProperties;
   assert.ok(requests.every(request => request.method === 'GET' || request.method === 'POST' && request.path === '/api/properties'));
   pass('The header plus button creates from an empty workspace and selects the new property after refresh with a per-account preference');
+  install('history',dom.window.history);
+  const signupRequests=[];
+  globalThis.fetch=async(path,options={})=>{
+    if(path==='/api/bootstrap')return Response.json({error:'Vui lòng đăng nhập.'},{status:401});
+    if(path==='/api/health')return Response.json({database:'d1',mailAvailable:false,landlordSignup:true});
+    signupRequests.push([path,JSON.parse(options.body)]);
+    if(path==='/api/auth/landlord-signup')return Response.json({delivery:'pending',message:'Yêu cầu được giữ trong 7 ngày.'},{status:202});
+    if(path==='/api/auth/landlord-activate')return Response.json({email:'owner@example.test'},{status:201});
+    throw Error('Unexpected signup test request: '+path);
+  };
+  dom.window.history.replaceState(null,'','/');
+  view=render(h(App));
+  const signupLink=await screen.findByRole('link',{name:'Tạo tài khoản chủ trọ'});
+  assert.equal(screen.queryByRole('dialog',{name:installTitle}),null);
+  const signupUrl=signupLink.getAttribute('href');
+  assert.equal(signupUrl,'?action=register-landlord');
+  view.unmount();
+  dom.window.history.replaceState(null,'',signupUrl);
+  view=render(h(App));
+  const address=await screen.findByLabelText(/Email của chủ trọ/);
+  await waitFor(()=>assert.equal(screen.getByRole('button',{name:'Đăng ký bằng email'}).disabled,false));
+  fireEvent.change(address,{target:{value:'owner@example.test'}});
+  fireEvent.click(screen.getByRole('button',{name:'Đăng ký bằng email'}));
+  await screen.findByRole('heading',{name:'Yêu cầu đăng ký chủ trọ'});
+  assert.deepEqual(signupRequests[0],['/api/auth/landlord-signup',{email:'owner@example.test'}]);
+  assert.match(screen.getByRole('status').textContent,/7 ngày/);
+  view.unmount();
+  dom.window.history.replaceState(null,'','/?action=create-landlord#token=fixture-token');
+  view=render(h(App));
+  await screen.findByRole('heading',{name:'Hoàn tất tài khoản chủ trọ'});
+  for(const [name,value] of Object.entries({name:'Chủ nhà',phone:'0912345678',password:'test-password',confirmation:'test-password'})){
+    fireEvent.change(document.querySelector('input[name="'+name+'"]'),{target:{value}});
+  }
+  fireEvent.click(screen.getByRole('checkbox'));
+  fireEvent.click(screen.getByRole('button',{name:'Tạo tài khoản chủ trọ'}));
+  await screen.findByRole('heading',{name:'Mừng bạn trở lại.'});
+  assert.equal(signupRequests[1][0],'/api/auth/landlord-activate');
+  assert.equal(signupRequests[1][1].token,'fixture-token');
+  assert.equal(screen.getByLabelText(/Email/).value,'owner@example.test');
+  assert.equal(location.hash,'');
+  view.unmount();
+  pass('Public signup remains visible without mail, retains a pending email and returns an activated landlord to login');
   console.log(`PASS: ${checks} App-shell interaction groups using mocked API data. Browser layout verification remains separate.`);
 } finally {
   await act(async () => { cleanup(); await new Promise(resolve => setImmediate(resolve)); });

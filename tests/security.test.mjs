@@ -80,7 +80,7 @@ test('replaying a completed checkout cannot release a room rented to someone els
 
 test('a future draft cannot create two current active tenancies in one room', async t => {
   const { app, owner } = await fixture(t);
-  const person = await owner('/tenants', { method: 'POST', body: { propertyId: 'property_01', name: 'Người thuê dự kiến', email: 'future@example.com' } });
+  const person = await owner('/tenants', { method: 'POST', body: { propertyId: 'property_01', roomId:'room_101', name: 'Người thuê dự kiến', email: 'future@example.com' } });
   assert.equal(person.status, 201);
   const draft = await owner('/contracts', { method: 'POST', body: { propertyId: 'property_01', roomId: 'room_101', tenantId: person.data.id, startDate: '2028-01-01', endDate: '2028-12-31', rent: 3500000, deposit: 3500000 } });
   assert.equal(draft.status, 201);
@@ -121,7 +121,7 @@ test('failed bulk import rolls back rows already processed', async t => {
 
 test('reworked repairs cannot silently diverge from the posted cashbook expense', async t => {
   const { app, owner } = await fixture(t);
-  assert.equal((await owner('/actions/issue-transition', { method: 'POST', body: { id: 'issue_01', status: 'resolved', resolution: 'Đã sửa đường ống thoát nước máy lạnh.', cost: 180000 } })).status, 200);
+  assert.equal((await owner('/actions/issue-transition', { method: 'POST', body: { id: 'issue_01', status: 'resolved', resolution: 'Đã sửa đường ống thoát nước máy lạnh.', cost: 180000, recordExpense:true } })).status, 200);
   const issue = app.store.get('issues', 'issue_01');
   assert.equal(app.store.get('transactions', issue.expenseId).amount, 180000);
   assert.equal((await owner('/actions/issue-transition', { method: 'POST', body: { id: 'issue_01', status: 'progress' } })).status, 200);
@@ -154,7 +154,7 @@ test('maintenance asset links must identify equipment in the reported room', asy
   assert.equal(valid.status, 201);
   assert.equal(valid.data.assetId, 'asset_0');
   assert.equal(valid.data.roomId, 'room_101');
-  const invalid = await owner('/issues', { method: 'POST', body: { propertyId: 'property_01', roomId: 'room_101', tenantId: 'tenant_01', title: 'Sai thiết bị', category: 'Thiết bị', description: 'Không được liên kết tài sản thuộc một phòng khác.', assetId: 'asset_1' } });
+  const invalid = await tenant('/issues', { method: 'POST', body: { propertyId: 'property_01', roomId: 'room_101', tenantId: 'tenant_01', title: 'Sai thiết bị', category: 'Thiết bị', description: 'Không được liên kết tài sản thuộc một phòng khác.', assetId: 'asset_1' } });
   assert.equal(invalid.status, 400);
 });
 

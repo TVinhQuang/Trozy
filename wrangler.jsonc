@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "trozy",
+  "account_id": "e1d667999db181fdad4942153345449f",
+  "main": "src/cloudflare/worker.mjs",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {"TROZY_PUBLIC_URL": "https://trozy.nhom11.workers.dev"},
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api", "/api/*"]
+  },
+  "d1_databases": [
+    {"binding": "DB", "database_name": "trozy", "database_id": "8b806d36-f014-45c0-b17e-ce7333fc1166", "migrations_dir": "cloudflare/migrations"}
+  ],
+  "kv_namespaces": [{"binding": "FILES", "id": "5b34bb4c1a674988b001e283ab94a23d"}],
+  "env": {
+    "local": {
+      "name": "trozy-local",
+      "workers_dev": false,
+      "d1_databases": [
+        {"binding": "DB", "database_name": "trozy", "migrations_dir": "cloudflare/migrations"}
+      ],
+      "kv_namespaces": [{"binding": "FILES"}]
+    }
+  },
+  "triggers": {"crons": ["15 * * * *"]},
+  "minify": true
+}

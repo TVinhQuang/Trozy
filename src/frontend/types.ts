@@ -1,6 +1,6 @@
 export type RecordData = { id: string; [key: string]: any };
-export type User = { id: string; name: string; email: string; role: 'landlord'|'tenant'; tenantId?: string; phone?: string; verified?: boolean; avatarFileId?:string; notificationPreferences?:{invoices?:boolean;contracts?:boolean;maintenance?:boolean;general?:boolean} };
-export const collections = ['properties','rooms','tenants','contracts','readings','meters','meterSubmissions','meterProfiles','services','charges','invoices','payments','deposits','depositSettlements','transactions','issues','assets','handovers','notifications','tickets','documents','vehicles','amenities','bookings','settings','audits','credits'] as const;
+export type User = { id: string; name: string; email: string; pendingEmail?:string; role: 'landlord'|'tenant'; tenantId?: string; phone?: string; verified?: boolean; avatarFileId?:string; notificationPreferences?:{invoices?:boolean;contracts?:boolean;maintenance?:boolean;general?:boolean;emailNotifications?:boolean} };
+export const collections = ['properties','rooms','tenants','contracts','readings','meters','meterSubmissions','meterProfiles','services','charges','invoices','payments','deposits','depositSettlements','transactions','issues','assets','handovers','notifications','tickets','documents','vehicles','amenities','bookings','settings','audits','credits','privacyRequests'] as const;
 export type Collection = typeof collections[number];
 export type AppData = Record<Collection, RecordData[]>;
 export type Bootstrap = { user: User; data: AppData; capabilities?: Record<string,boolean> };

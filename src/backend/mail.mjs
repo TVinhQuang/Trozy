@@ -2,8 +2,9 @@ import {now} from './db.mjs';
 export const smtpConfigured=(env=process.env)=>!!env.SMTP_HOST;
 export function authMail(record,env=process.env){
   const reset=record.kind==='reset',link=new URL(env.TROZY_PUBLIC_URL||'http://127.0.0.1:5173');
+  if(reset)return {from:env.SMTP_FROM,to:record.email,subject:'Trozy — Mã đặt lại mật khẩu',text:'Mã OTP đặt lại mật khẩu của bạn là '+record.token+'. Mã có hiệu lực 10 phút và chỉ sử dụng một lần.'};
   link.searchParams.set('action',reset?'reset':'verify');link.searchParams.set('token',record.token);
-  return {from:env.SMTP_FROM,to:record.email,subject:reset?'Trozy — Đặt lại mật khẩu':'Trozy — Xác thực email',text:(reset?'Bạn vừa yêu cầu đặt lại mật khẩu Trozy.':'Chào mừng bạn đến Trozy. Vui lòng xác thực địa chỉ email.')+'\n\n'+link.href+'\n\nLiên kết có hiệu lực '+(reset?'1 giờ':'24 giờ')+'. Nếu bạn không gửi yêu cầu này, vui lòng bỏ qua thư.'};
+  return {from:env.SMTP_FROM,to:record.email,subject:reset?'Trozy — Đặt lại mật khẩu':'Trozy — Xác thực email',text:(reset?'Bạn vừa yêu cầu đặt lại mật khẩu Trozy.':record.kind==='change-email'?'Xác nhận địa chỉ email mới cho tài khoản Trozy.':'Chào mừng bạn đến Trozy. Vui lòng xác thực địa chỉ email.')+'\n\n'+link.href+'\n\nLiên kết có hiệu lực '+(reset?'1 giờ':'24 giờ')+'. Nếu bạn không gửi yêu cầu này, vui lòng bỏ qua thư.'};
 }
 export async function deliverAuthMail(store,record,{env=process.env,transportFactory}={}){
   if(!smtpConfigured(env))return false;

@@ -8,6 +8,7 @@ import { MeterReaderPanel, meterProposalMatchesUtility, scheduleMeterProposalExp
 import { MeterAutomaticPanel, MeterUsageSummary, meterAutomaticResultMatches, type MeterAutomaticResult } from './meter-automatic-panel';
 import type { RecordData } from './types';
 
+const photoExpired = (photo?: { expiresAt?: string }) => !!photo?.expiresAt && Date.parse(photo.expiresAt) <= Date.now();
 const label = (utility: string) => utility === 'electric' ? 'điện' : 'nước';
 const unit = (utility: string) => utility === 'electric' ? 'kWh' : 'm³';
 const statusLabels: Record<string, string> = { processing: 'Chờ chủ nhà xác minh', pending: 'Chờ chủ nhà xác minh', approved: 'Đã xác minh', rejected: 'Cần chụp lại' };
@@ -16,7 +17,7 @@ function nextPeriod(period: string) { const [year, month] = period.split('-').ma
 
 /** Captures are submitted evidence; an owner review is the only write to readings. */
 export function MeterSubmissionsPanel() {
-  const { data, user, propertyId, refresh, notify } = useApp(), landlord = user.role === 'landlord';
+  const { data, user, propertyId, refresh, notify, bootstrap } = useApp(), landlord = user.role === 'landlord', readerEnabled = bootstrap.capabilities?.meterReader !== false;
   const tenant = data.tenants.find(row => row.id === user.tenantId || row.userId === user.id), room = data.rooms.find(row => row.id === tenant?.roomId);
   const last = data.readings.filter(row => row.roomId === room?.id && row.confirmed).sort((a, b) => b.period.localeCompare(a.period))[0];
   const defaultPeriod = last?.period >= today().slice(0, 7) ? nextPeriod(last.period) : today().slice(0, 7);
@@ -26,7 +27,7 @@ export function MeterSubmissionsPanel() {
   const [page, setPage] = useState(0);
   const rows = (data.meterSubmissions || []).filter(row => !propertyId || row.propertyId === propertyId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   const filteredRows = rows.filter(row => filter === 'all' || waiting(row)), pageCount = Math.max(1, Math.ceil(filteredRows.length / 30)), currentPage = Math.min(page, pageCount - 1), visibleRows = filteredRows.slice(currentPage * 30, (currentPage + 1) * 30);
-  const automaticRows = visibleRows.filter(waiting), automaticKey = JSON.stringify(automaticRows.map(row => [row.id, row.version, row.selectedFileId || row.photos[0]?.fileId]));
+  const automaticRows = readerEnabled ? visibleRows.filter(waiting) : [], automaticKey = JSON.stringify(automaticRows.map(row => [row.id, row.version, row.selectedFileId || row.photos[0]?.fileId]));
   const latestRows = useRef(automaticRows); latestRows.current = automaticRows;
   const eligible = photos.filter(photo => photo.fileId && !photo.pending), uploading = photos.some(photo => photo.pending);
   useEffect(() => { setCapture(null); setOwnerCapture(false); setSelected(null); setPhotos([]); setError(''); }, [user.id, propertyId, room?.id]);
@@ -66,9 +67,9 @@ export function MeterSubmissionsPanel() {
       await refresh(); setCapture(null); setPhotos([]); notify('Đã gửi ảnh cho chủ nhà để xem và xác minh chỉ số.');
     } catch (reason) { setError((reason as Error).message); } finally { setBusy(false); }
   }
-  return <section className="card meter-submissions"><div className="card-header"><div><h2>{landlord ? 'Ảnh công tơ cần xác minh' : 'Chụp và gửi ảnh công tơ'}</h2><p>{landlord ? 'Xem chỉ số và lượng dùng dự kiến đã đọc từ ảnh. Mở ảnh để đối chiếu và xác minh.' : 'Chụp rõ công tơ và gửi ảnh để chủ nhà xem và xác minh chỉ số.'}</p></div><div className="inline">{landlord ? <><button className="btn btn-assistant btn-sm" onClick={() => setOwnerCapture(true)}><Camera size={16} />Đọc ảnh công tơ</button><button className="btn btn-warning btn-sm" onClick={() => void refresh().catch(reason => notify(reason.message, 'error'))}><RefreshCw size={15} />Tải lại</button></> : room && tenant?.status === 'active' ? (['electric', 'water'] as const).map(utility => <button key={utility} className="btn btn-sm" onClick={() => { setPeriod(defaultPeriod); setCapture(utility); setPhotos([]); setNote(''); setError(''); }}><Camera size={16} />Chụp {label(utility)}</button>) : <span className="muted">Cần liên kết phòng đang thuê để gửi ảnh.</span>}</div></div>
+  return <section className="card meter-submissions"><div className="card-header"><div><h2>{landlord ? 'Ảnh công tơ cần xác minh' : 'Chụp và gửi ảnh công tơ'}</h2><p>{landlord && !readerEnabled ? 'Mở ảnh gốc để đối chiếu và nhập chỉ số. Ảnh được lưu một tháng từ ngày tải lên.' : landlord ? 'Xem chỉ số và lượng dùng dự kiến đã đọc từ ảnh. Mở ảnh để đối chiếu và xác minh.' : 'Chụp rõ công tơ và gửi ảnh để chủ nhà xem và xác minh chỉ số.'}</p></div><div className="inline">{landlord ? <><button className="btn btn-assistant btn-sm" onClick={() => setOwnerCapture(true)}><Camera size={16} />Đọc ảnh công tơ</button><button className="btn btn-warning btn-sm" onClick={() => void refresh().catch(reason => notify(reason.message, 'error'))}><RefreshCw size={15} />Tải lại</button></> : room && tenant?.status === 'active' ? (['electric', 'water'] as const).map(utility => <button key={utility} className="btn btn-sm" onClick={() => { setPeriod(defaultPeriod); setCapture(utility); setPhotos([]); setNote(''); setError(''); }}><Camera size={16} />Chụp {label(utility)}</button>) : <span className="muted">Cần liên kết phòng đang thuê để gửi ảnh.</span>}</div></div>
     <div className="card-body stack"><div className="tabs">{[['pending', 'Chờ xác minh'], ['all', 'Tất cả']].map(([value, text]) => <button key={value} className={filter === value ? 'active' : ''} onClick={() => setFilter(value)}>{text}{value === 'pending' ? ` (${rows.filter(waiting).length})` : ''}</button>)}</div>
-      {visibleRows.map(row => <div className="meter-submission-row" key={row.id}><div><strong>Phòng {data.rooms.find(item => item.id === row.roomId)?.code || '—'} · {label(row.utility)} · {row.period}</strong><small className="muted block">{landlord ? `${row.submittedByName || 'Người thuê'} · ` : ''}{date(row.createdAt)} · {row.photos.length} ảnh</small><Badge value={row.status === 'approved' ? 'confirmed' : row.status === 'rejected' ? 'overdue' : 'draft'} label={statusLabels[row.status]} />{landlord && waiting(row) && <SubmissionAutomaticSummary result={automatic[row.id]} utility={row.utility} />}{landlord && row.reviewNote && <p>{row.reviewNote}</p>}</div><button className="btn btn-sm" onClick={() => setSelected(row)}>{landlord && waiting(row) ? 'Xem ảnh & xác minh' : landlord ? 'Xem ảnh' : 'Xem ảnh đã gửi'}</button></div>)}
+      {visibleRows.map(row => <div className="meter-submission-row" key={row.id}><div><strong>Phòng {data.rooms.find(item => item.id === row.roomId)?.code || '—'} · {label(row.utility)} · {row.period}</strong><small className="muted block">{landlord ? `${row.submittedByName || 'Người thuê'} · ` : ''}{date(row.createdAt)} · {row.photos.length} ảnh</small><Badge value={row.status === 'approved' ? 'confirmed' : row.status === 'rejected' ? 'overdue' : 'draft'} label={statusLabels[row.status]} />{landlord && readerEnabled && waiting(row) && <SubmissionAutomaticSummary result={automatic[row.id]} utility={row.utility} />}{landlord && row.reviewNote && <p>{row.reviewNote}</p>}</div><button className="btn btn-sm" onClick={() => setSelected(row)}>{landlord && waiting(row) ? 'Xem ảnh & xác minh' : landlord ? 'Xem ảnh' : 'Xem ảnh đã gửi'}</button></div>)}
       {pageCount > 1 && <nav className="inline meter-automatic-actions" aria-label="Trang bộ ảnh công tơ"><button type="button" className="btn btn-sm" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Trang trước</button><span className="form-note">Trang {currentPage + 1}/{pageCount} · {filteredRows.length} bộ ảnh</span><button type="button" className="btn btn-sm" disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}>Trang sau</button></nav>}
       {!rows.some(row => filter === 'all' || waiting(row)) && <p className="muted">{filter === 'pending' ? 'Chưa có bộ ảnh chờ xác minh.' : 'Chưa có ảnh công tơ được gửi.'}</p>}
       <small className="muted">Mỗi công tơ gửi tối đa 3 ảnh. Chủ nhà xem ảnh gốc và xác minh trước khi lưu chỉ số.</small>
@@ -94,7 +95,8 @@ function SubmissionAutomaticSummary({ result, utility }: { result: MeterAutomati
 
 /** Owner uploads follow the same reviewed-evidence flow; creation cannot set a reading. */
 export function OwnerMeterEvidenceEntry({ onClose, onCreated }: { onClose: () => void; onCreated: (submission: RecordData) => Promise<void> }) {
-  const { data, propertyId } = useApp();
+  const { data, propertyId, bootstrap } = useApp();
+  const readerEnabled = bootstrap.capabilities?.meterReader !== false;
   const rooms = data.rooms.filter(row => (!propertyId || row.propertyId === propertyId) && !data.properties.find(item => item.id === row.propertyId)?.archived);
   function suggestedPeriod(roomId: string) { const latest = data.readings.filter(row => row.roomId === roomId && row.confirmed).sort((a, b) => b.period.localeCompare(a.period))[0]; return latest?.period >= today().slice(0, 7) ? nextPeriod(latest.period) : today().slice(0, 7); }
   const [roomId, setRoomId] = useState(rooms[0]?.id || ''), [period, setPeriod] = useState(suggestedPeriod(rooms[0]?.id || '')), [utility, setUtility] = useState<'electric' | 'water'>('electric'), [photos, setPhotos] = useState<MeterCapturedEvidence[]>([]), [note, setNote] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState('');
@@ -110,11 +112,11 @@ export function OwnerMeterEvidenceEntry({ onClose, onCreated }: { onClose: () =>
     } catch (reason) { if (mounted.current && !controller.signal.aborted) setError((reason as Error).message); } finally { if (mounted.current) setBusy(false); request.current = null; }
   }
   return <Modal title="Đọc ảnh công tơ của chủ nhà" wide onClose={() => { if (!busy) onClose(); }}><form className="stack" onSubmit={create}>
-    <p className="form-note">Tạo bộ ảnh cho đúng phòng và kỳ. Hệ thống tự tìm vùng số, đọc chỉ số và tính lượng dùng dự kiến; bạn đối chiếu ảnh trước khi lưu.</p>
+    <p className="form-note">{readerEnabled ? 'Tạo bộ ảnh cho đúng phòng và kỳ. Đối chiếu kết quả đọc với ảnh trước khi lưu.' : 'Chọn phòng và kỳ ghi, sau đó mở ảnh để đối chiếu và nhập chỉ số.'}</p>
     <div className="form-grid"><Field label="Phòng của ảnh công tơ" type="select" value={roomId} required disabled={busy} onChange={event => { setRoomId(event.target.value); setPeriod(suggestedPeriod(event.target.value)); setPhotos([]); setError(''); }}><option value="">Chọn phòng</option>{rooms.map(room => <option value={room.id} key={room.id}>Phòng {room.code} · {data.properties.find(row => row.id === room.propertyId)?.name}</option>)}</Field><Field label="Kỳ của ảnh công tơ" type="month" value={period} required disabled={busy} onChange={event => { setPeriod(event.target.value); setPhotos([]); setError(''); }} /><Field label="Loại công tơ trong ảnh" type="select" value={utility} disabled={busy} onChange={event => { setUtility(event.target.value as 'electric' | 'water'); setPhotos([]); setError(''); }} options={[{ value: 'electric', label: 'Điện · kWh' }, { value: 'water', label: 'Nước · m³' }]} /></div>
     {roomId ? <MeterEvidenceCapture key={`${roomId}-${period}-${utility}`} roomId={roomId} period={period} utility={utility} owner onChange={setPhotos} disabled={busy} /> : <p className="muted">Chọn một phòng đang quản lý để thêm ảnh.</p>}
     <Field label="Ghi chú bộ ảnh (không bắt buộc)" type="textarea" value={note} maxLength={1000} disabled={busy} onChange={event => setNote(event.target.value)} />
-    {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button type="button" className="btn" disabled={busy} onClick={onClose}>Hủy</button><button className="btn btn-assistant" disabled={busy || !roomId || !period || uploading || !eligible.length}>{busy ? 'Đang tạo bộ ảnh…' : 'Tạo bộ ảnh & đọc tự động'}</button></div>
+    {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button type="button" className="btn" disabled={busy} onClick={onClose}>Hủy</button><button className="btn btn-assistant" disabled={busy || !roomId || !period || uploading || !eligible.length}>{busy ? 'Đang tạo bộ ảnh…' : readerEnabled ? 'Tạo bộ ảnh & đọc tự động' : 'Tạo bộ ảnh'}</button></div>
   </form></Modal>;
 }
 
@@ -126,12 +128,12 @@ export function MeterSubmissionReview({ submission, onClose, onSaved }: { submis
 function TenantMeterReceipt({ submission, onClose }: { submission: RecordData; onClose: () => void }) {
   return <Modal title={`Ảnh công tơ ${label(submission.utility)} đã gửi · ${submission.period}`} wide onClose={onClose}><div className="stack">
     <p>{statusLabels[submission.status] || 'Đã gửi ảnh'}. {submission.status === 'rejected' ? 'Vui lòng chụp rõ lại công tơ và gửi ảnh mới.' : 'Chủ nhà sẽ xem xét ảnh và xác minh chỉ số.'}</p>
-    {submission.photos.map((photo: any, index: number) => <a key={photo.fileId || index} href={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} target="_blank" rel="noreferrer"><img className="meter-review-original" src={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} alt={`Ảnh công tơ ${label(submission.utility)} đã gửi ${index + 1}`} /></a>)}
+    {submission.photos.map((photo: any, index: number) => photoExpired(photo) ? <p className="muted" key={photo.fileId}>Ảnh {index + 1} đã hết thời hạn lưu một tháng.</p> : <a key={photo.fileId || index} href={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} target="_blank" rel="noreferrer"><img className="meter-review-original" src={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} alt={`Ảnh công tơ ${label(submission.utility)} đã gửi ${index + 1}`} /></a>)}
   </div></Modal>;
 }
 
 function OwnerMeterSubmissionReview({ submission, onClose, onSaved }: { submission: RecordData; onClose: () => void; onSaved: () => Promise<void> }) {
-  const { data, notify, user, propertyId } = useApp();
+  const { data, notify, user, propertyId, bootstrap } = useApp();
   const [fileId, setFileId] = useState(submission.selectedFileId || submission.photos[0]?.fileId || ''), [value, setValue] = useState(''), [note, setNote] = useState(''), [checked, setChecked] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState('');
   const [readerOpen, setReaderOpen] = useState(false), [applied, setApplied] = useState<MeterReaderProposal | null>(null), [fractionalChecked, setFractionalChecked] = useState(false);
   const appliedRef = useRef(applied); appliedRef.current = applied;
@@ -147,6 +149,7 @@ function OwnerMeterSubmissionReview({ submission, onClose, onSaved }: { submissi
     if (proposal.status !== 'ready' || !proposal.reading || !meterProposalMatchesUtility(proposal, submission.utility) || proposal.fileId !== photo?.fileId || proposal.submissionVersion !== submission.version || Date.parse(proposal.expiresAt) <= Date.now()) return;
     setApplied(proposal); setValue(String(proposal.reading.integerValue)); setNote(current => current.trim() ? current : 'Xác minh chỉ số từ ảnh công tơ và đề xuất nhận dạng.'); setChecked(false); setFractionalChecked(false); setError('');
   }
+  const expired = photoExpired(photo);
   const current = data.readings.find(row => row.roomId === submission.roomId && row.period === submission.period), noteLength = note.trim().length;
   async function review(decision: 'approve' | 'reject') {
     setBusy(true); setError('');
@@ -158,19 +161,19 @@ function OwnerMeterSubmissionReview({ submission, onClose, onSaved }: { submissi
   }
   return <Modal title={`Minh chứng ${label(submission.utility)} · ${submission.period}`} wide onClose={() => { if (!busy) onClose(); }}><div className="stack">
     <div className="inline">{submission.photos.map((item: any, index: number) => <button className={`btn btn-sm ${fileId === item.fileId ? 'btn-primary' : ''}`} key={item.fileId || index} disabled={busy} onClick={() => setFileId(item.fileId)}>Ảnh {index + 1}</button>)}</div>
-    {photo && <a href={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} target="_blank" rel="noreferrer"><img className="meter-review-original" src={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} alt={`Ảnh gốc công tơ ${label(submission.utility)} ${submission.source === 'owner' ? 'của chủ nhà' : 'do người thuê gửi'}`} /></a>}
-    <small className="muted">Nhấn ảnh để mở bản gốc. Đối chiếu đủ từng ô số, đơn vị và vị trí phần lẻ.</small>
+    {photo && !expired && <a href={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} target="_blank" rel="noreferrer"><img className="meter-review-original" src={`/api/files/${encodeURIComponent(photo.fileId)}?inline=1`} alt={`Ảnh gốc công tơ ${label(submission.utility)} ${submission.source === 'owner' ? 'của chủ nhà' : 'do người thuê gửi'}`} /></a>}
+    <small className="muted">{expired ? 'Ảnh đã hết thời hạn lưu một tháng.' : 'Nhấn ảnh để mở bản gốc. Đối chiếu đủ từng ô số, đơn vị và vị trí phần lẻ.'}</small>
     {submission.note && <p><b>{submission.source === 'owner' ? 'Ghi chú bộ ảnh:' : 'Người thuê ghi chú:'}</b> {submission.note}</p>}
     {waiting(submission) ? <>
-      {photo && <>
+      {photo && !expired && bootstrap.capabilities?.meterReader !== false && <>
         <MeterAutomaticPanel key={`automatic-${user.id}-${propertyId}-${submission.id}-${submission.version}-${photo.fileId}`} submission={submission} fileId={photo.fileId} disabled={busy} onApply={applyProposal} onInvalidate={invalidateProposal} />
         <div className="meter-manual-fallback"><button type="button" className="btn btn-warning btn-sm" aria-expanded={readerOpen} disabled={busy} onClick={() => { invalidateProposal(); setReaderOpen(open => !open); }}>Chỉnh vùng / đọc thủ công</button>{readerOpen && <MeterReaderPanel key={`${user.id}-${propertyId}-${submission.id}-${submission.version}-${photo.fileId}`} submission={submission} fileId={photo.fileId} disabled={busy} onApply={applyProposal} onInvalidate={invalidateProposal} />}</div>
       </>}
-      <Field label={`Chỉ số ${label(submission.utility)} xác minh (${unit(submission.utility)}, phần nguyên)`} type="number" min={0} max={999999999} step={1} value={value} disabled={busy} onChange={event => { setValue(event.target.value); setChecked(false); setApplied(null); setFractionalChecked(false); }} />
+      <Field label={`Chỉ số ${label(submission.utility)} xác minh (${unit(submission.utility)}, phần nguyên)`} type="number" min={0} max={999999999} step={1} value={value} disabled={busy || expired} onChange={event => { setValue(event.target.value); setChecked(false); setApplied(null); setFractionalChecked(false); }} />
       {applied?.reading && <div className="meter-reader-applied">Đang dùng phần nguyên từ đề xuất <b>{applied.reading.displayText} {unit(submission.utility)}</b>. Chỉnh sửa chỉ số sẽ chuyển sang xác minh thủ công.{applied.reading.fractionalDigits !== '' && <label className="inline"><input type="checkbox" checked={fractionalChecked} disabled={busy} onChange={event => setFractionalChecked(event.target.checked)} />Tôi đã kiểm tra phần lẻ và chỉ dùng phần nguyên để ghi chỉ số</label>}</div>}
-      <label className="inline"><input type="checkbox" checked={checked} disabled={busy} onChange={event => setChecked(event.target.checked)} />Tôi đã đối chiếu từng ô số, đơn vị và cách chia phần nguyên/phần lẻ trên ảnh gốc</label>
+      <label className="inline"><input type="checkbox" checked={checked} disabled={busy || expired} onChange={event => setChecked(event.target.checked)} />Tôi đã đối chiếu từng ô số, đơn vị và cách chia phần nguyên/phần lẻ trên ảnh gốc</label>
       <Field label="Ghi chú xác minh hoặc lý do yêu cầu chụp lại (ít nhất 10 ký tự)" type="textarea" value={note} maxLength={1000} disabled={busy} placeholder="Ví dụ: Đã đối chiếu đầy đủ dãy số và đơn vị trên ảnh gốc." hint={noteLength < 10 ? `Cần thêm ${10 - noteLength} ký tự trong ghi chú (hiện có ${noteLength}/10, không tính khoảng trắng ở đầu/cuối). Khi yêu cầu chụp lại, không cần nhập chỉ số hoặc tích ô xác minh.` : undefined} onChange={event => setNote(event.target.value)} />
-      {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button className="btn btn-warning" disabled={busy || noteLength < 10} onClick={() => void review('reject')}>Yêu cầu chụp lại</button><button className="btn btn-success" disabled={busy || !photo || !checked || !!(applied?.reading?.fractionalDigits && !fractionalChecked) || !/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) > 999999999 || noteLength < 10} onClick={() => void review('approve')}>{busy ? 'Đang lưu…' : 'Xác minh chỉ số này'}</button></div>
+      {error && <p className="form-error" role="alert">{error}</p>}<div className="form-actions"><button className="btn btn-warning" disabled={busy || noteLength < 10} onClick={() => void review('reject')}>Yêu cầu chụp lại</button><button className="btn btn-success" disabled={busy || expired || !photo || !checked || !!(applied?.reading?.fractionalDigits && !fractionalChecked) || !/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)) || Number(value) > 999999999 || noteLength < 10} onClick={() => void review('approve')}>{busy ? 'Đang lưu…' : 'Xác minh chỉ số này'}</button></div>
     </> : <p className="muted">{statusLabels[submission.status]}{submission.verifiedValue !== undefined ? ` · ${submission.verifiedValue} ${unit(submission.utility)}` : ''}{submission.reviewNote ? ` · ${submission.reviewNote}` : ''}</p>}
   </div></Modal>;
 }

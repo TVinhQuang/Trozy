@@ -13,6 +13,22 @@ function history(usages,{roomId='room_a',propertyId='property_a'}={}){
 function data(readings,threshold=50){return {rooms:[{id:'room_a',code:'A01',propertyId:'property_a'},{id:'room_b',code:'B01',propertyId:'property_b'}],readings,settings:[{id:'settings_a',propertyId:'property_a',anomalyThreshold:threshold},{id:'settings_b',propertyId:'property_b',anomalyThreshold:threshold}]};}
 const stable=[['2026-01',62],['2026-02',56],['2026-03',62]];
 
+test('UC69/70 meter replacements contribute every device to consumption and anomaly history',()=>{
+ const rows=history([...stable,['2026-04',120],['2026-05',124]]);
+ const april=rows[3], may=rows[4], opening=april.electricOld;
+ Object.assign(april,{electricOld:5,electricNew:25,meterBreakdown:[
+   {utility:'electric',oldOpening:opening,oldClosing:opening+70,newOpening:10},
+   {utility:'electric',oldOpening:10,oldClosing:40,newOpening:5}
+ ]});
+ Object.assign(may,{electricOld:25,electricNew:149});
+ const result=analyzeUtilities({data:data(rows),input:{period:april.period}});
+ const alert=result.alerts.find(item=>item.utility==='electric');
+ assert.equal(alert?.kind,'spike');
+ assert.equal(alert.currentUsage,120);
+ const next=analyzeUtilities({data:data(rows)}).alerts.find(item=>item.utility==='electric');
+ assert.equal(next.history.find(point=>point.period===april.period).usage,120);
+});
+
 test('B02 normalizes monthly lengths and uses median rather than an outlier-sensitive mean',()=>{
  const result=analyzeUtilities({data:data(history([...stable,['2026-04',120]]))});
  const alert=result.alerts.find(row=>row.utility==='electric');assert.equal(alert.baseline,60);assert.equal(alert.currentUsage,120);assert.equal(alert.changePercent,100);assert.equal(alert.kind,'spike');assert.equal(alert.severity,'warning');assert(alert.explanation.includes('số ngày'));assert.equal(result.alerts.filter(row=>row.utility==='water').length,0);
