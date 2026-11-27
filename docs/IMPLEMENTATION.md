@@ -2,7 +2,7 @@
 
 > **Bộ đọc công tơ ngày 26/11/2026.** Điện dùng PaddleOCR, nước dùng YOLO và VisionState. Gemini Vision đóng vai trò dự phòng khi đã cấu hình. Các mô tả B03 và lựa chọn nhà cung cấp ở mốc tháng 10 bên dưới ghi lại thiết kế lúc đó. [Quy trình và cấu hình đang dùng](METER-READER.md)
 
-Trozy hiện có ứng dụng React/TypeScript, API Node.js và dữ liệu SQLite lưu trên máy. Chủ trọ và người thuê đăng nhập bằng tài khoản riêng; mọi truy cập dữ liệu được kiểm tra ở API. B01–B04 đã có provider và giao diện: trợ lý có nguồn dữ liệu, cảnh báo điện nước, OCR đọc công tơ với Vision kiểm tra khung, bổ sung một ô hoặc đọc dự phòng khi chưa có đề xuất, cùng phân loại sửa chữa. Các model dùng Ollama cục bộ khi sẵn sàng; tra cứu/quy tắc vẫn hoạt động khi chưa chạy model. B03 thiếu bằng chứng khung/chữ số thì cần chủ nhà xem ảnh hoặc nhập tay. B05 chưa triển khai.
+Trozy hiện có ứng dụng React/TypeScript, API Node.js và dữ liệu SQLite lưu trên máy. Chủ trọ và người thuê đăng nhập bằng tài khoản riêng; mọi truy cập dữ liệu được kiểm tra ở API. B01–B04 đã có provider và giao diện: trợ lý có nguồn dữ liệu, cảnh báo điện nước, OCR đọc công tơ với Vision kiểm tra khung, bổ sung một ô hoặc đọc dự phòng khi chưa có đề xuất, cùng phân loại sửa chữa. B01, B04 và đọc hợp đồng giấy UC16 dùng Gemini trên Node và Worker. Tra cứu và quy tắc có thể hoạt động khi thiếu khóa. B03 thiếu bằng chứng khung/chữ số thì cần chủ nhà xem ảnh hoặc nhập tay. B05 chưa triển khai.
 
 Tài liệu này mô tả mã ứng dụng trong `src/`, tách biệt với hai prototype HTML ở `pa/`. Phạm vi từng module và giới hạn được ghi tại [FEATURE-COVERAGE.md](requirements/FEATURE-COVERAGE.md); điểm nối B01–B05 ở [AI-INTEGRATION.md](analysis%20and%20design/AI-INTEGRATION.md).
 
@@ -79,11 +79,10 @@ Backend đọc các biến môi trường sau:
 | `SMTP_REQUIRE_TLS` | Bật | SMTP cổng không dùng TLS trực tiếp yêu cầu STARTTLS; chỉ đặt `false` cho môi trường thử cục bộ có chủ đích. |
 | `SMTP_USER` / `SMTP_PASS` | Rỗng | Tài khoản SMTP, phải đặt cùng nhau nếu máy chủ yêu cầu xác thực. |
 | `SMTP_FROM` | Rỗng | Địa chỉ người gửi; bắt buộc khi bật SMTP. |
-| `OLLAMA_HOST` | `http://127.0.0.1:11434` | Ollama cục bộ, chỉ chấp nhận localhost/loopback, không có cloud fallback. |
-| `TROZY_AI_MODEL` | `qwen3:4b-instruct` | Model Ollama đã tải trên máy; không dùng tag cloud. |
-| `TROZY_AI_ENABLED` | Bật | Đặt `false` hoặc `0` để không gọi model của B01/B03/B04; truy vấn/quy tắc vẫn dùng được. OCR vẫn đọc cục bộ; B03 không tạo đề xuất nếu khung chưa được kiểm tra, nhập tay vẫn có. |
-| `TROZY_AI_AUTO_START` | Bật | Mở runtime đã setup khi chạy dev nếu chưa có server; không tự tải runtime/model. |
-| `TROZY_AI_TIMEOUT_MS` | `60000` | Thời gian chờ model; code giới hạn 100–120000 ms. |
+| `GEMINI_API_KEY` | Rỗng | Secret phía máy chủ cho B01, B04 và UC16. |
+| `GEMINI_MODELS` | Danh sách mặc định của Gemini client | Danh sách model theo thứ tự ưu tiên. |
+| `TROZY_AI_ENABLED` | Bật | Đặt `false` hoặc `0` để tắt B01/B04/UC16 gọi Gemini. |
+| `TROZY_GEMINI_TIMEOUT_MS` | `45000` | Ngân sách thời gian cho một yêu cầu Gemini, gồm cả lần thử dự phòng. |
 | `TROZY_OCR_TIMEOUT_MS` | `45000` | Thời gian chờ OCR; code giới hạn 5000–90000 ms. |
 | `TROZY_OCR_ENGINE` | `auto` | Ưu tiên PaddleOCR đã chuẩn bị, dùng Tesseract khi chưa sẵn sàng; `paddleocr` hoặc `tesseract` chọn riêng bộ OCR. Không tải model lúc nhận dạng. |
 | `TROZY_PADDLE_ROOT` | `.runtime/paddleocr` | Python portable, thư viện, model và cache trong dự án; đường dẫn ngoài dự án bị từ chối. |
@@ -127,24 +126,17 @@ http://127.0.0.1:5173/?action=reset&token=TOKEN_PHAT_TRIEN
 
 Khi dùng bản build thay cổng 5173 bằng 3001. Thông báo HTTP/ứng dụng rằng thư đã được tạo trong outbox chỉ xác nhận đã xếp hàng; không phải bằng chứng thư SMTP đã tới người nhận. Transport SMTP đã được kiểm thử bằng transport thay thế, nhưng cần cấu hình và kiểm tra tài khoản SMTP thực tế trước khi dùng với người dùng bên ngoài.
 
-## Ollama, Vision và OCR cục bộ
+## Gemini và bộ đọc công tơ
 
-Không cần API key AI trả phí. `npm install` cài Tesseract.js, file ngôn ngữ và thư viện xử lý ảnh; OCR không tải model từ CDN khi nhận dạng. B01/B04 dùng model văn bản Ollama khi server/model sẵn sàng. B03 dùng OCR tự tìm khung/đọc và Vision kiểm tra khung. OCR đọc đủ thì giữ đề xuất OCR, không gọi Vision đọc chữ số. Thiếu đúng một ô có vị trí rõ trong bằng chứng OCR thì Vision chỉ đọc ô đó để bổ sung; không so sánh hai dãy hoặc dung sai hàng đơn vị. Khung đúng giữ nguyên; khung sai chỉ có một lần OCR tìm lại. B02 dùng thống kê. Xem [thiết kế B03 hiện hành](<analysis and design/archive/METER-OCR-VISION-ASSISTED.md>).
+B01, B04 và UC16 gọi Gemini từ máy chủ. Đặt khóa trong `.env` khi phát triển hoặc dùng Worker secret khi triển khai. [Cấu hình Gemini và quy trình UC16](CLOUDFLARE.md#gemini)
 
-Trên Windows chuẩn bị runtime trong chính dự án:
-
-```powershell
-npm run ai:setup-vision
-npm run ai:setup-ocr
-```
-
-Ollama mặc định ở `.runtime/ollama/`, gồm runtime chính thức được kiểm tra SHA-256 và model văn bản `qwen3:4b-instruct`/model ảnh `qwen3-vl:4b-instruct`; server chỉ dùng loopback. PaddleOCR/Python portable và model ONNX ở `.runtime/paddleocr/`. Script dùng lại model/thư viện đã chuẩn bị, không thêm system PATH hoặc tạo Windows service; `-InstallRoot` phải là thư mục con hợp lệ của dự án. Lệnh setup lần đầu có thể tải các thành phần còn thiếu, còn `npm run dev` và nhận dạng không tải model. Không dùng lệnh pull từ một Ollama ngoài dự án để thay cho quy tắc lưu trữ này.
+B02 dùng thống kê. Hướng dẫn cài và vận hành bộ đọc công tơ cục bộ nằm trong [quy trình B03](METER-READER.md).
 
 Thư viện JavaScript ở `node_modules/`, npm cache ở `.cache/npm/`, dữ liệu nghiệp vụ ở `data/`; cache/log/dataset/runtime riêng của Trozy cũng nằm trong dự án và được Git bỏ qua khi thích hợp. Mỗi tác vụ dùng thư mục tạm riêng trong dự án. Sau khi hoàn tất, chỉ dọn tệp tạm do tác vụ đó tạo và giữ lại ảnh gốc, model, dữ liệu và báo cáo.
 
 **Vị trí dự án ngày 29/10/2026:** dùng `D:\Trozy`, gồm Git, thư viện JavaScript, dữ liệu ứng dụng và các runtime/model dưới `.runtime/`. Đã kiểm tra SHA-256 trước khi loại bản runtime cũ trùng lặp; không tải/cài lại model. Ollama, Vision và PaddleOCR chạy được ở vị trí mới. Các đường dẫn trong báo cáo cũ giữ nguyên theo lịch sử. Xem [báo cáo kiểm chứng](test/archive/meter-ocr/METER-GUIDED-VALIDATION.md).
 
-Mở **Trợ lý Trozy → Kiểm tra** để xem riêng trạng thái trợ lý, OCR và Vision kiểm tra khung. `capabilities.B01`–`B04` là provider đã cài, không bảo đảm runtime/model hiện sẵn sàng. Phản hồi gắn nhãn bộ xử lý thực tế. Khung chưa được chấp nhận hoặc cả các bước đọc đều chưa đủ bằng chứng thì B03 không tạo đề xuất và hiển thị lý do; chủ nhà vẫn có thể xác minh thủ công.
+Mở **Trợ lý Trozy → Kiểm tra** để xem trạng thái cấu hình Gemini. `capabilities.B01`–`B04` là provider đã cài, không bảo đảm runtime/model hiện sẵn sàng. Phản hồi gắn nhãn bộ xử lý thực tế. Khung chưa được chấp nhận hoặc cả các bước đọc đều chưa đủ bằng chứng thì B03 không tạo đề xuất và hiển thị lý do; chủ nhà vẫn có thể xác minh thủ công.
 
 - **Trợ lý Trozy:** hỏi công nợ, tiền thu, hợp đồng, phòng, sửa chữa hoặc nội quy; mở nguồn để đối chiếu. Bản nháp thông báo cần chủ trọ kiểm tra người nhận/nội dung và xác nhận gửi.
 - **Tiêu thụ điện nước:** xem cảnh báo và lịch sử tham chiếu; thiếu ba kỳ trước được báo rõ. Ghi chú kiểm tra không thay chỉ số/hóa đơn. Ngưỡng chỉnh trong Cài đặt → Nhắc lịch.
@@ -190,7 +182,7 @@ Hướng dẫn API, cấu hình, cách tính cảnh báo, giới hạn ảnh và
 | `src/backend/mail.mjs`, `outbox.mjs` | Hàng đợi/thư xác thực, transport SMTP tùy chọn và đọc thư phát triển cục bộ. |
 | `src/backend/backup.mjs` | Sao lưu SQLite đầy đủ và giữ khóa mã hóa cục bộ. |
 | `src/backend/extensions.mjs`, `ai-service.mjs` | Đăng ký provider, kiểm tra phạm vi đầu vào/tệp, lịch sử AI và review cảnh báo. B01–B04 hoạt động; B05 chưa có provider. |
-| `src/ai/` | Ollama cục bộ, copilot, thống kê bất thường, đọc công tơ bằng Vision + OCR và phân loại sửa chữa. |
+| `src/ai/` | Gemini, copilot, thống kê bất thường, đọc công tơ bằng Vision + OCR và phân loại sửa chữa. |
 
 SQLite có bảng riêng cho tài khoản, session, token, outbox, tệp, lịch sử AI và ghi nhận kiểm tra cảnh báo. Các thực thể nghiệp vụ được lưu dưới dạng JSON trong bảng `records`, có index theo chủ trọ/cơ sở và ràng buộc trùng phòng/kỳ. Liên kết nghiệp vụ được kiểm tra tại tầng domain; đây chưa phải mô hình quan hệ tách bảng hoàn chỉnh cho từng thực thể.
 

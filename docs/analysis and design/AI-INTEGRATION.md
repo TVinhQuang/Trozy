@@ -1,10 +1,14 @@
-# Các tính năng B01 đến B04 và cấu hình AI cục bộ
+# Tích hợp AI trong Trozy
+
+Từ 27/11/2026, Node và Worker dùng Gemini cho trợ lý B01, phân loại sửa chữa B04 và OCR hợp đồng giấy UC16. B02 dùng thống kê. [Cấu hình hiện hành](../CLOUDFLARE.md#gemini)
+
+## Hồ sơ lịch sử thiết kế OCR và nhà cung cấp
 
 > **Bộ đọc công tơ ngày 26/11/2026.** Điện dùng PaddleOCR, nước dùng YOLO và VisionState. Gemini Vision đóng vai trò dự phòng khi đã cấu hình. Các mô tả B03 và lựa chọn nhà cung cấp ở mốc tháng 10 bên dưới ghi lại thiết kế lúc đó. [Quy trình và cấu hình đang dùng](../METER-READER.md)
 
 Trozy đã có B01–B04 trong ứng dụng: trợ lý vận hành có nguồn dữ liệu, cảnh báo điện nước, OCR công tơ và gợi ý phân loại sửa chữa. Người dùng chọn **Ollama chạy cục bộ**, không dùng API AI trả phí. B05 — dự báo công nợ, doanh thu và phòng trống — vẫn chưa triển khai.
 
-## Luồng hiện tại: OCR ưu tiên, Vision đọc dự phòng
+## Thiết kế tháng 10 của luồng OCR và Vision
 
 B03 dùng `recognizeMeterAssisted`, mode `ocr-vision-assisted`: OCR tự xác định khung và đọc; Vision vẫn kiểm tra khung. OCR đã đọc đủ thì giữ đề xuất đó, không gọi Vision đọc chữ số. Nếu bằng chứng OCR xác định đúng một ô thiếu, Vision thử đọc ô ấy; mọi chữ số OCR khác giữ nguyên. Nếu vẫn chưa có đề xuất, Vision có thể đọc dự phòng toàn hàng bằng hai yêu cầu không chia sẻ đáp án: toàn cảnh + crop, sau đó chỉ crop. Mỗi lượt chỉ trả `integerDigits`, `fractionalDigits`, `uncertainDigits`; các nhóm phải trùng và không có ký tự chưa rõ. Không gửi số OCR, profile hoặc chỉ số cũ vào model. Transport không yêu cầu model suy đơn vị/loại/quy ước nên metadata chưa quan sát giữ `unknown`: nhánh dự phòng cần cấu hình công tơ đã xác nhận, khớp số ô/ranh giới nhóm, để cung cấp quy ước; thiếu cấu hình thì chưa có đề xuất. Cấu hình không ghi đè bằng chứng quan sát trái ngược trong snapshot có metadata. Các bước dùng chung ngân sách Vision mặc định 90 giây. Hai lượt cùng model chỉ kiểm tra ổn định, không bảo đảm chính xác. Không so sánh hai đáp án chính thức hoặc dùng dung sai hàng đơn vị; không suy vị trí ký tự rơi hay đoán bánh số đang xoay. Màn hình chính chỉ một đề xuất, thông tin kỹ thuật trong chi tiết; chủ nhà vẫn xem ảnh/phần lẻ trước lưu, người thuê chỉ gửi ảnh. Xem [thiết kế hiện hành](archive/METER-OCR-VISION-ASSISTED.md).
 

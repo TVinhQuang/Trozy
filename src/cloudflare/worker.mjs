@@ -6,6 +6,8 @@ import {applyDueTransfers,occupancyAction} from '../backend/occupancy.mjs';
 import {meterWorkflow} from '../backend/meter-workflow.mjs';
 import {accessLogQuery} from '../backend/access-log.mjs';
 import {classifyMaintenance} from '../ai/maintenance-engine.mjs';
+import {workerGemini} from '../ai/llm.mjs';
+import {contractTarget,contractImage,readPaperContract,proposedFields} from '../backend/paper-contract.mjs';
 import {answerQuestion} from '../ai/copilot-engine.mjs';
 import {analyzeUtilities} from '../ai/anomalies.mjs';
 import {scopeInput,validateResult,syncUtilityNotifications,alertFingerprint} from '../backend/ai-scope.mjs';
@@ -82,7 +84,8 @@ async function api(request,env,url,path) {
     const row=await env.DB.prepare('SELECT version FROM owner_revisions WHERE owner_id=?').bind(user.id).first();
     return json({revision:hashToken(user.id+':'+(row?.version??0))});
   }
-  const store=await openOwnerStore(env,user,{includeFiles:!['GET','HEAD'].includes(method)&&path!=='/files'});
+  if(path==='/ai/status'&&method==='GET')return json(workerGemini(env).getStatus());
+  let store=await openOwnerStore(env,user,{includeFiles:!['GET','HEAD'].includes(method)&&path!=='/files'});
   let result,status=200; const extra=[];
   const post=method==='POST';
   if(path==='/bootstrap'&&method==='GET'){
@@ -143,11 +146,17 @@ async function api(request,env,url,path) {
     await access(env,user,store.get(collection,key),collection,key,'download','success').run();
     return new Response(bytes,{headers:{'Content-Type':'application/pdf','Cache-Control':'private, no-store',
       'Content-Disposition':(url.searchParams.has('preview')?'inline':'attachment')+'; filename="'+collection+'-'+encodeURIComponent(key)+'-v'+document.version+'.pdf"'}});
-  } else if(path.startsWith('/paper-contract/')&&post){
-    if(user.role!=='landlord')fail(403,'Chỉ chủ trọ được nhập hợp đồng.');
-    fail(503,'OCR hợp đồng giấy cần bộ đọc riêng. Bạn có thể nhập tay trên bản cloud.');
-  } else if(path==='/ai/status'&&method==='GET'){
-    result={available:false,modelInstalled:false,models:[],model:'',message:'Bản cloud dùng quy tắc nghiệp vụ và thống kê.'};
+  } else if(post&&['/paper-contract/extract','/paper-contract/confirm'].includes(path)){
+    contractTarget(store,user,input);
+    if(path.endsWith('/confirm'))return json({ok:true});
+    const bytes=contractImage(input);
+    await limit(env,'paper-ocr:'+user.id,12);
+    const lines=await readPaperContract(bytes,input.collection,workerGemini(env));
+    const fresh=await openOwnerStore(env,user);
+    const room=contractTarget(fresh,user,input);
+    const fields=proposedFields(fresh,room,input.collection,lines);
+    if(!Object.keys(fields).length)fail(422,'Chưa đọc được trường có nhãn rõ trên hợp đồng. Chọn ảnh rõ hơn hoặc nhập tay.');
+    return json({fields});
   } else if(path==='/ai/history'&&method==='GET'){
     const history=store.list('aiHistory').filter(row=>row.userId===user.id&&(!url.searchParams.get('feature')||row.feature===url.searchParams.get('feature'))).reverse().slice(0,40);
     result={entries:history.reverse().map(({id,feature,input,result,createdAt})=>({id,feature,input,result,createdAt}))};
@@ -166,7 +175,11 @@ async function api(request,env,url,path) {
     result={ok:true,id:key,status:input.status,reviewed:input.status==='reviewed',note};
   } else if(/^\/extensions\/B0[124]$/.test(path)&&post){
     const feature=path.slice(-3),options={user:safeUser(user),...scopeInput(store,user,feature,input)};
-    const answer=validateResult(feature,feature==='B01'?await answerQuestion(options):feature==='B02'?analyzeUtilities(options):await classifyMaintenance(options),options.data);
+    const provider=feature==='B02'?null:workerGemini(env);
+    if(provider)await limit(env,'ai:'+user.id,20);
+    const raw=feature==='B01'?await answerQuestion(options,provider):feature==='B02'?analyzeUtilities(options):await classifyMaintenance(options,provider);
+    if(provider)store=await openOwnerStore(env,user);
+    const answer=validateResult(feature,raw,provider?scopeInput(store,user,feature,input).data:options.data);
     if(feature==='B02')for(const alert of answer.alerts){
       const review=store.get('alertReviews',hashToken(user.id+':'+alert.id));
       const matches=review?.fingerprint===alertFingerprint(alert);
@@ -191,9 +204,21 @@ async function api(request,env,url,path) {
     const issue=retry?getRecord(store,user,'issues',input.id):createRecord(store,user,'issues',input);
     if(issue.classificationAttempt&&!retry) result=issue;
     else {
-      const proposal=await classifyMaintenance({data:dataFor(store,user),input:{title:issue.title,description:issue.description,roomId:issue.roomId}});
-      result=store.put('issues',{...issue,classificationAttempt:'available',classificationProposal:proposal,
-        classificationHistory:[...(issue.classificationHistory||[]),{at:now(),status:'available',proposal}]});
+      // Save the ticket and its notification before waiting for the external model.
+      const previous=store.get('issues',issue.id);
+      await store.commit();
+      let provider=workerGemini(env);
+      try{await limit(env,'ai:'+user.id,20);}catch(error){if(error.status!==429)throw error;provider=null;}
+      let proposal;
+      try{
+        proposal=await classifyMaintenance({user,data:dataFor(store,user),input:{title:issue.title,description:issue.description,roomId:issue.roomId,assetId:issue.assetId}},provider);
+      }catch(error){if(!error.status)throw error;}
+      store=await openOwnerStore(env,user);
+      const latest=getRecord(store,user,'issues',issue.id);
+      const unchanged=['description','title','assetId','roomId','updatedAt'].every(key=>latest[key]===previous[key]);
+      const attempt={at:now(),status:proposal?'available':'failed',proposal};
+      result=unchanged?store.put('issues',{...latest,classificationAttempt:attempt.status,classificationProposal:proposal||latest.classificationProposal,
+        classificationHistory:[...(latest.classificationHistory||[]),attempt]}):latest;
     }
     status=retry?200:201;
   } else {

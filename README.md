@@ -6,7 +6,7 @@ Trozy là ứng dụng web quản lý nhà trọ của **Nhóm 11**, môn **Nh�
 | --- | --- |
 | Demo PA4 | [Mở Trozy trên Cloudflare](https://trozy.nhom11.workers.dev) |
 | Mã nguồn | Nhánh [`main`](https://github.com/TVinhQuang/Trozy/tree/main) |
-| Phiên bản ứng dụng đang chạy | [`68f9714`](https://github.com/TVinhQuang/Trozy/commit/68f97146478d1f6df2c85bae916511d1a7a80d7a), gồm các bổ sung sau khi đối chiếu PA1–PA3 và chính sách UC67 đã chốt |
+| Phạm vi bản public | PA1–PA3, UC67 và tích hợp Gemini cho trợ lý, phân loại sửa chữa, đọc hợp đồng giấy. Ba luồng gọi mô hình cần secret phía máy chủ. |
 | Phạm vi theo đặc tả | [23 module và 73 use case](docs/requirements/FEATURE-COVERAGE.md), kèm mã nguồn, kiểm thử và điều kiện vận hành |
 | Theo dõi công việc | [Jira của Nhóm 11](https://projectse-1.atlassian.net/welcome/software?projectId=10001) |
 
@@ -48,9 +48,11 @@ Mở demo bằng **Safari trên iPhone** hoặc **Chrome trên Android**. Sau kh
 
 | Khả năng | Cloudflare | Node/SQLite trên máy |
 | --- | --- | --- |
-| **B01 · Trợ lý**, **B02 · Cảnh báo điện nước**, **B04 · Gợi ý phân loại sửa chữa** | Tra cứu theo quyền, quy tắc nghiệp vụ và thống kê. | Cùng luồng nghiệp vụ. B01/B04 có thể dùng Ollama cục bộ hoặc Gemini theo cấu hình và có cơ chế dự phòng. |
+| **B01 · Trợ lý**, **B02 · Cảnh báo điện nước**, **B04 · Gợi ý phân loại sửa chữa** | Gemini diễn đạt câu trả lời theo quyền và đề xuất phân loại phiếu đã lưu. B02 tính bằng thống kê. Khi Gemini gián đoạn, B01/B04 dùng tra cứu và quy tắc. | Cùng bộ xử lý Gemini và cùng cơ chế dự phòng. |
 | **B03 · Đọc công tơ** | Nhận ảnh và chủ trọ đối chiếu, nhập chỉ số thủ công. | OCR thử nghiệm cho công tơ cơ. Nhánh điện dùng PaddleOCR PP-OCRv6 small, nhánh nước dùng YOLO + VisionState Wheel Reader. Ảnh được đọc nền khi có runtime và model tương ứng. Có thể cấu hình Gemini Vision hỗ trợ khi kết quả cục bộ chưa rõ. |
-| **UC16 · Hợp đồng giấy** | Nhập dữ liệu hợp đồng bằng tay. | OCR bằng PaddleOCR khi có runtime. Chủ trọ xem trước kết quả và chọn từng trường để đưa vào biểu mẫu. |
+| **UC16 · Hợp đồng giấy** | Chủ trọ đồng ý gửi ảnh đến Gemini, đối chiếu ảnh và chọn từng trường để điền vào bản nháp. Có thể nhập tay. | Cùng quy trình, dùng khóa Gemini trong môi trường Node. |
+
+Đặt `GEMINI_API_KEY` trong Cloudflare Worker hoặc trong `.env` khi chạy Node. Với hợp đồng thật có dữ liệu cá nhân, dùng khóa của dự án Google Cloud đã bật thanh toán. [Cấu hình Gemini](docs/CLOUDFLARE.md#gemini) · [Điều khoản Gemini API](https://ai.google.dev/gemini-api/terms)
 
 Người thuê chỉ gửi ảnh công tơ. Chủ trọ đối chiếu ảnh gốc và xác nhận trước khi ghi chỉ số. Kết quả đọc ảnh chỉ là đề xuất. OCR công tơ vẫn ở giai đoạn thử nghiệm, với lựa chọn chỉnh vùng hoặc nhập tay khi ảnh khó đọc. Ảnh CCCD được quản lý bên ngoài Trozy. [Quy trình công tơ](docs/METER-READER.md) · [Danh mục model và SHA-256](MODELS-OCR/README.md) · [Tích hợp AI](<docs/analysis and design/AI-INTEGRATION.md>)
 
@@ -86,7 +88,7 @@ npm run build
 npm run cf:check
 ```
 
-GitHub Actions chạy kiểm thử Node, render trang, build production và đóng gói thử Cloudflare Worker khi có PR hoặc push vào `main`. Bản ứng dụng `68f9714` qua cả ba job ở thời điểm phát hành. Trên máy, bản tích hợp có **272/272 ca kiểm thử đạt** và **134 lượt render**. Build hiện có cảnh báo kích thước một số gói JavaScript. [Workflow CI](.github/workflows/ci.yml) · [Kết quả CI của bản ứng dụng](https://github.com/TVinhQuang/Trozy/actions/runs/45996008533) · [Chỉ mục kiểm thử](docs/test/README.md)
+GitHub Actions chạy kiểm thử Node, render trang, build production và đóng gói thử Cloudflare Worker khi có PR hoặc push vào `main`. Build hiện có cảnh báo kích thước một số gói JavaScript. [Workflow CI](.github/workflows/ci.yml) · [Các lần chạy CI](https://github.com/TVinhQuang/Trozy/actions/workflows/ci.yml) · [Chỉ mục kiểm thử](docs/test/README.md)
 
 Sau khi phát hành lên Cloudflare ngày 27/11/2026, trang chủ và các tệp JavaScript/CSS chính khớp bản build, `/api/health` xác nhận D1 hoạt động và API dữ liệu yêu cầu đăng nhập. Độ chính xác OCR trên tập ảnh thực tế, giao thư tới hộp thư và nghiệm thu từng luồng use case cần minh chứng riêng. [API health](https://trozy.nhom11.workers.dev/api/health)
 

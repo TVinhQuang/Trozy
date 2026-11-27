@@ -349,7 +349,7 @@ export function createApp(options={}){
           const input=await readJson(req),room=contractTarget(store,user,input);
           if(path.endsWith('/confirm'))return json(res,200,{ok:true});
           limit('paper-ocr:'+user.id,12,1);
-          const lines=await (options.readPaperContract||readPaperContract)(contractImage(input));
+          const lines=await (options.readPaperContract||readPaperContract)(contractImage(input),input.collection);
           contractTarget(store,user,input);
           const fields=proposedFields(store,room,input.collection,lines);
           if(!Object.keys(fields).length)fail(422,'Chưa đọc được trường có nhãn rõ trên hợp đồng. Chọn ảnh rõ hơn hoặc nhập tay.');

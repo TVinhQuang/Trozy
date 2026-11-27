@@ -13,6 +13,21 @@ function fixture(t){
   const owner=store.db.prepare('SELECT * FROM users WHERE id=?').get('owner_demo'),tenant=store.db.prepare('SELECT * FROM users WHERE id=?').get('user_tenant');
   return {store,owner:safeUser(owner),tenant:safeUser(tenant),ownerData:dataFor(store,owner),tenantData:dataFor(store,tenant)};
 }
+const fakeReplies=new WeakMap();
+function fakeGemini(t,respond) {
+  env(t,{GEMINI_API_KEY:'test-key',GEMINI_MODELS:'test-model',TROZY_AI_ENABLED:'true'});
+  const received=[];
+  const first=!fakeReplies.has(t);
+  fakeReplies.set(t,{respond,received});
+  if(first)t.mock.method(globalThis,'fetch',async(url,init)=>{
+    const {respond,received}=fakeReplies.get(t);
+    assert.equal(new URL(url).hostname,'generativelanguage.googleapis.com');
+    const text=JSON.parse(init.body).contents[0].parts[0].text;
+    received.push(text);
+    return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(respond(text))}]}}]});
+  });
+  return received;
+}
 const originalEnvironments=new WeakMap();
 function env(t,values){let old=originalEnvironments.get(t);if(!old){old=new Map();originalEnvironments.set(t,old);t.after(()=>{for(const [key,value]of old){if(value===undefined)delete process.env[key];else process.env[key]=value;}});}for(const [key,value]of Object.entries(values)){if(!old.has(key))old.set(key,process.env[key]);if(value===undefined)delete process.env[key];else process.env[key]=String(value);}}
 async function fakeOllama(t,respond){
@@ -71,9 +86,9 @@ test('copilot narrows follow-up room/month context and preserves explicit announ
  assert(followup.answer.includes('2026-09'));assert(!followup.answer.includes('2026-10'));assert(followup.sources.every(row=>row.id==='HD-09-101'));
  const naturalId=await answerQuestion({user:owner,data:ownerData,input:{question:'Giải thích hóa đơn HD-10-101'}});assert(naturalId.sources.every(row=>row.id==='HD-10-101'));
  const question='Soạn thông báo cắt nước ngày 29/10 từ 9h đến 11h để bảo trì đường ống.';
- await fakeOllama(t,(_req,res)=>chat(res,{title:'Thông báo tạm ngưng cấp nước',body:'Kính gửi người thuê, ngày 29/10 từ 9h đến 11h, tạm ngưng cấp nước để bảo trì đường ống. Cảm ơn bạn.',kind:'maintenance'}));
- const draft=await answerQuestion({user:owner,data:ownerData,input:{question}});assert.equal(draft.engine,'ollama');assert(draft.draft.body.includes('29/10'));assert(draft.answer.includes('chưa được gửi'));
- await fakeOllama(t,(_req,res)=>chat(res,{title:'Thông báo',body:'Ngày 30/10 sẽ cắt nước từ 9h đến 11h.',kind:'maintenance'}));
+ fakeGemini(t,()=>({title:'Thông báo tạm ngưng cấp nước',body:'Kính gửi người thuê, ngày 29/10 từ 9h đến 11h, tạm ngưng cấp nước để bảo trì đường ống. Cảm ơn bạn.',kind:'maintenance'}));
+ const draft=await answerQuestion({user:owner,data:ownerData,input:{question}});assert.equal(draft.engine,'gemini');assert(draft.draft.body.includes('29/10'));assert(draft.answer.includes('chưa được gửi'));
+ fakeGemini(t,()=>({title:'Thông báo',body:'Ngày 30/10 sẽ cắt nước từ 9h đến 11h.',kind:'maintenance'}));
  const invalid=await answerQuestion({user:owner,data:ownerData,input:{question}});assert.equal(invalid.engine,'local');assert(invalid.draft.body.includes('29/10'));assert(!invalid.draft.body.includes('30/10'));
 });
 
@@ -85,31 +100,31 @@ test('native Ollama client uses local structured chat and validates installed mo
 });
 
 test('model cannot invent citation IDs or alter numeric fact block; model context redacts personal data',async t=>{
- const {tenant,tenantData}=fixture(t);const requests=await fakeOllama(t,(req,res,input)=>{
-   const prompt=JSON.parse(input.messages[1].content);assert(!input.messages[1].content.includes('thue@trozy.vn'));assert(!input.messages[1].content.includes('0912345678'));
-   chat(res,{intro:'Đây là phần đối chiếu hóa đơn để bạn kiểm tra.',sourceIds:[prompt.sources[0].sourceId]});
+ const {tenant,tenantData}=fixture(t);const requests=fakeGemini(t,text=>{
+   const prompt=JSON.parse(text);assert(!text.includes('thue@trozy.vn'));assert(!text.includes('0912345678'));
+   return {intro:'Đây là phần đối chiếu hóa đơn để bạn kiểm tra.',sourceIds:[prompt.sources[0].sourceId]};
  });
- const result=await answerQuestion({user:tenant,data:tenantData,input:{question:'Giải thích hóa đơn của tôi'}});assert.equal(result.engine,'ollama');assert(result.answer.includes('Đây là phần đối chiếu'));assert(result.answer.includes('Tổng hóa đơn:'));
- const unauthorized=await fakeOllama(t,(_req,res)=>chat(res,{intro:'Đây là dữ liệu.',sourceIds:['invoices:secret_invoice']}));
+ const result=await answerQuestion({user:tenant,data:tenantData,input:{question:'Giải thích hóa đơn của tôi'}});assert.equal(result.engine,'gemini');assert(result.answer.includes('Đây là phần đối chiếu'));assert(result.answer.includes('Tổng hóa đơn:'));
+ const unauthorized=fakeGemini(t,()=>({intro:'Đây là dữ liệu.',sourceIds:['invoices:secret_invoice']}));
  const rejected=await answerQuestion({user:tenant,data:tenantData,input:{question:'Giải thích hóa đơn của tôi'}});assert.equal(rejected.engine,'local');assert(rejected.warnings.length);assert(!JSON.stringify(rejected).includes('secret_invoice'));
- await fakeOllama(t,(_req,res)=>chat(res,{intro:'Tổng hóa đơn là 999.999 ₫.',sourceIds:['invoices:HD-10-101']}));
+ fakeGemini(t,()=>({intro:'Tổng hóa đơn là 999.999 ₫.',sourceIds:['invoices:HD-10-101']}));
  const forgedAmount=await answerQuestion({user:tenant,data:tenantData,input:{question:'Giải thích hóa đơn của tôi'}});assert.equal(forgedAmount.engine,'local');assert(!forgedAmount.answer.includes('999.999'));
- await fakeOllama(t,(_req,res)=>chat(res,{intro:'Phòng ١٠١ cần kiểm tra hóa đơn.',sourceIds:['invoices:HD-10-101']}));
+ fakeGemini(t,()=>({intro:'Phòng ١٠١ cần kiểm tra hóa đơn.',sourceIds:['invoices:HD-10-101']}));
  const unicodeBypass=await answerQuestion({user:tenant,data:tenantData,input:{question:'Giải thích hóa đơn của tôi'}});assert.equal(unicodeBypass.engine,'local');assert(!unicodeBypass.answer.includes('١٠١'));
  assert(requests.length>0);assert(unauthorized.length>0);
 });
 
 test('Ollama timeout, malformed result and remote URLs fail closed to honest local behavior',async t=>{
- const {owner,ownerData}=fixture(t);await fakeOllama(t,async(_req,res)=>{await new Promise(r=>setTimeout(r,300));if(!res.destroyed)res.end('{}');});env(t,{TROZY_AI_TIMEOUT_MS:'100'});
- const result=await answerQuestion({user:owner,data:ownerData,input:{question:'Phòng nào còn nợ?'}});assert.equal(result.engine,'local');assert(result.warnings.some(value=>value.includes('quá lâu')));
+ await fakeOllama(t,async(_req,res)=>{await new Promise(r=>setTimeout(r,300));if(!res.destroyed)res.end('{}');});env(t,{TROZY_AI_TIMEOUT_MS:'100'});
+ await assert.rejects(()=>ollamaJson({system:'x',prompt:'x',schema:{type:'object'}}),{code:'timeout'});
  await fakeOllama(t,(_req,res)=>reply(res,{done:true,message:{content:'not json'}}));await assert.rejects(()=>ollamaJson({system:'x',prompt:'x',schema:{type:'object'}}),{code:'invalid_json'});
  env(t,{OLLAMA_HOST:'https://attacker.example',TROZY_AI_MODEL:'qwen3:4b-instruct'});assert.throws(()=>ollamaConfig(),{code:'configuration'});
  env(t,{OLLAMA_HOST:'http://127.0.0.1:11434',TROZY_AI_MODEL:'qwen3:cloud'});assert.throws(()=>ollamaConfig(),{code:'configuration'});
 });
 
 test('maintenance LLM suggestions require confirmation, enforce hazard floor and reject wrong-room asset',async t=>{
- const {tenant,tenantData}=fixture(t);await fakeOllama(t,(_req,res)=>chat(res,{category:'Khác',priority:'low',confidence:70,reasons:['Cần bổ sung mô tả.'],suggestedTitle:'Kiểm tra ổ cắm',suggestedSteps:['Tự tháo dây điện.']}));
+ const {tenant,tenantData}=fixture(t);fakeGemini(t,()=>({category:'Khác',priority:'low',confidence:70,reasons:['Cần bổ sung mô tả.'],suggestedTitle:'Kiểm tra ổ cắm',suggestedSteps:['Tự tháo dây điện.']}));
  const result=await classifyMaintenance({user:tenant,data:tenantData,input:{roomId:'room_101',assetId:'asset_0',description:'Ổ cắm phòng có tia lửa và mùi khét rõ rệt.'}});
- assert.equal(result.engine,'ollama');assert.equal(result.priority,'urgent');assert.equal(result.category,'Điện');assert.equal(result.requiresConfirmation,true);assert(!result.suggestedSteps.includes('Tự tháo dây điện.'));assert(result.safetyAdvice.length);
+ assert.equal(result.engine,'gemini');assert.equal(result.priority,'urgent');assert.equal(result.category,'Điện');assert.equal(result.requiresConfirmation,true);assert(!result.suggestedSteps.includes('Tự tháo dây điện.'));assert(result.safetyAdvice.length);
  await assert.rejects(()=>classifyMaintenance({user:tenant,data:tenantData,input:{roomId:'room_101',assetId:'asset_1',description:'Máy lạnh phòng không mát.'}}),{status:403});
 });

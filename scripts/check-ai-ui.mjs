@@ -27,6 +27,7 @@ const { render, screen, fireEvent, waitFor, cleanup, act, within, configure } = 
 // FileReader and Vite share the machine with local model checks; allow actual async work to settle.
 configure({ asyncUtilTimeout: 5000 });
 const { AppContext } = await vite.ssrLoadModule('/src/frontend/context.tsx');
+const { PaperContractInput } = await vite.ssrLoadModule('/src/frontend/paper-contract-input.tsx');
 const { AIStatusPanel } = await vite.ssrLoadModule('/src/frontend/ai-ui.tsx');
 const { MeterCamera } = await vite.ssrLoadModule('/src/frontend/meter-camera.tsx');
 const { MeterEvidenceCapture } = await vite.ssrLoadModule('/src/frontend/meter-evidence-capture.tsx');
@@ -110,6 +111,29 @@ function automaticClock() {
 }
 
 try {
+  {
+    const applied=[];
+    const requests=mockAPI((path,body)=>{
+      if(path==='/api/paper-contract/extract'){
+        assert.equal(body.geminiConsent,true); assert.equal(body.roomId,'room_101');
+        return {fields:{rent:'3500000',deposit:'1000000'}};
+      }
+      if(path==='/api/paper-contract/confirm')return {ok:true};
+    });
+    render(h('form',{},h('input',{name:'roomId',defaultValue:'room_101'}),h(PaperContractInput,{collection:'contracts',onApply:fields=>applied.push(fields)})));
+    fireEvent.click(screen.getByRole('button',{name:'Nhập từ hợp đồng giấy'}));
+    assert.equal(screen.queryByLabelText('Ảnh hợp đồng giấy'),null);
+    fireEvent.click(screen.getByRole('checkbox',{name:/Google Gemini/}));
+    fireEvent.change(screen.getByLabelText('Ảnh hợp đồng giấy'),{target:{files:[new File(['sample'],'contract.png',{type:'image/png'})]}});
+    fireEvent.click(screen.getByRole('button',{name:'Đọc ảnh hợp đồng'}));
+    const confirm=await screen.findByRole('button',{name:'Điền các trường đã xác nhận'});
+    assert.equal(confirm.disabled,true);assert.deepEqual(applied,[]);
+    fireEvent.click(screen.getByRole('checkbox',{name:'Tiền thuê mỗi tháng'}));
+    fireEvent.click(confirm);
+    await waitFor(()=>assert.deepEqual(applied,[{rent:'3500000'}]));
+    assert.equal(requests.length,2);
+    pass('UC16 obtains consent before upload and only applies individually selected Gemini fields');cleanup();
+  }
   // Owner polling refreshes once initially, then only on visible revision changes.
   {
     const savedInterval = dom.window.setInterval, savedClear = dom.window.clearInterval, visibility = Object.getOwnPropertyDescriptor(document, 'visibilityState');
@@ -900,7 +924,7 @@ try {
     const fixture = context('assistant');
     mount(AIStatusPanel, {}, fixture);
     await screen.findByText('Trợ lý AI Gemini');
-    assert(screen.getAllByText(/gemini-3.1-flash-lite.*1\/2 model miễn phí/).length >= 1);
+    assert(screen.getAllByText(/gemini-3.1-flash-lite.*1\/2 model/).length >= 1);
     cleanup();
     const applied = [];
     mount(MeterAutomaticPanel, { submission, fileId: submission.selectedFileId, onApply: p => applied.push(p), onInvalidate() {} }, context('readings'));
@@ -913,7 +937,7 @@ try {
     fireEvent.click(screen.getByRole('button', { name: 'Dùng chỉ số đề xuất' }));
     assert.equal(applied.length, 1);
     assert.equal(applied[0].engine, 'gemini-vision');
-    pass('Gemini status panel shows free-model rotation pool and Gemini Vision fallback proposals display provenance while requiring explicit Apply');
+    pass('Gemini status panel shows model rotation pool and Gemini Vision fallback proposals display provenance while requiring explicit Apply');
     cleanup();
   }
   console.log(`PASS: ${checks} AI interaction checks in an isolated in-memory DOM. No real browser, Ollama, file persistence or messages were used.`);

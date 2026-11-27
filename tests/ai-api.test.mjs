@@ -5,11 +5,8 @@ import { createApp } from '../src/backend/server.mjs';
 
 // Integration tests use deterministic local behavior and never call a model service.
 const previousEnabled=process.env.TROZY_AI_ENABLED;
-const previousProvider=process.env.TROZY_AI_PROVIDER;
 process.env.TROZY_AI_ENABLED='0';
-process.env.TROZY_AI_PROVIDER='ollama';
 after(()=>{if(previousEnabled===undefined)delete process.env.TROZY_AI_ENABLED;else process.env.TROZY_AI_ENABLED=previousEnabled;});
-after(()=>{if(previousProvider===undefined)delete process.env.TROZY_AI_PROVIDER;else process.env.TROZY_AI_PROVIDER=previousProvider;});
 
 async function fixture(t){
  const app=createApp({dbPath:':memory:',seed:true});
@@ -45,7 +42,7 @@ test('AI endpoints require authentication and advertise only implemented local c
   const bootstrap=await request('/bootstrap');
   assert.deepEqual(bootstrap.body.capabilities,{B01:true,B02:true,B03:false,B04:true,B05:false});
  }
- const status=await owner('/ai/status');assert.equal(status.status,200);assert.equal(status.body.provider,'ollama');assert.equal(status.body.ocr,undefined);assert.equal(status.body.vision,undefined);
+ const status=await owner('/ai/status');assert.equal(status.status,200);assert.equal(status.body.provider,'gemini');assert.equal(status.body.ocr,undefined);assert.equal(status.body.vision,undefined);
  assert.deepEqual(status.body.features,{B01:true,B02:true,B03:false,B04:true,B05:false});
  assert.equal((await owner('/extensions/B05',post({}))).status,501);
 });

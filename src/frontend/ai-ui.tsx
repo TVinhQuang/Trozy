@@ -26,9 +26,8 @@ export function AIWarnings({ warnings }: { warnings?: string[] }) {
 export function AIStatusBadge() {
   const [status, setStatus] = useState<AIStatus | null>(null), [error, setError] = useState('');
   useEffect(() => { const controller = new AbortController(); api<AIStatus>('/ai/status', { signal: controller.signal }).then(setStatus).catch(reason => { if (!controller.signal.aborted) setError(reason.message); }); return () => controller.abort(); }, []);
-  const gemini = status?.provider === 'gemini';
   const ready = Boolean(status?.available && status.modelInstalled);
-  const label = !status && !error ? 'Đang kiểm tra kết nối AI…' : ready ? `${gemini ? 'Gemini' : 'Ollama'} · ${status!.model}` : 'Chế độ cục bộ';
+  const label = !status && !error ? 'Đang kiểm tra kết nối AI…' : ready ? `Gemini · ${status!.model}` : 'Chế độ cục bộ';
   return <span className={`ai-status ${ready ? 'connected' : ''}`} title={status?.message || error || 'Đang kiểm tra kết nối AI'}><span className="live-dot" /><span>{label}</span></span>;
 }
 export function AIStatusPanel() {
@@ -36,15 +35,14 @@ export function AIStatusPanel() {
   const alive = useRef(true);
   const load = useCallback(async () => { setBusy(true); setError(''); try { const response = await api<AIStatus>('/ai/status'); if (alive.current) setStatus(response); } catch (reason) { if (alive.current) setError((reason as Error).message); } finally { if (alive.current) setBusy(false); } }, []);
   useEffect(() => { alive.current = true; void load(); return () => { alive.current = false; }; }, [load]);
-  const gemini = status?.provider === 'gemini';
   const ready = Boolean(status?.available && status.modelInstalled);
   return <section className="card ai-status-panel">
-    <div className="card-header"><div className="inline"><span className="stat-icon"><Cpu size={20} /></span><div><h2>{gemini ? 'Trợ lý AI Gemini' : 'AI trên máy của bạn'}</h2><p>{gemini ? 'Tự động xoay vòng các model Gemini miễn phí khi chạm hạn mức token' : 'Trợ lý Ollama cục bộ, không cần API trả phí'}</p></div></div><button className="btn btn-sm" onClick={load} disabled={busy}><RefreshCw size={14} className={busy ? 'spin' : ''} />Kiểm tra</button></div>
+    <div className="card-header"><div className="inline"><span className="stat-icon"><Cpu size={20} /></span><div><h2>Trợ lý AI Gemini</h2><p>Gemini hỗ trợ trả lời câu hỏi và phân loại phiếu sửa chữa.</p></div></div><button className="btn btn-sm" onClick={load} disabled={busy}><RefreshCw size={14} className={busy ? 'spin' : ''} />Kiểm tra</button></div>
     <div className="card-body stack">
-      <div className="inline"><Badge value={ready ? 'active' : 'draft'} label={busy && !status ? 'Đang kiểm tra' : ready ? 'Trợ lý đã sẵn sàng' : 'Tra cứu cục bộ sẵn sàng'} />{status?.model && <span className="muted small">{status.model}{gemini && status.rotationPool?.length ? ` · ${status.availableModels ?? status.rotationPool.length}/${status.rotationPool.length} model miễn phí` : ''}</span>}</div>
+      <div className="inline"><Badge value={ready ? 'active' : 'draft'} label={busy && !status ? 'Đang kiểm tra' : ready ? 'Đã cấu hình Gemini' : 'Tra cứu cục bộ sẵn sàng'} />{status?.model && <span className="muted small">{status.model}{status.rotationPool?.length ? ` · ${status.availableModels ?? status.rotationPool.length}/${status.rotationPool.length} model` : ''}</span>}</div>
       <p className="muted">{error || status?.message || 'Đang kiểm tra kết nối AI…'}</p>
       <div className="inline small"><ShieldCheck size={16} /><span>Trợ lý chỉ đọc dữ liệu bạn được phép xem. Mọi thay đổi cần bạn xác nhận.</span></div>
-      {status && !ready && <p className="form-note">{gemini ? 'Các câu hỏi tra cứu thông dụng và phân loại theo quy tắc vẫn dùng được. Khi hết hạn mức token tạm thời, hệ thống tự xoay model dự phòng hoặc chờ hồi hạn mức rồi thử lại.' : 'Các câu hỏi tra cứu thông dụng và phân loại theo quy tắc vẫn dùng được. Để trò chuyện bằng mô hình, khởi động Ollama với model hiển thị ở trên rồi nhấn Kiểm tra.'}</p>}
+      {status && !ready && <p className="form-note">Bạn vẫn có thể tra cứu dữ liệu và phân loại phiếu theo quy tắc.</p>}
     </div>
   </section>;
 }

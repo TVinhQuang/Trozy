@@ -1,4 +1,4 @@
-/** Native Gemini API transport with automatic free-model rotation and Vision fallback.
+/** Native Gemini API transport with automatic model rotation and Vision fallback.
  *
  * Uses Node.js built-in fetch (no external SDK). API keys are sent strictly in the
  * x-goog-api-key request header and never logged or returned to clients.
@@ -496,7 +496,7 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
           cursor = (slotIndex + 1) % slots.length;
           rotatedFrom.push(`${slot.model}:429`);
           attemptLog.push({ model: slot.model, keySlot: `#${slot.keyIndex + 1}`, outcome: '429', durationMs: elapsedMs, detail: `Hết hạn mức token/RPM (nghỉ ${Math.ceil(delayMs / 1000)}s) → xoay model` });
-          lastError = new GeminiError('rate_limited', 'Model Gemini hiện tại đã chạm hạn mức token/lượt gọi; đang xoay sang model miễn phí khác.', 429);
+          lastError = new GeminiError('rate_limited', 'Model Gemini hiện tại đã chạm hạn mức token/lượt gọi; đang xoay sang model khác.', 429);
           continue;
         }
         if ([500, 502, 503, 504].includes(response.status)) {
@@ -566,11 +566,11 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
 
     if (lastError) {
       if (lastError.code === 'rate_limited') {
-        throw failWithLog(new GeminiError('rate_limited', 'Tất cả model Gemini miễn phí đều đã tạm chạm hạn mức token. Đang dùng chế độ cục bộ và sẽ tự xoay lại khi hồi hạn mức.', 429));
+        throw failWithLog(new GeminiError('rate_limited', 'Tất cả model Gemini đều đã tạm chạm hạn mức token. Đang dùng chế độ cục bộ và sẽ tự xoay lại khi hồi hạn mức.', 429));
       }
       throw failWithLog(lastError);
     }
-    throw failWithLog(new GeminiError('rate_limited', 'Tất cả model Gemini miễn phí đang trong thời gian chờ hồi hạn mức token. Đang dùng chế độ cục bộ.', 429));
+    throw failWithLog(new GeminiError('rate_limited', 'Các model Gemini đang tạm chờ thử lại. Bạn có thể tiếp tục bằng chế độ dự phòng.', 429));
   }
 
   async function geminiJson({ system, prompt, schema, maxTokens = 900, timeoutMs, signal } = {}) {
@@ -653,7 +653,7 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
         availableModels: 0,
         keyCount: 0,
         rotationMode: config.rotationMode,
-        message: 'Chưa cấu hình GEMINI_API_KEY. Hãy thêm khóa miễn phí từ Google AI Studio vào tệp .env.',
+        message: 'Máy chủ chưa cấu hình GEMINI_API_KEY.',
       };
     }
     const slots = buildSlots(config);
@@ -686,8 +686,8 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
       rotationMode: config.rotationMode,
       ...(cooling.length ? { cooling } : {}),
       message: available
-        ? `Gemini API sẵn sàng (${activeSlot.model} · xoay vòng ${readyModelCount}/${config.models.length} model miễn phí).`
-        : 'Các model Gemini miễn phí đang tạm chờ hồi hạn mức token; hệ thống tự dùng chế độ cục bộ và tự xoay lại sau ít giây.',
+        ? `Đã cấu hình Gemini API (${activeSlot.model} · xoay vòng ${readyModelCount}/${config.models.length} model).`
+        : 'Các model Gemini đang tạm chờ hồi hạn mức token; hệ thống tự dùng chế độ cục bộ và tự xoay lại sau ít giây.',
     };
   }
 
@@ -696,10 +696,18 @@ export function createGeminiClient({ fetchImpl = (...args) => globalThis.fetch(.
     cooldowns.clear();
   }
 
-  return { geminiJson, geminiVisionMeter, getStatus, resetRotation };
+  function imageJson({bytes,mime,system,prompt,schema}) {
+    return generateStructured({
+      systemInstruction:system,
+      contents:[{role:'user',parts:[{text:prompt},{inlineData:{mimeType:mime,data:bytes.toString('base64')}}]}],
+      schema, maxTokens:1536, maxRequestBytes:8*1024*1024,
+    });
+  }
+
+  return { geminiJson, imageJson, geminiVisionMeter, getStatus, resetRotation };
 }
 
-const defaultClient = createGeminiClient();
+export const defaultClient = createGeminiClient();
 export const geminiJson = (...args) => defaultClient.geminiJson(...args);
 export const geminiVisionMeter = (...args) => defaultClient.geminiVisionMeter(...args);
 export const getGeminiStatus = () => defaultClient.getStatus();

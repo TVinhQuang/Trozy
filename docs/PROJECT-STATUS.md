@@ -6,8 +6,8 @@ Cập nhật **27/11/2026**. Phạm vi hiện hành dựa trên PA1, PA2, PA3 v2
 
 | Môi trường | Trạng thái |
 | --- | --- |
-| Cloudflare | Demo PA4 phục vụ bản ứng dụng [`68f9714`](https://github.com/TVinhQuang/Trozy/commit/68f97146478d1f6df2c85bae916511d1a7a80d7a) bằng Workers, D1 và KV. Worker version `6e9ae22b-9c80-4caf-bc4a-d1cf716e996b` nhận 100% lưu lượng khi phát hành. D1 không còn migration chờ. [Demo](https://trozy.nhom11.workers.dev) · [Hướng dẫn vận hành](CLOUDFLARE.md) |
-| Node/SQLite | Chạy trên máy với Node 24, SQLite và thư mục dữ liệu cục bộ. Thư xác thực dùng outbox khi chưa có SMTP. Có thể chuẩn bị runtime OCR và Ollama theo nhu cầu. [Chạy trên máy](../README.md#chạy-trên-máy) · [Cấu hình Node](IMPLEMENTATION.md) |
+| Cloudflare | Demo PA4 dùng Workers, D1 và KV. B01, B04 và UC16 dùng secret Gemini do nhóm cấu hình cho Worker production. [Demo](https://trozy.nhom11.workers.dev) · [Hướng dẫn vận hành](CLOUDFLARE.md) |
+| Node/SQLite | Chạy trên máy với Node 24, SQLite và thư mục dữ liệu cục bộ. Thư xác thực dùng outbox khi chưa có SMTP. B01, B04 và UC16 dùng Gemini. Bộ đọc công tơ có runtime riêng. [Chạy trên máy](../README.md#chạy-trên-máy) · [Cấu hình Node](IMPLEMENTATION.md) |
 | Điện thoại | PWA có hướng dẫn thêm vào màn hình chính cho iPhone và Android. Tải dữ liệu và gửi ảnh cần mạng. [Cài Trozy](../README.md#cài-trozy-trên-điện-thoại) |
 
 Kiểm tra sau phát hành ngày 27/11 xác nhận HTML, JavaScript chính và CSS khớp bản build. `/api/health` trả HTTP 200 và xác nhận truy vấn D1 thành công. API dữ liệu trả HTTP 401 khi chưa đăng nhập. Worker báo có cấu hình gửi thư. [Health](https://trozy.nhom11.workers.dev/api/health)
@@ -22,7 +22,7 @@ Kiểm tra sau phát hành ngày 27/11 xác nhận HTML, JavaScript chính và C
 | Thanh toán, cọc, thu chi | VietQR theo số còn nợ. Chủ trọ đối chiếu và xác nhận thực thu, cấp biên nhận PDF, điều chỉnh có lịch sử. Sổ thu chi liên kết chứng từ. Quyết toán công nợ, hư hỏng và hoàn cọc trước khi đóng lượt thuê. |
 | Vận hành và cổng người thuê | Dashboard và chi phí theo kỳ, sửa chữa, hỗ trợ, tài sản, bàn giao, tài liệu, phương tiện và đặt tiện ích. Nhắc hạn trong ứng dụng theo người nhận, có kênh email khi môi trường bật dịch vụ. |
 | Báo cáo và quản trị | Bộ lọc theo cơ sở hoặc kỳ, Excel/CSV có xem trước khi nhập, xuất và sao lưu bản ghi JSON có tham chiếu tệp, nhật ký nghiệp vụ và nhật ký truy cập. |
-| AI hỗ trợ | B01 tra cứu theo quyền, giải thích hóa đơn và soạn nháp thông báo. B02 phân tích tiêu thụ và cảnh báo. B04 gợi ý phân loại sau khi phiếu sửa chữa đã được lưu. Worker dùng quy tắc và thống kê. Bản Node có thể cấu hình Ollama hoặc Gemini cho B01/B04. |
+| AI hỗ trợ | B01 tra cứu theo quyền, giải thích hóa đơn và soạn nháp thông báo. B02 phân tích tiêu thụ và cảnh báo. B04 gợi ý phân loại sau khi phiếu sửa chữa đã được lưu. Worker và Node cùng dùng Gemini cho B01/B04. Khi thiếu khóa hoặc lỗi dịch vụ, tra cứu và quy tắc vẫn hoạt động. |
 
 ### UC67 và dữ liệu cá nhân
 
@@ -33,13 +33,13 @@ Chủ trọ xem trước kết quả từng trường rồi xác nhận xử lý
 ## Điều kiện vận hành và phạm vi còn lại
 
 - **B03 OCR công tơ** đang thử nghiệm trên máy. PaddleOCR PP-OCRv6 small dùng cho công tơ điện cơ và YOLO + VisionState Wheel Reader cho công tơ nước cơ. Chủ trọ xem đề xuất và đối chiếu ảnh trước khi ghi chỉ số. Trên Cloudflare, chủ trọ xem ảnh và nhập chỉ số thủ công. [Quy trình công tơ](METER-READER.md) · [Danh mục model và SHA-256](../MODELS-OCR/README.md)
-- **UC16 OCR hợp đồng giấy** dùng PaddleOCR khi bản Node có runtime. Chủ trọ chọn từng trường sau khi đối chiếu. Bản Cloudflare hỗ trợ nhập tay hợp đồng giấy.
+- **UC16 OCR hợp đồng giấy** trên Worker và Node dùng Gemini sau khi chủ trọ đồng ý gửi ảnh. Chủ trọ đối chiếu từng trường và chọn dữ liệu điền vào bản nháp. Khi dịch vụ gián đoạn, có thể nhập tay. [Cấu hình và điều kiện dữ liệu](CLOUDFLARE.md#gemini)
 - **UC64/B05** dự báo công nợ, doanh thu và phòng trống thuộc nghiên cứu tùy chọn. Ký số, đối soát ngân hàng tự động, chat thời gian thực và ứng dụng native nằm ngoài phạm vi phát hành hiện tại.
 - Nghiệm thu từng luồng thay thế của 73 use case, việc giao email đến hộp thư, độ chính xác OCR và thao tác trên các thiết bị thực tế cần minh chứng theo từng môi trường. Build có cảnh báo kích thước một số gói JavaScript.
 
 ## Kiểm thử và CI
 
-Bản ứng dụng `68f9714` đạt **272/272** kiểm thử Node và **134** lượt render trên máy. Ba job Node tests, Render pages và Production build đã đạt trên GitHub tại thời điểm phát hành. [Kết quả CI của bản ứng dụng](https://github.com/TVinhQuang/Trozy/actions/runs/45996008533) · [Chỉ mục kiểm thử](test/README.md)
+Bản tích hợp Gemini đạt **274/274** kiểm thử Node trên máy có runtime của dự án, **134** lượt render và đóng gói Worker với 18 tệp tĩnh. Kiểm tra qua API Gemini thật với dữ liệu giả lập đã nhận kết quả cho B01, B04 và đọc đúng tiền thuê ở UC16. Khóa production do chủ dự án đặt riêng. [Các lần chạy CI](https://github.com/TVinhQuang/Trozy/actions/workflows/ci.yml) · [Chỉ mục kiểm thử](test/README.md)
 
 Workflow chạy bốn job trên Ubuntu với Node 24 khi mở hoặc cập nhật PR vào `main` và khi push vào `main`.
 

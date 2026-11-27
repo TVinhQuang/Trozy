@@ -1,42 +1,32 @@
-/** Unified LLM provider selector for Trozy language features (B01, B04).
- *
- * Defaults to local Ollama when no GEMINI_API_KEY is configured, and switches
- * automatically to Gemini (with free-model rotation) when configured or forced
- * via TROZY_AI_PROVIDER=gemini.
- */
-import { geminiJson, getGeminiStatus, hasGeminiKeys } from './gemini.mjs';
-import { getOllamaStatus, ollamaConfig, ollamaJson } from './ollama.mjs';
+import {createGeminiClient, defaultClient, GeminiError} from './gemini.mjs';
 
-export function activeAiProvider(env = process.env) {
-  const mode = String(env.TROZY_AI_PROVIDER || 'auto').trim().toLowerCase();
-  if (mode === 'ollama') return 'ollama';
-  if (mode === 'gemini') return 'gemini';
-  return hasGeminiKeys(env) ? 'gemini' : 'ollama';
-}
-
-export function isProviderError(error) {
-  return error?.name === 'OllamaError' || error?.name === 'GeminiError';
-}
-
-export async function getAiStatus() {
-  return activeAiProvider() === 'gemini' ? getGeminiStatus() : getOllamaStatus();
-}
-
-export async function llmJson({ system, prompt, schema, maxTokens = 900, timeoutMs, signal } = {}) {
-  if (activeAiProvider() === 'gemini') {
-    const response = await geminiJson({ system, prompt, schema, maxTokens, timeoutMs, signal });
-    return {
-      data: response.data,
-      engine: 'gemini',
-      model: response.model,
-      rotatedFrom: response.rotatedFrom,
-    };
-  }
-  const data = await ollamaJson({ system, prompt, schema, maxTokens, timeoutMs });
+function provider(client, env) {
+  const enabled = () => !['0','false'].includes(String(env.TROZY_AI_ENABLED).toLowerCase());
   return {
-    data,
-    engine: 'ollama',
-    model: ollamaConfig().model,
-    rotatedFrom: [],
+    getStatus() {
+      const status = client.getStatus();
+      return enabled() ? status : {...status, available:false, modelInstalled:false, message:'Gemini đã được tắt trong cấu hình máy chủ.'};
+    },
+    async llmJson(options) {
+      if (!enabled()) throw new GeminiError('disabled','Gemini đã được tắt trong cấu hình máy chủ.',503);
+      const {data,model,rotatedFrom} = await client.geminiJson(options);
+      return {data,model,rotatedFrom,engine:'gemini'};
+    },
+    async contractFields(options) {
+      if (!enabled()) throw new GeminiError('disabled','Gemini đã được tắt trong cấu hình máy chủ.',503);
+      return client.imageJson(options);
+    },
+    isProviderError: error => error instanceof GeminiError,
   };
 }
+
+const bindings = new WeakMap();
+export function workerGemini(env) {
+  if (!bindings.has(env)) bindings.set(env,provider(createGeminiClient({env:()=>env}),env));
+  return bindings.get(env);
+}
+
+export const nodeGemini = () => provider(defaultClient,process.env);
+export const llmJson = options => nodeGemini().llmJson(options);
+export const getAiStatus = () => nodeGemini().getStatus();
+export const isProviderError = error => error instanceof GeminiError;

@@ -76,4 +76,12 @@ Khi dịch vụ thư tạm ngừng, yêu cầu mới nằm trong bảng D1 `land
 - Với Brevo, dùng địa chỉ gửi đã xác minh của nhóm, đặt `BREVO_API_KEY` và `MAIL_FROM` bằng `npm run cf -- secret put <tên>`, rồi thử đăng ký với một hộp thư nhóm kiểm soát. OTP đặt lại mật khẩu có hiệu lực 10 phút. [API email giao dịch của Brevo](https://developers.brevo.com/reference/send-transac-email)
 - Nếu nhóm có dịch vụ thư riêng chạy trên Workers, có thể thêm Service Binding tên `MAILER`. Worker gọi nội bộ `POST /auth` với `to`, `kind` và `url` hoặc `otp`. Với thông báo do chủ trọ gửi, `POST /notification` nhận `id`, `to`, `subject`, `text` và có thể có `attachment` dạng `{name, content}` với nội dung base64. Trả HTTP 2xx khi nhận thành công. Lịch hàng giờ gửi tối đa ba email thông báo đã xếp hàng mỗi lượt, tối đa ba lần thử cho mỗi email.
 
-Bản cloud hỗ trợ chủ trọ đối chiếu ảnh gốc rồi nhập chỉ số. Các bộ đọc OCR/AI chạy bằng Python và model trên máy nằm trong bản Node/SQLite. Bản cloud cho nhập hợp đồng giấy bằng tay. Các quyết định ghi chỉ số và lập hóa đơn vẫn dùng quy tắc nghiệp vụ của Trozy.
+Chủ trọ đối chiếu ảnh công tơ và nhập chỉ số trên Cloudflare. Bộ đọc công tơ tự động thuộc bản Node.
+
+## Gemini
+
+Worker gọi Gemini cho B01, B04 và UC16. Trong **Workers & Pages → trozy → Settings → Variables and Secrets**, thêm secret kiểu **Secret** tên `GEMINI_API_KEY` ở production rồi chọn **Deploy**. Có thể nhập khóa qua CLI bằng `node scripts/cloudflare.mjs cli secret put GEMINI_API_KEY --profile trozy-team`. Tên model có thể ghi đè bằng biến `GEMINI_MODELS`. Khóa chỉ được dùng ở máy chủ.
+
+Sau khi đăng nhập, mở **Trợ lý Trozy → Kiểm tra** để xem cấu hình. Thử soạn một thông báo nháp với dữ liệu mẫu và kiểm tra nhãn Gemini để xác nhận có phản hồi thật. Khi thiếu khóa hoặc dịch vụ gián đoạn, B01 tra cứu theo quyền, B04 có quy tắc dự phòng và UC16 cho phép nhập tay. B02 tính bằng thống kê.
+
+UC16 nhận ảnh JPG, PNG hoặc WebP tối đa 5 MiB của chủ trọ sau khi có đồng ý gửi ảnh. Trozy chuyển ảnh trực tiếp đến Gemini trong yêu cầu đọc. Ảnh hợp đồng không được lưu vào D1 hoặc KV qua thao tác này. Đối chiếu và chọn các trường rồi lưu biểu mẫu như thường lệ. Với tài liệu thật có thông tin cá nhân, dùng Gemini API qua dự án Google Cloud đã liên kết tài khoản thanh toán đang hoạt động. Dùng tài liệu giả lập khi thử gói miễn phí. [Điều khoản Gemini API](https://ai.google.dev/gemini-api/terms)

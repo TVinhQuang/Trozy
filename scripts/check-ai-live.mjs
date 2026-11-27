@@ -1,16 +1,18 @@
-// Opt-in real local model checks. Uses only isolated synthetic seed data.
+// Opt-in real Gemini model checks. Uses only isolated synthetic seed data.
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {createApp} from '../src/backend/server.mjs';
 import {safeUser} from '../src/backend/db.mjs';
 import {dataFor} from '../src/backend/domain.mjs';
-import {getOllamaStatus} from '../src/ai/ollama.mjs';
+import {getAiStatus} from '../src/ai/llm.mjs';
+import {existsSync} from 'node:fs';
 import {answerQuestion} from '../src/ai/copilot.mjs';
 import {classifyMaintenance} from '../src/ai/maintenance.mjs';
 
 process.env.TROZY_AI_ENABLED='true';
-const status=await getOllamaStatus();
+if(existsSync('.env'))process.loadEnvFile('.env');
+const status=await getAiStatus();
 if(!status.available||!status.modelInstalled)throw new Error(status.message);
 const app=createApp({dbPath:':memory:',seed:true});
 const ownerRow=app.store.db.prepare('SELECT * FROM users WHERE id=?').get('owner_demo');
@@ -19,7 +21,7 @@ const owner=safeUser(ownerRow),tenant=safeUser(tenantRow),ownerData=dataFor(app.
 const hash=()=>createHash('sha256').update(JSON.stringify(['invoices','payments','contracts','deposits','readings','issues','notifications'].map(name=>app.store.list(name)))).digest('hex');
 const before=hash(),entries=[];
 const currency=value=>new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(value);
-async function check(name,input,run,validate,expectedEngine='ollama'){
+async function check(name,input,run,validate,expectedEngine='gemini'){
  const start=performance.now();const result=await run();const entry={name,input,expectedEngine,elapsedMs:Math.round(performance.now()-start),result,passed:false};entries.push(entry);
  assert.equal(result.engine,expectedEngine,`${name}: did not use required engine (${JSON.stringify(result.warnings)})`);validate(result);entry.passed=true;console.log(`PASS ${name} (${entry.elapsedMs}ms, ${result.engine})`);
 }
@@ -46,14 +48,14 @@ try{
  const base=`http://127.0.0.1:${app.server.address().port}/api`;
  const login=await fetch(`${base}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'chu@trozy.vn',password:'Trozy@2026'})});assert.equal(login.status,200);const cookie=login.headers.get('set-cookie').split(';')[0];
  await check('B01 authenticated HTTP round-trip + persisted history',{question},async()=>{const response=await fetch(`${base}/extensions/B01`,{method:'POST',headers:{'Content-Type':'application/json',cookie},body:JSON.stringify({question})});assert.equal(response.status,200);return (await response.json()).result;},result=>assert(result.sources.length));
- const persisted=await fetch(`${base}/ai/history?feature=B01`,{headers:{cookie}}).then(response=>response.json());assert(persisted.entries.some(entry=>entry.input.question===question&&entry.result.engine==='ollama'));
+ const persisted=await fetch(`${base}/ai/history?feature=B01`,{headers:{cookie}}).then(response=>response.json());assert(persisted.entries.some(entry=>entry.input.question===question&&entry.result.engine==='gemini'));
  const otherLogin=await fetch(`${base}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'thue@trozy.vn',password:'Trozy@2026'})});const tenantCookie=otherLogin.headers.get('set-cookie').split(';')[0];
  const isolated=await fetch(`${base}/ai/history?feature=B01`,{headers:{cookie:tenantCookie}}).then(response=>response.json());assert.equal(isolated.entries.length,0);
  assert.equal(hash(),before,'Read-only AI calls changed business records.');
 }catch(error){failed=error;console.error(error.message);}
 finally{
- const evidence={recordedAt:new Date().toISOString(),provider:'ollama',model:status.model,syntheticDataOnly:true,businessRecordsUnchanged:hash()===before,passed:!failed,checks:entries};
+ const evidence={recordedAt:new Date().toISOString(),provider:'gemini',model:status.model,syntheticDataOnly:true,businessRecordsUnchanged:hash()===before,passed:!failed,checks:entries};
  mkdirSync('docs/test',{recursive:true});writeFileSync('docs/test/AI-LIVE-EXAMPLES.json',JSON.stringify(evidence,null,2)+'\n');if(app.server.listening)await app.close();else app.store.close();
 }
 if(failed)throw failed;
-console.log(`PASS ${entries.length} checks using local ${status.model}; no business data changed.`);
+console.log(`PASS ${entries.length} checks using Gemini ${status.model}; no business data changed.`);

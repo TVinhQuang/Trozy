@@ -297,3 +297,64 @@ test('public binary upload enforces size and capacity before any KV write',async
   assert.equal((await request('t','/files',{name:'image.jpg',type:'image/jpeg',purpose:'meter',roomId:'r',data:'/9j/'})).status,507);
   assert.equal(blobs.size,1);
 });
+
+test('UC16 checks authorization and consent, sends only the contract image to Gemini and returns draft fields',async t=>{
+  const {env,blobs,request}=fixture(t);
+  const image='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jgT8AAAAASUVORK5CYII=';
+  const input={roomId:'r',collection:'contracts',source:'paper-contract',fileName:'contract.png',geminiConsent:true,image};
+  const extract=(user,changes={})=>request(user,'/paper-contract/extract',{...input,...changes});
+  assert.equal((await extract('o')).status,503);
+  Object.assign(env,{GEMINI_API_KEY:'fixture-private-key',GEMINI_MODELS:'test-model'});
+  let output={isRentalContract:true,room:'101',rent:'3.500.000 đồng',endDate:'2026-02-31',identityNumber:'invalid'},calls=0;
+  t.mock.method(globalThis,'fetch',async(url,init)=>{
+    calls++;
+    assert.equal(new URL(url).hostname,'generativelanguage.googleapis.com');
+    const payload=JSON.parse(init.body);
+    assert.deepEqual(payload.contents[0].parts[1].inlineData,{data:image,mimeType:'image/png'});
+    assert(!init.body.includes('fixture-private-key'));
+    return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(output)}]}}]});
+  });
+  assert.equal((await extract('t')).status,403);
+  assert.equal((await extract('other')).status,404);
+  assert.equal((await extract('o',{geminiConsent:false})).status,400);
+  assert.equal((await extract('o',{fileName:'CCCD.png'})).status,400);
+  assert.equal((await extract('o',{id:'c'})).status,409);
+  assert.equal(calls,0);
+  assert.deepEqual(await (await extract('o')).json(),{fields:{roomId:'r',rent:'3500000'}});
+  assert.equal((await request('o','/paper-contract/confirm',{roomId:'r',collection:'contracts'})).status,200);
+  assert.equal(calls,1);assert.equal(blobs.size,0);
+  output={isRentalContract:false,rent:'1'};
+  assert.equal((await extract('o')).status,422);
+});
+
+test('Worker uses Gemini for scoped drafts and saved repair tickets and keeps review manual',async t=>{
+  const {env,sql,request}=fixture(t);
+  const status=async()=>await (await request('o','/ai/status')).json();
+  assert.equal((await status()).available,false);
+  Object.assign(env,{GEMINI_API_KEY:'fixture-private-key',GEMINI_MODELS:'test-model'});
+  assert.equal((await status()).provider,'gemini');
+  let savedAtFetch=false, calls=0;
+  t.mock.method(globalThis,'fetch',async(url,init)=>{
+    calls++;
+    const prompt=JSON.parse(JSON.parse(init.body).contents[0].parts[0].text);
+    let answer;
+    if(prompt.allowedCategories){
+      savedAtFetch=!!sql.prepare("SELECT id FROM records WHERE collection='issues'").get();
+      assert(!JSON.stringify(prompt).includes('person@example.test'));
+      answer={category:'Khác',priority:'low',confidence:70,reasons:['Cần kiểm tra.'],suggestedTitle:'Kiểm tra ổ cắm',suggestedSteps:[]};
+    }else answer=prompt.draft;
+    return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(answer)}]}}]});
+  });
+  const draft=await (await request('o','/extensions/B01',{question:'Soạn thông báo kiểm tra điện nước'})).json();
+  assert.equal(draft.result.engine,'gemini',JSON.stringify(draft));
+  const description='Ổ cắm có tia lửa, liên hệ person@example.test';
+  const response=await request('t','/issues',{title:'Kiểm tra ổ cắm',description,roomId:'r',propertyId:'p',category:'Điện'});
+  const issue=await response.json();
+  assert.equal(response.status,201,JSON.stringify(issue));
+  assert(savedAtFetch);assert.equal(issue.classificationProposal.engine,'gemini');
+  assert.equal(issue.classificationProposal.priority,'urgent');assert(issue.classificationProposal.requiresConfirmation);
+  assert.equal((await request('t','/issues/retry-classification',{id:issue.id})).status,403);
+  const retry=await (await request('o','/issues/retry-classification',{id:issue.id})).json();
+  assert.equal(retry.classificationHistory.length,2);
+  assert.equal(calls,3);
+});

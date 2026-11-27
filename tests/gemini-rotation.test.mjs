@@ -10,7 +10,7 @@ import {
   resetGeminiRotation,
   toGeminiSchema,
 } from '../src/ai/gemini.mjs';
-import { activeAiProvider, getAiStatus } from '../src/ai/llm.mjs';
+import { getAiStatus } from '../src/ai/llm.mjs';
 import { answerQuestion } from '../src/ai/copilot.mjs';
 import { classifyMaintenance } from '../src/ai/maintenance.mjs';
 import { openStore, id, now, safeUser } from '../src/backend/db.mjs';
@@ -178,9 +178,10 @@ test('Gemini client supports multi-key auth failover and round_robin rotation mo
   assert.deepEqual(seen, ['m1:bad-key', 'm1:good-key', 'm2:good-key']);
 });
 
-test('activeAiProvider defaults to ollama without key and activates Gemini with B01/B04 safety guards', async t => {
+test('Gemini is unavailable without a key and activates with B01/B04 safety guards', async t => {
   withEnv(t, { GEMINI_API_KEY: undefined, GEMINI_API_KEYS: undefined, TROZY_AI_PROVIDER: undefined });
-  assert.equal(activeAiProvider(), 'ollama');
+  assert.equal((await getAiStatus()).available, false);
+  assert.equal((await getAiStatus()).provider, 'gemini');
 
   const store = openStore(':memory:');
   seedDemo(store);
@@ -198,7 +199,6 @@ test('activeAiProvider defaults to ollama without key and activates Gemini with 
     TROZY_AI_ENABLED: 'true',
   });
   resetGeminiRotation();
-  assert.equal(activeAiProvider(), 'gemini');
   const status = await getAiStatus();
   assert.equal(status.provider, 'gemini');
   assert.equal(status.available, true);

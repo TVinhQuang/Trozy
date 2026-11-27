@@ -622,10 +622,11 @@ test('UC16 paper OCR is scoped and fills only supported proposals, without savin
   let calls=0;
   const {store,login,request}=await fixture(t,{readPaperContract:async()=>{calls++;return ['Bên thuê: Nguyễn Văn An','Phòng: 101','Giá thuê: 3.500.000 đồng','Tiền cọc: 0 đồng','CCCD: 000000000123'];}});
   const owner=await login(),tenant=await login('thue@trozy.vn');
-  const body={source:'paper-contract',fileName:'hop-dong.png',image:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jgT8AAAAASUVORK5CYII=',collection:'tenants',roomId:'room_101'};
+  const body={geminiConsent:true,source:'paper-contract',fileName:'hop-dong.png',image:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jgT8AAAAASUVORK5CYII=',collection:'tenants',roomId:'room_101'};
   const run=(data,actor=owner)=>request('/api/paper-contract/extract',post(actor,data));
   const before=store.get('tenants','tenant_01'),fileCount=()=>store.db.prepare('SELECT COUNT(*) AS n FROM files').get().n;
   const count=fileCount();
+  assert.equal((await run({...body,geminiConsent:false})).status,400);
   assert.equal((await run({...body,fileName:'Căn cước.png'})).status,400);
   assert.equal((await run({...body,source:'cccd'})).status,400);
   assert.equal((await run(body,tenant)).status,403);
