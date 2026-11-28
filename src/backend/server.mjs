@@ -9,6 +9,7 @@ import {resolve,extname,sep} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {loadEnvFile} from 'node:process';
 import {openStore,createUser,safeUser,passwordMatches,passwordHash,hashToken,id,now,COLLECTIONS} from './db.mjs';
+import {expireTenantLinkRequests,sqliteTenantLinks} from './tenant-link.mjs';
 import {contractTarget,contractExcerpt,readPaperContract,proposedFields} from './paper-contract.mjs';
 import {recordAccess,readAccessLog} from './access-log.mjs';
 import {seedDemo} from './seed.mjs';
@@ -41,6 +42,7 @@ async function readJson(req){
 export function createApp(options={}){
   const exportKey=randomBytes(32);
   const store=openStore(options.dbPath??process.env.TROZY_DB_PATH??'data/trozy.sqlite');
+  const tenantLinks=sqliteTenantLinks(store);
   const seed=options.seed??!['0','false'].includes(String(process.env.TROZY_SEED_DEMO).toLowerCase());if(seed)seedDemo(store);
   const ai=createAIService(store);
   const meterReader=createMeterReaderService(store,options.meterReader);
@@ -195,10 +197,7 @@ export function createApp(options={}){
           if(input.consent!==true&&input.consent!=='on')fail(400,'Cần đồng ý xử lý dữ liệu trước khi đăng ký.');
           const phone=String(input.phone||'').trim();if(!phone||phone.length>30)fail(400,'Vui lòng nhập số điện thoại hợp lệ.');
           const code=String(input.inviteCode||'').trim().toUpperCase();
-          if(input.role==='tenant'&&code){
-            const tenant=store.list('tenants').find(row=>row.inviteCode===code&&!row.userId&&row.inviteExpiresAt>Date.now());
-            if(!tenant||tenant.email&&tenant.email.toLowerCase()!==email)fail(400,'Mã liên kết không còn hợp lệ hoặc email chưa khớp hồ sơ.');
-          }
+          if(input.role==='tenant'&&code&&!tenantLinks.invitation(code))fail(400,'Mã mời không hợp lệ hoặc đã hết hạn.');
           const user=createUser(store,{name,email,password:input.password,role:input.role,phone});
           store.db.prepare('UPDATE users SET consented_at=?,pending_invite=? WHERE id=?').run(now(),input.role==='tenant'&&code?code:null,user.id);
           outbox(user,'verify');return user;
@@ -243,7 +242,7 @@ export function createApp(options={}){
       }
       if(path==='/api/auth/verify-email'&&req.method==='POST'){
         const input=await readJson(req);limit('verify:'+req.socket.remoteAddress,20);
-        store.transaction(()=>{
+        const verified=store.transaction(()=>{
           const token=store.db.prepare("SELECT t.*,u.email,u.pending_email,u.tenant_id,u.pending_invite FROM auth_tokens t JOIN users u ON u.id=t.user_id WHERE token_hash=? AND kind IN ('verify','change-email') AND expires_at>?").get(hashToken(String(input.token||'')),Date.now());
           if(!token)fail(400,'Mã xác thực không hợp lệ hoặc hết hạn.');
           if(token.kind==='change-email'){
@@ -251,21 +250,17 @@ export function createApp(options={}){
             store.db.prepare('UPDATE users SET email=?,verified=1,pending_email=NULL WHERE id=?').run(token.target_email,token.user_id);
             const tenant=token.tenant_id&&store.get('tenants',token.tenant_id);
             if(tenant)store.put('tenants',{...tenant,email:token.target_email});
+            store.db.prepare(expireTenantLinkRequests).run(token.user_id,token.target_email,token.target_email);
             store.db.prepare('DELETE FROM auth_tokens WHERE user_id=?').run(token.user_id);
           }else{
             if(token.target_email&&token.target_email!==token.email)fail(400,'Địa chỉ xác thực đã thay đổi.');
-            if(token.pending_invite){
-              const tenant=store.list('tenants').find(row=>row.inviteCode===token.pending_invite&&!row.userId&&row.inviteExpiresAt>Date.now()&&(!row.email||row.email.toLowerCase()===token.email));
-              if(tenant){
-                store.db.prepare('UPDATE users SET tenant_id=?,landlord_id=? WHERE id=?').run(tenant.id,tenant.ownerId,token.user_id);
-                store.put('tenants',{...tenant,userId:token.user_id,email:token.email,inviteCode:null,inviteExpiresAt:null});
-              }
-              store.db.prepare('UPDATE users SET pending_invite=NULL WHERE id=?').run(token.user_id);
-            }
-            store.db.prepare('UPDATE users SET verified=1 WHERE id=?').run(token.user_id);
+            store.db.prepare('UPDATE users SET verified=1,pending_invite=NULL WHERE id=?').run(token.user_id);
             store.db.prepare('DELETE FROM auth_tokens WHERE token_hash=?').run(token.token_hash);
+            if(token.pending_invite)return {user:store.account(token.user_id),code:token.pending_invite};
           }
-        });return json(res,200,{ok:true});
+        });
+        const link=verified&&await tenantLinks.submit(verified.user,verified.code,{afterVerification:true});
+        return json(res,200,{ok:true,...(link?{linkStatus:link.status}:{})});
       }
       if(path==='/api/auth/resend-registration'&&req.method==='POST'){
         const input=await readJson(req),email=cleanEmail(input.email);validateEmail(email);limit('resend-registration:'+req.socket.remoteAddress,6);
@@ -277,15 +272,11 @@ export function createApp(options={}){
         const user=requireUser(req);
         if(path==='/api/auth/link-tenant'&&req.method==='POST'){
           const input=await readJson(req);limit('link:'+user.id,8);
-          if(user.role!=='tenant'||user.tenant_id)fail(409,'Tài khoản không ở trạng thái chờ liên kết.');
-          store.transaction(()=>{
-            const code=String(input.inviteCode||'').trim().toUpperCase();
-            const tenant=code&&store.list('tenants').find(row=>row.inviteCode===code&&!row.userId&&row.inviteExpiresAt>Date.now()&&(!row.email||row.email.toLowerCase()===user.email));
-            if(!tenant)fail(400,'Mã mời hết hạn hoặc không khớp hồ sơ.');
-            const result=store.db.prepare('UPDATE users SET tenant_id=?,landlord_id=? WHERE id=? AND tenant_id IS NULL').run(tenant.id,tenant.ownerId,user.id);
-            if(result.changes!==1)fail(409,'Tài khoản đã được liên kết.');
-            store.put('tenants',{...tenant,userId:user.id,email:user.email,inviteCode:null,inviteExpiresAt:null});
-          });return json(res,200,{ok:true});
+          return json(res,200,await tenantLinks.submit(user,input.inviteCode));
+        }
+        if(path==='/api/auth/tenant-link-requests'){
+          if(req.method==='GET')return json(res,200,await tenantLinks.status(user));
+          if(req.method==='POST')return json(res,200,await tenantLinks.decide(user,await readJson(req)));
         }
         const logMatch=path.match(/^\/api\/access-log(?:\/([^/]+))?$/);
         if(logMatch&&req.method==='GET')return json(res,200,readAccessLog(store,user,url.searchParams,logMatch[1]));
@@ -315,7 +306,14 @@ export function createApp(options={}){
                 if(target!==user.email){limit('email-change:'+user.id,8);outbox(user,'change-email',target);}
               }
             }
-            store.db.prepare('UPDATE users SET name=?,phone=?,avatar_file_id=?,notification_preferences=? WHERE id=?').run(name,phone,avatarFileId,JSON.stringify(preferences),user.id);if(user.tenant_id){const tenant=store.get('tenants',user.tenant_id);if(tenant)store.put('tenants',{...tenant,name,phone});}audit(store,user,'profile','users',{id:user.id});});return json(res,200,{user:safeUser(store.db.prepare('SELECT * FROM users WHERE id=?').get(user.id))});
+            store.db.prepare('UPDATE users SET name=?,phone=?,avatar_file_id=?,notification_preferences=? WHERE id=?').run(name,phone,avatarFileId,JSON.stringify(preferences),user.id);
+            if(user.tenant_id){
+              const tenant=store.get('tenants',user.tenant_id);
+              if(tenant)store.put('tenants',{...tenant,name,phone});
+            }
+            if(ownerId(user))audit(store,user,'profile','users',{id:user.id});
+          });
+          return json(res,200,{user:safeUser(store.account(user.id))});
         }
         if(path==='/api/auth/change-password'&&req.method==='POST'){
           const input=await readJson(req);validatePassword(input.password);if(input.confirmation!==input.password)fail(400,'Xác nhận mật khẩu chưa khớp.');limit(`change:${user.id}`,10);if(!passwordMatches(String(input.currentPassword||''),user.password_hash))fail(400,'Mật khẩu hiện tại không đúng.');store.transaction(()=>{store.db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(passwordHash(input.password),user.id);store.db.prepare("DELETE FROM auth_tokens WHERE user_id=? AND kind IN ('reset','reset-grant')").run(user.id);store.db.prepare('DELETE FROM sessions WHERE user_id=?').run(user.id);audit(store,user,'change-password','users',{id:user.id});});cookie(res,user.id);return json(res,200,{ok:true});

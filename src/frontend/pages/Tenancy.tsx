@@ -2,7 +2,8 @@ import {BusinessPdfLink} from '../business-pdf-link';
 import {ReceiptCorrection} from '../receipt-correction';
 import {OccupancyDialog} from '../occupancy-dialog';
 import {PaperContractInput} from '../paper-contract-input';
-import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import {linkRequestsPath,type TenantLinkRequest} from '../tenant-link';
+import { useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Building2, CalendarDays, Check, CheckCheck, Copy, Download, FileText, KeyRound, Landmark, Plus, ReceiptText, Send, ShieldCheck, Users, Wallet, X } from 'lucide-react';
 import { api, date, download, money, today } from '../api';
 import { useApp, useRecords } from '../context';
@@ -115,21 +116,75 @@ export function Tenants() {
   const [occupancy,setOccupancy]=useState<RecordData|null>(null);
   const [details, setDetails] = useState<RecordData | null>(null);
   const [request, setRequest] = useState(false);
+  const [linkRequests,setLinkRequests]=useState<TenantLinkRequest[]>([]);
+  const [linkReview,setLinkReview]=useState<{row:RecordData;request:TenantLinkRequest}|null>(null);
+  const [linkBusy,setLinkBusy]=useState(false);
+  const [linkError,setLinkError]=useState('');
+  const [linkLoadError,setLinkLoadError]=useState('');
+  useEffect(()=>{
+    if(!ctx.isLandlord||linkReview)return;
+    const controller=new AbortController();
+    async function load(){
+      try{
+        const {requests}=await api<{requests:TenantLinkRequest[]}>(linkRequestsPath,{signal:controller.signal});
+        if(!controller.signal.aborted){setLinkRequests(requests);setLinkLoadError('');}
+      }catch(failure){if(!controller.signal.aborted)setLinkLoadError((failure as Error).message);}
+    }
+    void load();
+    const timer=window.setInterval(load,30000);
+    window.addEventListener('focus',load);
+    return ()=>{
+      controller.abort();
+      window.clearInterval(timer);
+      window.removeEventListener('focus',load);
+    };
+  },[ctx.isLandlord,ctx.user.id,ctx.data.tenants,linkReview]);
+  const pendingLink=(row:RecordData)=>linkRequests.find(entry=>entry.tenantId===row.id);
+  async function reviewLink(decision:'approve'|'reject'){
+    if(!linkReview)return;
+    setLinkBusy(true);
+    setLinkError('');
+    try{
+      await api(linkRequestsPath,{method:'POST',body:JSON.stringify({id:linkReview.request.id,decision})});
+      setLinkRequests(current=>current.filter(entry=>entry.id!==linkReview.request.id));
+      setLinkReview(null);
+      ctx.notify(decision==='approve'?'Đã liên kết tài khoản và cập nhật email hồ sơ.':'Đã từ chối và hủy mã cũ. Bạn có thể cấp mã mời mới.');
+      await ctx.refresh();
+    }catch(failure){setLinkError((failure as Error).message);}
+    finally{setLinkBusy(false);}
+  }
   async function invite(row: RecordData) {
     try { const result = await ctx.action('invite-tenant', { id: row.id }); setInvitation({ name: row.name, inviteCode: result.inviteCode || result.code }); }
     catch (failure) { ctx.notify(failure instanceof Error ? failure.message : 'Không thể tạo lời mời.', 'error'); }
   }
   return <div className="page-stack">
+    {linkLoadError&&<p className="form-error" role="alert">Chưa tải được yêu cầu liên kết. {linkLoadError}</p>}
     <div className="stats-grid"><Metric label="Người thuê đang ở" value={rows.filter(row => row.status === 'active').length} icon={<Users size={18}/>}/><Metric label="Đã liên kết tài khoản" value={rows.filter(row => row.userId).length} icon={<ShieldCheck size={18}/>}/><Metric label="Chờ liên kết" value={rows.filter(row => row.status === 'active' && !row.userId).length} icon={<Send size={18}/>}/><Metric label="Đã chuyển đi" value={rows.filter(row => row.status === 'left').length} icon={<ArrowUpRight size={18}/>}/></div>
     <EntityPage collection="tenants" title={ctx.isLandlord ? 'Người thuê' : 'Hồ sơ lưu trú'} description="Hồ sơ đại diện, thành viên cùng phòng và lịch sử lưu trú." canCreate={ctx.isLandlord} canEdit={ctx.isLandlord} canDelete={false}
       defaults={{ propertyId: ctx.defaultProperty }}
       fields={[propertyField(ctx.propertyOptions), roomField(ctx.roomOptions), {name:'paperContract',label:'Hợp đồng giấy',renderInput:row=><PaperContractInput collection="tenants" id={row?.id}/>},textField('name', 'Họ tên người đại diện', true),{name:'birthDate',label:'Ngày sinh',type:'date'}, { name: 'email', label: 'Email', type: 'email' }, { name: 'phone', label: 'Số điện thoại', type: 'tel' }, textField('identityNumber', 'Số CCCD nhập tay'),{name:'memberProfiles',label:'Thành viên',renderInput:row=><MemberEditor initial={row}/>},{name:'confirmSeparate',label:'Trùng số điện thoại',type:'checkbox',renderInput:(_row,error)=>error.includes('hai người khác nhau')&&<label><input type="checkbox" name="confirmSeparate"/> Tôi đã đối chiếu và xác nhận đây là những người khác nhau</label>}]}
       onSubmit={async (values, id) => ctx.mutate('tenants', { ...values, memberProfiles:JSON.parse(values.memberProfiles||'[]'),propertyId: ctx.room(values.roomId)?.propertyId || values.propertyId }, id)}
-      columns={[{ key: 'name', label: 'Người thuê', render: row => <div><strong>{row.name}</strong><div className="muted">{row.email || 'Chưa có email'}</div></div> }, { key: 'roomId', label: 'Phòng', render: row => ctx.room(row.roomId)?.code || 'Chưa bố trí' }, { key: 'phone', label: 'Điện thoại' }, { key: 'moveInDate', label: 'Chuyển vào', render: row => date(row.moveInDate) }, { key: 'status', label: 'Trạng thái', render: row => <Badge value={row.status} label={row.status === 'left' ? 'Đã chuyển đi' : row.status==='pending'?'Chưa chuyển vào':'Đang ở'}/> }, { key: 'userId', label: 'Tài khoản', render: row => <Badge value={row.userId ? 'active' : 'draft'} label={row.userId ? 'Đã liên kết' : 'Chưa liên kết'}/> }]}
-      renderActions={row => <><button className="btn btn-sm btn-info" onClick={async()=>{try{setDetails(await api('/tenants/'+encodeURIComponent(row.id)));}catch(e){ctx.notify((e as Error).message,'error');}}}>Chi tiết</button>{ctx.isLandlord&&row.status==='active'&&<button className="btn btn-sm" onClick={()=>setOccupancy(row)}>Lưu trú / chuyển phòng</button>}{ctx.isLandlord && !row.userId && row.status !== 'left' && <button className="btn btn-sm btn-primary" onClick={() => invite(row)}><Send size={14}/>Mời liên kết</button>}</>}/>
+      columns={[{ key: 'name', label: 'Người thuê', render: row => <div><strong>{row.name}</strong><div className="muted">{row.email || 'Chưa có email'}</div></div> }, { key: 'roomId', label: 'Phòng', render: row => ctx.room(row.roomId)?.code || 'Chưa bố trí' }, { key: 'phone', label: 'Điện thoại' }, { key: 'moveInDate', label: 'Chuyển vào', render: row => date(row.moveInDate) }, { key: 'status', label: 'Trạng thái', render: row => <Badge value={row.status} label={row.status === 'left' ? 'Đã chuyển đi' : row.status==='pending'?'Chưa chuyển vào':'Đang ở'}/> }, { key: 'userId', label: 'Tài khoản', render: row => <Badge value={row.userId ? 'active' : pendingLink(row) ? 'pending' : 'draft'} label={row.userId ? 'Đã liên kết' : pendingLink(row) ? 'Chờ duyệt liên kết' : 'Chưa liên kết'}/> }]}
+      renderActions={row => <><button className="btn btn-sm btn-info" onClick={async()=>{try{setDetails(await api('/tenants/'+encodeURIComponent(row.id)));}catch(e){ctx.notify((e as Error).message,'error');}}}>Chi tiết</button>{ctx.isLandlord&&row.status==='active'&&<button className="btn btn-sm" onClick={()=>setOccupancy(row)}>Lưu trú / chuyển phòng</button>}{ctx.isLandlord && pendingLink(row) && !row.userId && <button className="btn btn-sm btn-warning" onClick={()=>{const request=pendingLink(row);if(request){setLinkError('');setLinkReview({row,request});}}}>Duyệt liên kết</button>}{ctx.isLandlord && !row.userId && row.status !== 'left' && !pendingLink(row) && <button className="btn btn-sm btn-primary" onClick={() => invite(row)}><Send size={14}/>Mời liên kết</button>}</>}/>
     {occupancy&&<OccupancyDialog tenant={occupancy} onClose={()=>setOccupancy(null)}/>}
+    {linkReview&&<Modal title="Duyệt yêu cầu liên kết" onClose={()=>{if(!linkBusy)setLinkReview(null);}}>
+      <div className="stack">
+        <Details values={[
+          ['Người thuê',linkReview.row.name],
+          ['Phòng',ctx.room(linkReview.row.roomId)?.code],
+          ['Email đang ghi trên hồ sơ',linkReview.request.profileEmail],
+          ['Email tài khoản đã xác minh',linkReview.request.requestedEmail],
+        ]}/>
+        <p>Khi duyệt, tài khoản sẽ được liên kết và email đã xác minh sẽ thay email trên hồ sơ thuê. Nếu từ chối, Trozy sẽ hủy mã mời hiện tại.</p>
+        {linkError&&<p className="form-error" role="alert">{linkError}</p>}
+        <div className="inline">
+          <button className="btn btn-success" disabled={linkBusy} onClick={()=>reviewLink('approve')}>Duyệt và cập nhật email</button>
+          <button className="btn btn-danger" disabled={linkBusy} onClick={()=>reviewLink('reject')}>Từ chối và hủy mã</button>
+        </div>
+      </div>
+    </Modal>}
     {!ctx.isLandlord && <button className="btn btn-warning" onClick={() => setRequest(true)}>Đề nghị cập nhật hồ sơ</button>}
-    {invitation && <Modal title="Lời mời liên kết tài khoản" onClose={() => setInvitation(null)}><div className="stack"><p>Gửi mã này cho <strong>{invitation.name}</strong>. Người thuê nhập mã khi đăng ký để liên kết đúng hồ sơ và hợp đồng.</p><div className="callout"><strong style={{ fontSize: 24, letterSpacing: 3, overflowWrap: 'anywhere' }}>{invitation.inviteCode}</strong></div><button className="btn btn-primary" onClick={async () => { try { await navigator.clipboard.writeText(invitation.inviteCode); ctx.notify('Đã sao chép mã lời mời.'); } catch { ctx.notify('Bạn có thể chọn và sao chép mã bên trên.', 'error'); } }}><Copy size={16}/>Sao chép mã</button></div></Modal>}
+    {invitation && <Modal title="Lời mời liên kết tài khoản" onClose={() => setInvitation(null)}><div className="stack"><p>Gửi mã này cho <strong>{invitation.name}</strong>. Người thuê có thể nhập mã khi đăng ký hoặc trong mục Tài khoản sau khi đăng nhập.</p><div className="callout"><strong style={{ fontSize: 24, letterSpacing: 3, overflowWrap: 'anywhere' }}>{invitation.inviteCode}</strong></div><button className="btn btn-primary" onClick={async () => { try { await navigator.clipboard.writeText(invitation.inviteCode); ctx.notify('Đã sao chép mã lời mời.'); } catch { ctx.notify('Bạn có thể chọn và sao chép mã bên trên.', 'error'); } }}><Copy size={16}/>Sao chép mã</button></div></Modal>}
     {details && <Modal title={details.name} onClose={() => setDetails(null)}><div className="stack"><Details values={[[ 'Phòng', ctx.room(details.roomId)?.code ], [ 'Email', details.email ], [ 'Điện thoại', details.phone ], [ 'Giấy tờ', details.identityNumber ? `•••• ${String(details.identityNumber).slice(-4)}` : 'Chưa cập nhật' ], [ 'Ngày chuyển vào', date(details.moveInDate) ], [ 'Ngày chuyển ra', date(details.moveOutDate) ], [ 'Tài khoản', details.userId ? 'Đã liên kết' : 'Chưa liên kết' ]]}/><div><h3>Thành viên cùng phòng</h3>{details.memberProfiles?.length?<ul>{details.memberProfiles.map((m:RecordData)=><li key={m.id}><b>{m.name}</b>{ctx.isLandlord&&[m.birthDate,m.phone,m.email,m.identityNumber].filter(Boolean).map((v:string)=><span key={v}> · {v}</span>)}</li>)}</ul>:<p>Chưa có thông tin thành viên.</p>}</div>{details.occupancyHistory?.length>0&&<section><h3>Lịch sử lưu trú</h3>{details.occupancyHistory.map((h:RecordData)=><p key={h.id}>{date(h.effectiveDate)} · {h.direction?(h.direction==='in'?'Chuyển vào':'Chuyển ra')+' · '+h.personName:'Chuyển phòng '+(ctx.room(h.fromRoomId)?.code||h.fromRoomId)+' → '+(ctx.room(h.toRoomId)?.code||h.toRoomId)}</p>)}</section>}<h3>Lịch sử hợp đồng</h3>{ctx.data.contracts.filter(contract => contract.tenantId === details.id).map(contract => <div className="inline" key={contract.id}><span>Phòng {ctx.room(contract.roomId)?.code} · {date(contract.startDate)} – {date(contract.endDate)}</span><Badge value={contract.status}/></div>)}</div></Modal>}
     {request && <FormDialog title="Đề nghị cập nhật hồ sơ" fields={[{ name: 'body', label: 'Thông tin cần điều chỉnh', type: 'textarea', required: true, full: true }]} onClose={() => setRequest(false)} submitLabel="Gửi đề nghị" onSubmit={async values => { if (!ctx.myTenant) throw new Error('Tài khoản chưa liên kết hồ sơ người thuê.'); await ctx.mutate('tickets', { propertyId: ctx.myTenant.propertyId, roomId: ctx.myTenant.roomId, tenantId: ctx.myTenant.id, title: 'Đề nghị cập nhật hồ sơ', category: 'profile', body: values.body, status: 'open' }); ctx.notify('Đã gửi đề nghị cho chủ trọ.'); }}/>}
   </div>;

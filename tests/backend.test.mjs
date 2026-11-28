@@ -240,9 +240,8 @@ test('invite linking, local mail tokens, reset invalidation and origin protectio
   const {request,login,store}=await fixture(t);const owner=await login();
   assert.equal((await request('/api/auth/register',post(null,{name:'Kiểm thử',email:'none@example.com',password:'Password@123',role:'landlord'}))).status,400);
   const invite=await request('/api/actions/invite-tenant',post(owner,{id:'tenant_02'}));assert.equal(invite.status,200);
-  const bad=await request('/api/auth/register',post(null,{name:'Hà',email:'wrong@example.com',password:'Password@123',consent:true,phone:'0912345678',role:'tenant',inviteCode:invite.body.inviteCode}));assert.equal(bad.status,400);
+  const bad=await request('/api/auth/register',post(null,{name:'Hà',email:'wrong@example.com',password:'Password@123',consent:true,phone:'0912345678',role:'tenant',inviteCode:'INVALID'}));assert.equal(bad.status,400);
   const registered=await request('/api/auth/register',post(null,{name:'Trần Thu Hà',email:'ha.demo@example.com',password:'Password@123',consent:true,phone:'0912345678',role:'tenant',inviteCode:invite.body.inviteCode}));assert.equal(registered.status,201);assert(!registered.cookie);assert(!registered.body.user.tenantId);assert.equal((await request('/api/auth/login',post(null,{email:'ha.demo@example.com',password:'Password@123'}))).status,403);assert(!JSON.stringify(registered.body).includes('"token"'));
-  assert.equal((await request('/api/auth/register',post(null,{name:'Khách khác',email:'new@example.com',password:'Password@123',consent:true,phone:'0912345678',role:'tenant',inviteCode:invite.body.inviteCode}))).status,400);
   const verification=store.db.prepare('SELECT token FROM mail_outbox WHERE email=? AND kind=?').get('ha.demo@example.com','verify');
   assert.equal((await request('/api/auth/verify-email',post(null,{token:verification.token}))).status,200);
   assert.equal(store.get('tenants','tenant_02').userId,registered.body.user.id);
@@ -258,6 +257,49 @@ test('invite linking, local mail tokens, reset invalidation and origin protectio
   await login('ha.demo@example.com','NewPassword@123');
   assert.equal((await request('/api/rooms',{...post(owner,{}),origin:'https://attacker.example'})).status,403);
   assert.equal((await request('/api/auth/login',{...post(null,{email:'chu@trozy.vn',password:'Trozy@2026'}),origin:'null'})).status,403);
+});
+
+test('UC18 Node registers with a different email and links only after scoped approval',async t=>{
+  const {request,login,store}=await fixture(t),owner=await login(),other=await login('khac@trozy.vn');
+  const invite=async()=> (await request('/api/actions/invite-tenant',post(owner,{id:'tenant_02'}))).body.inviteCode;
+  const first=await invite(),email='new-resident@example.com',password='Password@123';
+  const app='/api/auth/tenant-link-requests';
+  assert.equal((await request('/api/auth/register',post(null,{name:'Trần Thu Hà',email,password,consent:true,phone:'0912345678',role:'tenant',inviteCode:first}))).status,201);
+  assert.deepEqual((await request(app,{cookie:owner})).body.requests,[]);
+  const {token}=store.db.prepare("SELECT token FROM mail_outbox WHERE email=? AND kind='verify'").get(email);
+  assert.equal((await request('/api/auth/verify-email',post(null,{token}))).body.linkStatus,'pending');
+  const tenant=await login(email,password),tenantState=()=>request(app,{cookie:tenant});
+  assert.equal((await tenantState()).body.status,'pending');
+  assert.deepEqual((await request('/api/bootstrap',{cookie:tenant})).body.data.rooms,[]);
+  const pending=async()=> (await request(app,{cookie:owner})).body.requests[0];
+  const original=await pending();
+  assert.equal(original.profileEmail,'ha.demo@example.com');
+  assert.equal(original.requestedEmail,email);
+  assert.equal((await request('/api/auth/link-tenant',post(tenant,{inviteCode:first}))).body.status,'pending');
+  assert.equal((await pending()).id,original.id);
+  assert.equal((await request(app,post(other,{id:original.id,decision:'approve'}))).status,404);
+  assert.equal((await request(app,post(owner,{id:original.id,decision:'reject'}))).body.status,'rejected');
+  assert.equal((await tenantState()).body.status,'rejected');
+  assert.equal(store.get('tenants','tenant_02').email,'ha.demo@example.com');
+  assert.equal((await request('/api/auth/link-tenant',post(tenant,{inviteCode:first}))).status,400);
+  const second=await invite();
+  assert.notEqual(second,first);
+  assert.equal((await request('/api/auth/link-tenant',post(tenant,{inviteCode:second}))).body.status,'pending');
+  const stale=await pending(),replacement='verified-replacement@example.com';
+  assert.equal((await request('/api/auth/profile',patch(tenant,{email:replacement}))).status,200);
+  assert.equal((await tenantState()).body.status,'pending');
+  const newToken=store.db.prepare("SELECT token FROM mail_outbox WHERE email=? AND kind='change-email'").get(replacement).token;
+  assert.equal((await request('/api/auth/verify-email',post(null,{token:newToken}))).status,200);
+  assert.equal((await tenantState()).body.status,'expired');
+  assert.equal((await request(app,post(owner,{id:stale.id,decision:'approve'}))).status,409);
+  assert.equal((await request('/api/auth/link-tenant',post(tenant,{inviteCode:second}))).body.status,'pending');
+  const next=await pending();
+  assert.equal(next.requestedEmail,replacement);
+  assert.equal((await request(app,post(owner,{id:next.id,decision:'approve'}))).body.status,'approved');
+  assert.equal((await tenantState()).body.status,'approved');
+  assert.equal(store.get('tenants','tenant_02').email,replacement);
+  assert.equal(store.get('tenants','tenant_02').inviteCode,null);
+  assert.equal((await request('/api/bootstrap',{cookie:tenant})).body.user.tenantId,'tenant_02');
 });
 
 test('authorized file association, atomic imports and amenity capacity',async t=>{

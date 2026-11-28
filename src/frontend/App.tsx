@@ -65,7 +65,14 @@ function Auth({onAuthenticated}:{onAuthenticated:()=>Promise<void>}){
    }else if(mode==='reset'){
     await api('/auth/reset-password',{method:'POST',body:JSON.stringify({...values,token:resetToken})});history.replaceState(null,'',location.pathname);setMessage('Đã đặt lại mật khẩu. Bạn có thể đăng nhập.');setMode('login');await onAuthenticated();
    }else{
-    await api('/auth/verify-email',{method:'POST',body:JSON.stringify({token})});history.replaceState(null,'',location.pathname);setMessage('Email đã được xác thực. Bạn có thể đăng nhập.');setMode('login');await onAuthenticated();
+    const result=await api<{linkStatus?:string}>('/auth/verify-email',{method:'POST',body:JSON.stringify({token})});
+    history.replaceState(null,'',location.pathname);
+    setMessage(result.linkStatus==='pending'
+      ?'Email đã được xác thực. Yêu cầu liên kết đang chờ chủ trọ duyệt. Bạn có thể đăng nhập để xem trạng thái.'
+      :result.linkStatus==='expired'
+        ?'Email đã được xác thực. Hãy đăng nhập và kiểm tra mã mời với chủ trọ để liên kết hồ sơ.'
+        :'Email đã được xác thực. Bạn có thể đăng nhập.');
+    setMode('login');await onAuthenticated();
    }
   }catch(reason){setError((reason as Error).message);}finally{setBusy(false);}
  }

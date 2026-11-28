@@ -63,6 +63,7 @@ export function openStore(path='data/trozy.sqlite') {
   if(!fileColumns.includes('room_id'))db.exec('ALTER TABLE files ADD COLUMN room_id TEXT');
   db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(4,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
   db.exec("INSERT OR IGNORE INTO schema_migrations VALUES(5,strftime('%Y-%m-%dT%H:%M:%fZ','now'))");
+  db.exec(readFileSync(new URL('../../cloudflare/migrations/0004_tenant_link_requests.sql',import.meta.url),'utf8'));
   const read=db.prepare('SELECT data FROM records WHERE collection=? AND id=?');
   const all=db.prepare('SELECT data FROM records WHERE collection=? ORDER BY rowid');
   const own=db.prepare('SELECT data FROM records WHERE collection=? AND owner_id=? ORDER BY rowid');

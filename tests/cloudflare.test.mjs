@@ -19,6 +19,7 @@ function fixture(t) {
   sql.exec(readFileSync(new URL('../cloudflare/migrations/0001_trozy.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../cloudflare/migrations/0002_scheduled_work.sql', import.meta.url),'utf8'));
   sql.exec(readFileSync(new URL('../cloudflare/migrations/0003_landlord_signups.sql', import.meta.url),'utf8'));
+  sql.exec(readFileSync(new URL('../cloudflare/migrations/0004_tenant_link_requests.sql', import.meta.url),'utf8'));
   const result = (query, args) => {
     const results=sql.prepare(query).all(...args);
     return {results,meta:{changes:sql.prepare('SELECT changes() AS n').get().n}};
@@ -58,6 +59,43 @@ function fixture(t) {
   }
   return {sql,blobs,request,env};
 }
+
+test('UC18 Worker serializes decisions, invalidates stale requests and consumes accepted codes',async t=>{
+  const {sql,env,request}=fixture(t);
+  const owner=await openOwnerStore(env,{id:'o',role:'landlord'});
+  owner.put('tenants',{id:'new-tenant',name:'Người thuê mới',ownerId:'o',propertyId:'p',roomId:'r',status:'active',email:'old@test.example'});
+  await owner.commit();
+  const account=sql.prepare("INSERT INTO users(id,name,email,password_hash,role,verified,created_at) VALUES(?,?,?,'unused','tenant',1,?)");
+  for(const id of ['new-account','different-account']){
+    account.run(id,id,id+'@test.example',new Date().toISOString());
+    sql.prepare('INSERT INTO sessions VALUES(?,?,?)').run(createHash('sha256').update(id).digest('hex'),id,Date.now()+600000);
+  }
+  const code=async()=> (await (await request('o','/actions/invite-tenant',{id:'new-tenant'})).json()).inviteCode;
+  const submit=(inviteCode,actor='new-account')=>request(actor,'/auth/link-tenant',{inviteCode});
+  const endpoint='/auth/tenant-link-requests';
+  const visible=async()=> (await (await request('o',endpoint)).json()).requests;
+  const first=await code();
+  assert.deepEqual(await (await submit(first)).json(),{ok:true,status:'pending'});
+  assert.equal((await submit(first,'different-account')).status,409);
+  const firstRequest=(await visible())[0];
+  const second=await code();
+  assert.equal((await (await request('new-account',endpoint)).json()).status,'expired');
+  assert.equal((await request('o',endpoint,{id:firstRequest.id,decision:'approve'})).status,409);
+  assert.deepEqual(await (await submit(second)).json(),{ok:true,status:'pending'});
+  const pending=(await visible())[0];
+  assert.equal(pending.requestedEmail,'new-account@test.example');
+  assert.equal((await request('other',endpoint,{id:pending.id,decision:'reject'})).status,404);
+  assert.equal((await request('new-account',endpoint,{id:pending.id,decision:'approve'})).status,403);
+  const decisions=await Promise.all(['approve','reject'].map(decision=>request('o',endpoint,{id:pending.id,decision})));
+  assert.deepEqual(decisions.map(result=>result.status).sort(),[200,409]);
+  const decision=await decisions.find(result=>result.ok).json();
+  const profile=JSON.parse(sql.prepare("SELECT data FROM records WHERE collection='tenants' AND id='new-tenant'").get().data);
+  const linked=(await (await request('new-account','/bootstrap')).json()).user;
+  assert.equal(profile.inviteCode,null);
+  assert.equal(profile.email,decision.status==='approved'?'new-account@test.example':'old@test.example');
+  assert.equal(linked.tenantId??null,decision.status==='approved'?'new-tenant':null);
+  assert.equal((await submit(second,'different-account')).status,400);
+});
 
 test('UC67 Worker scopes linked requests, preserves account email and commits a reviewed partial deletion once',async t=>{
   const {sql,env,request}=fixture(t);

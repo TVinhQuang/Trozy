@@ -3,12 +3,22 @@ import {deliverMail,mailConfigured} from './mail.mjs';
 import {randomBytes,randomInt,timingSafeEqual} from 'node:crypto';
 import {audit,fail} from '../backend/domain.mjs';
 import {hashToken,id,now,safeUser} from '../backend/model.mjs';
+import {expireTenantLinkRequests,tenantLinkRoutes} from '../backend/tenant-link.mjs';
 
 const COOKIE='trozy_session';
 const encoder=new TextEncoder();
 const dummy='pbkdf2:100000:'+ '00'.repeat(16)+':'+ '00'.repeat(32);
 const normalizeEmail=value=>String(value??'').trim().toLowerCase();
 const statement=(env,sql,...params)=>env.DB.prepare(sql).bind(...params);
+function workerTenantLinks(env){
+  return tenantLinkRoutes({
+    first:(sql,params)=>statement(env,sql,...params).first(),
+    all:async(sql,params)=>(await statement(env,sql,...params).all()).results,
+    batch:async items=>(await env.DB.batch(items.map(([sql,params])=>statement(env,sql,...params)))).map(result=>result.meta.changes),
+    revision:ownerId=>[[`INSERT INTO owner_revisions(owner_id,version) SELECT ?,1 WHERE changes()=1
+      ON CONFLICT(owner_id) DO UPDATE SET version=version+1`,[ownerId]]]
+  });
+}
 function checkEmail(email) {
   if(email.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(email)) fail(400,'Địa chỉ email không hợp lệ.');
 }
@@ -156,7 +166,7 @@ export async function authRoute(env,request,path,input,user,json) {
     const name=String(input.name||'').trim(),phone=String(input.phone||'').trim();
     if(!['landlord','tenant'].includes(input.role)||name.length<2||name.length>150||!phone||phone.length>30||![true,'on'].includes(input.consent)) fail(400,'Kiểm tra thông tin đăng ký và xác nhận đồng ý xử lý dữ liệu.');
     const uid=id('usr'),invitation=String(input.inviteCode||'').trim().toUpperCase();
-    if(invitation && !await invite(env,invitation,email)) fail(400,'Mã mời không hợp lệ.');
+    if(input.role==='tenant'&&invitation&&!await workerTenantLinks(env).invitation(invitation))fail(400,'Mã mời không hợp lệ hoặc đã hết hạn.');
     await statement(env,`INSERT INTO users(id,name,email,password_hash,role,phone,created_at,consented_at,pending_invite)
       VALUES(?,?,?,?,?,?,?,?,?)`,uid,name,email,await passwordDigest(input.password),input.role,phone,now(),now(),input.role==='tenant'?invitation||null:null).run();
     await issue(env,request,{id:uid,email},'verify');
@@ -184,17 +194,19 @@ export async function authRoute(env,request,path,input,user,json) {
       WHERE token_hash=? AND expires_at>? AND kind IN ('verify','change-email')`,digest,Date.now()).first();
     if(!row||row.target_email!==(row.kind==='verify'?row.email:row.pending_email)) fail(400,'Liên kết không hợp lệ hoặc đã hết hạn.');
     const result=await env.DB.batch([
-      statement(env,`UPDATE users SET verified=1,email=?,pending_email=NULL WHERE id=? AND (CASE WHEN ?='verify' THEN email ELSE pending_email END)=? AND EXISTS
+      statement(env,`UPDATE users SET verified=1,email=?,pending_email=NULL,pending_invite=NULL WHERE id=? AND (CASE WHEN ?='verify' THEN email ELSE pending_email END)=? AND EXISTS
         (SELECT 1 FROM auth_tokens WHERE token_hash=? AND expires_at>?)`,row.target_email,row.id,row.kind,row.target_email,digest,Date.now()),
       ...(row.tenant_id?[
         statement(env,`UPDATE records SET data=json_set(data,'$.email',?) WHERE collection='tenants' AND id=? AND owner_id=?
           AND EXISTS(SELECT 1 FROM users WHERE id=? AND email=?)`,row.target_email,row.tenant_id,row.landlord_id,row.id,row.target_email),
         statement(env,'INSERT INTO owner_revisions(owner_id,version) VALUES(?,1) ON CONFLICT(owner_id) DO UPDATE SET version=version+1',row.landlord_id)
       ]:[]),
+      ...(row.kind==='change-email'?[statement(env,expireTenantLinkRequests,row.id,row.target_email,row.target_email)]:[]),
       statement(env,'DELETE FROM auth_tokens WHERE token_hash=?',digest)]);
     if(!result[0].meta.changes) fail(400,'Liên kết đã dùng.');
-    if(row.pending_invite) await linkTenant(env,row,row.pending_invite);
-    return json({ok:true,message:'Email đã được xác thực.'});
+    const link=row.kind==='verify'&&row.pending_invite
+      ?await workerTenantLinks(env).submit({...row,verified:1},row.pending_invite,{afterVerification:true}):null;
+    return json({ok:true,message:'Email đã được xác thực.',...(link?{linkStatus:link.status}:{})});
   }
   if(request.method==='POST'&&path==='/auth/verify-reset-otp') {
     await limit(env,'otp:'+ip,20,900000);
@@ -222,7 +234,12 @@ export async function authRoute(env,request,path,input,user,json) {
   }
   if(!user) fail(401,'Vui lòng đăng nhập.');
   if(request.method==='POST'&&path==='/auth/link-tenant') {
-    await limit(env,'link:'+user.id,8,900000); await linkTenant(env,user,String(input.inviteCode||'').trim().toUpperCase()); return json({ok:true});
+    await limit(env,'link:'+user.id,8,900000);
+    return json(await workerTenantLinks(env).submit(user,input.inviteCode));
+  }
+  if(path==='/auth/tenant-link-requests'){
+    if(request.method==='GET')return json(await workerTenantLinks(env).status(user));
+    if(request.method==='POST')return json(await workerTenantLinks(env).decide(user,input));
   }
   if(request.method==='POST'&&path==='/auth/change-password') {
     await limit(env,'password:'+user.id,8,900000); checkPassword(input.password);
@@ -266,23 +283,4 @@ export async function authRoute(env,request,path,input,user,json) {
     return json({user:safeUser(await statement(env,'SELECT * FROM users WHERE id=?',user.id).first())});
   }
   fail(404,'Không tìm thấy chức năng tài khoản.');
-}
-
-function invite(env,code,email) {
-  return statement(env,`SELECT * FROM records WHERE collection='tenants' AND json_extract(data,'$.inviteCode')=?
-    AND json_extract(data,'$.inviteExpiresAt')>? AND json_extract(data,'$.userId') IS NULL
-    AND (coalesce(json_extract(data,'$.email'),'')='' OR lower(json_extract(data,'$.email'))=?)`,code,Date.now(),email).first();
-}
-async function linkTenant(env,user,code) {
-  if(user.role!=='tenant'||user.tenant_id||!code) fail(409,'Tài khoản không ở trạng thái chờ liên kết.');
-  const row=await invite(env,code,user.email);
-  if(!row) fail(400,'Mã mời hết hạn hoặc không đúng hồ sơ.');
-  // A conditional claim and the account link are visible together in one batch.
-  const result=await env.DB.batch([
-    statement(env,`UPDATE records SET data=json_set(data,'$.userId',?,'$.email',?,'$.inviteCode',NULL,'$.inviteExpiresAt',NULL)
-      WHERE collection='tenants' AND id=? AND data=? AND EXISTS(SELECT 1 FROM users WHERE id=? AND tenant_id IS NULL)`,user.id,user.email,row.id,row.data,user.id),
-    statement(env,`UPDATE users SET tenant_id=?,landlord_id=?,pending_invite=NULL WHERE id=? AND tenant_id IS NULL
-      AND EXISTS(SELECT 1 FROM records WHERE collection='tenants' AND id=? AND json_extract(data,'$.userId')=?)`,row.id,row.owner_id,user.id,row.id,user.id),
-    statement(env,'INSERT INTO owner_revisions(owner_id,version) VALUES(?,1) ON CONFLICT(owner_id) DO UPDATE SET version=version+1',row.owner_id)]);
-  if(!result[1].meta.changes) fail(409,'Mã mời đã thay đổi.');
 }

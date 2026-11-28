@@ -2,7 +2,7 @@
 
 Trozy phục vụ giao diện React và API trên cùng một địa chỉ HTTPS. Worker kiểm tra phiên đăng nhập và quyền từng phòng. D1 giữ tài khoản, dữ liệu nghiệp vụ, lịch sử xác minh và thông tin tệp. Workers KV giữ nội dung tệp riêng tư.
 
-Bản demo PA4 chạy trên tài khoản Cloudflare riêng của nhóm từ ngày 26/11/2026. Thư mục dự án trên máy đã gắn với profile Wrangler `trozy-team`. Cấu hình `wrangler.jsonc` chỉ định tài khoản, D1 và KV của nhóm. Để phát hành phiên bản tiếp theo, chạy `npm run cf:check` rồi `npm run cf -- deploy`. Các tài khoản Trozy hiện có dùng tiếp mật khẩu cũ. [Mở Trozy PA4](https://trozy.nhom11.workers.dev)
+Bản demo PA4 chạy trên tài khoản Cloudflare riêng của nhóm từ ngày 26/11/2026. Thư mục dự án trên máy đã gắn với profile Wrangler `trozy-team`. Cấu hình `wrangler.jsonc` chỉ định tài khoản, D1 và KV của nhóm. Để phát hành phiên bản tiếp theo, chạy `npm run cf:check`, áp dụng các migration D1 mới bằng `npm run cf -- d1 migrations apply DB --remote` rồi chạy `npm run cf -- deploy`. Migration `0004_tenant_link_requests.sql` tạo bảng yêu cầu liên kết UC18. Các tài khoản Trozy hiện có dùng tiếp mật khẩu cũ. [Mở Trozy PA4](https://trozy.nhom11.workers.dev)
 
 ## Chạy thử trên máy
 
