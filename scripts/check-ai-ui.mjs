@@ -21,7 +21,10 @@ const nativeFetch = globalThis.fetch;
 const store = openStore(':memory:'); seedDemo(store);
 const rawUser = store.db.prepare('SELECT * FROM users WHERE email=?').get('chu@trozy.vn');
 const user = safeUser(rawUser), data = dataFor(store, rawUser);
-const vite = await createVite({ server: { middlewareMode: true, hmr: false }, appType: 'custom' });
+const vite = await createVite({ plugins:[{name:'fixture-contract-ocr',enforce:'pre',
+  resolveId(source){if(source==='./contract-ocr')return '\0fixture-contract-ocr';},
+  load(source){if(source==='\0fixture-contract-ocr')return "export async function readContractPage(){return 'Hợp đồng thuê phòng: 101'}";}
+}], server: { middlewareMode: true, hmr: false }, appType: 'custom' });
 const { createElement: h } = await import('react');
 const { render, screen, fireEvent, waitFor, cleanup, act, within, configure } = await import('@testing-library/react');
 // FileReader and Vite share the machine with local model checks; allow actual async work to settle.
@@ -115,7 +118,7 @@ try {
     const applied=[];
     const requests=mockAPI((path,body)=>{
       if(path==='/api/paper-contract/extract'){
-        assert.equal(body.geminiConsent,true); assert.equal(body.roomId,'room_101');
+        assert.equal(body.geminiConsent,true); assert.equal(body.roomId,'room_101');assert.ok(body.contractText);assert.equal(body.image,undefined);
         return {fields:{rent:'3500000',deposit:'1000000'}};
       }
       if(path==='/api/paper-contract/confirm')return {ok:true};

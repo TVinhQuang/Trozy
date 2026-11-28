@@ -1,7 +1,7 @@
 /** Tenant photos remain immutable; readings change only after landlord review. */
 import {createHash} from 'node:crypto';
 import {id,now} from './model.mjs';
-import {audit,fail,ownerId,tenantFor,visible} from './domain.mjs';
+import {audit,fail,ownerId,tenantFor,visible,syncReadingAlerts} from './domain.mjs';
 import {tenantMeterReceipt,ownerMeterSubmission} from './meter-visibility.mjs';
 import {rasterMimeFromBytes} from '../shared/raster-image.mjs';
 import {meterConsumption} from '../shared/meter-consumption.mjs';
@@ -179,6 +179,7 @@ export function meterWorkflow(store,{onCreated=()=>{},onReviewed=()=>{},validate
       const saved=store.put('meterSubmissions',{...row,status:'approved',version:row.version+1,selectedFileId:photo.fileId,reviewedBy:user.id,reviewedAt:now(),reviewNote:note,verifiedValue:value.value,verificationSource:proposal?(proposal.engine==='gemini-vision'?'gemini-vision-and-human':proposal.engine==='paddleocr'?'paddleocr-and-human':'wheel-reader-and-human'):'manual',...(proposal?{readerProposalId:proposal.id}:{}),readingId:reading.id});
       audit(store,user,'meter-approve','meterSubmissions',saved,`${row.utility}: ${value.value}; ${proposal?(proposal.engine==='gemini-vision'?`đề xuất Gemini Vision (${proposal.model||''}) + đối chiếu ảnh`:proposal.engine==='paddleocr'?'đề xuất PaddleOCR + đối chiếu ảnh':'đề xuất Wheel Reader + đối chiếu ảnh'):'nhập tay'}; ${note}`);
       audit(store,user,'meter-reading-verify','readings',reading,`Ảnh ${photo.fileId}; bộ gửi ${row.id}`);
+      if(reading.confirmed)syncReadingAlerts(store,user,reading);
       onReviewed(user,saved,proposal);
       return {submission:ownerMeterSubmission(saved),reading};
     });

@@ -9,7 +9,7 @@ import {resolve,extname,sep} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {loadEnvFile} from 'node:process';
 import {openStore,createUser,safeUser,passwordMatches,passwordHash,hashToken,id,now,COLLECTIONS} from './db.mjs';
-import {contractTarget,contractImage,readPaperContract,proposedFields} from './paper-contract.mjs';
+import {contractTarget,contractExcerpt,readPaperContract,proposedFields} from './paper-contract.mjs';
 import {recordAccess,readAccessLog} from './access-log.mjs';
 import {seedDemo} from './seed.mjs';
 import {HttpError,fail,publicTenant,dataFor,createRecord,updateRecord,deleteRecord,performAction,previewImport,importRecords,generatePeriodInvoices,generateReminders,audit,ownerId,tenantFor,visible} from './domain.mjs';
@@ -23,7 +23,7 @@ import {createMeterReaderService} from './meter-reader-service.mjs';
 import {createMeterAutomaticService} from './meter-automatic.mjs';
 import {prepareProjectRuntime} from '../../scripts/project-runtime.mjs';
 
-const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'};
+const MIME={'.wasm':'application/wasm','.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.webmanifest':'application/manifest+json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.ico':'image/x-icon','.woff2':'font/woff2'};
 const COOKIE='trozy_session';
 if(existsSync('.env'))loadEnvFile('.env');
 registerDefaultExtensions();
@@ -66,7 +66,11 @@ export function createApp(options={}){
   function notificationRecipients(notification){
     const people=new Map();
     const add=(account,tenantId)=>{if(!account)return;let preferences={};try{preferences=JSON.parse(account.notification_preferences||'{}')}catch{};if(!acceptsNotice(preferences,notification,'email'))return;people.set(account.id,{id:account.id,email:account.email});};
-    if(notification.recipientUserId){add(store.db.prepare('SELECT id,email,notification_preferences FROM users WHERE id=?').get(notification.recipientUserId));return [...people.values()];}
+    if(notification.recipientUserId){
+      const recipient=store.account(notification.recipientUserId);
+      if(notification.source!=='utility-ai'||recipient?.id===notification.ownerId||recipient?.role==='tenant'&&recipient.landlord_id===notification.ownerId&&recipient.tenant_id===notification.tenantId&&store.get('tenants',notification.tenantId)?.userId===recipient.id)add(recipient);
+      return [...people.values()];
+    }
     const tenants=store.list('tenants',notification.ownerId).filter(tenant=>tenant.status==='active'&&tenant.userId&&tenant.propertyId===notification.propertyId);
     let targets=tenants;
     if(notification.tenantId){const target=store.get('tenants',notification.tenantId);targets=target?.ownerId===notification.ownerId&&target.userId?[target]:[];}
@@ -170,7 +174,7 @@ export function createApp(options={}){
   }
   async function handler(req,res){
     res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','same-origin');res.setHeader('X-Frame-Options','DENY');
-    res.setHeader('Content-Security-Policy',"default-src 'self'; img-src 'self' data: blob: https://img.vietqr.io; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    res.setHeader('Content-Security-Policy',"default-src 'self'; img-src 'self' data: blob: https://img.vietqr.io; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; font-src 'self' data:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
     try{
       const url=new URL(req.url,'http://localhost');let path;
       try{path=decodeURIComponent(url.pathname);if(path.includes('\0'))fail(400,'Đường dẫn không hợp lệ.');}
@@ -349,7 +353,7 @@ export function createApp(options={}){
           const input=await readJson(req),room=contractTarget(store,user,input);
           if(path.endsWith('/confirm'))return json(res,200,{ok:true});
           limit('paper-ocr:'+user.id,12,1);
-          const lines=await (options.readPaperContract||readPaperContract)(contractImage(input),input.collection);
+          const lines=await (options.readPaperContract||readPaperContract)(contractExcerpt(input),input.collection);
           contractTarget(store,user,input);
           const fields=proposedFields(store,room,input.collection,lines);
           if(!Object.keys(fields).length)fail(422,'Chưa đọc được trường có nhãn rõ trên hợp đồng. Chọn ảnh rõ hơn hoặc nhập tay.');

@@ -50,7 +50,7 @@ Mở demo bằng **Safari trên iPhone** hoặc **Chrome trên Android**. Sau kh
 | --- | --- | --- |
 | **B01 · Trợ lý**, **B02 · Cảnh báo điện nước**, **B04 · Gợi ý phân loại sửa chữa** | Gemini diễn đạt câu trả lời theo quyền và đề xuất phân loại phiếu đã lưu. B02 tính bằng thống kê. Khi Gemini gián đoạn, B01/B04 dùng tra cứu và quy tắc. | Cùng bộ xử lý Gemini và cùng cơ chế dự phòng. |
 | **B03 · Đọc công tơ** | Nhận ảnh và chủ trọ đối chiếu, nhập chỉ số thủ công. | OCR thử nghiệm cho công tơ cơ. Nhánh điện dùng PaddleOCR PP-OCRv6 small, nhánh nước dùng YOLO + VisionState Wheel Reader. Ảnh được đọc nền khi có runtime và model tương ứng. Có thể cấu hình Gemini Vision hỗ trợ khi kết quả cục bộ chưa rõ. |
-| **UC16 · Hợp đồng giấy** | Chủ trọ đồng ý gửi ảnh đến Gemini, đối chiếu ảnh và chọn từng trường để điền vào bản nháp. Có thể nhập tay. | Cùng quy trình, dùng khóa Gemini trong môi trường Node. |
+| **UC16 · Hợp đồng giấy** | Trình duyệt đọc ảnh, sàng lọc CCCD và trang không rõ. Chủ trọ đồng ý gửi phần chữ hợp đồng đã lọc đến Gemini rồi đối chiếu và chọn trường điền vào bản nháp. Có thể nhập tay. | Cùng quy trình, dùng khóa Gemini trong môi trường Node. |
 
 Đặt `GEMINI_API_KEY` trong Cloudflare Worker hoặc trong `.env` khi chạy Node. Với hợp đồng thật có dữ liệu cá nhân, dùng khóa của dự án Google Cloud đã bật thanh toán. [Cấu hình Gemini](docs/CLOUDFLARE.md#gemini) · [Điều khoản Gemini API](https://ai.google.dev/gemini-api/terms)
 

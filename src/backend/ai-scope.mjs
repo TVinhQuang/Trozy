@@ -1,6 +1,5 @@
-import {id,COLLECTIONS,now} from './model.mjs';
-import {dataFor,fail,ownerId} from './domain.mjs';
-import {analyzeUtilities} from '../ai/anomalies.mjs';
+import {COLLECTIONS} from './model.mjs';
+import {dataFor,fail,ownerId,syncReadingAlerts} from './domain.mjs';
 import {createHash} from 'node:crypto';
 const sourcePages={properties:'properties',rooms:'rooms',tenants:'tenants',contracts:'contracts',readings:'readings',services:'services',invoices:'invoices',payments:'payments',credits:'payments',deposits:'deposits',transactions:'transactions',issues:'issues',assets:'assets',handovers:'handovers',notifications:'notifications',tickets:'tickets',documents:'documents',vehicles:'vehicles',amenities:'amenities',bookings:'amenities',settings:'settings'};
 const isObject=value=>value&&typeof value==='object'&&!Array.isArray(value);
@@ -52,15 +51,9 @@ export function validateResult(name,result,data){
 export function syncUtilityNotifications(store,user){
  const ownerUser=user.role==='landlord'?user:store.account(ownerId(user));
  if(!ownerUser)return;
- // Generate from the owner's complete history. A tenant's shorter authorized
- // history must never erase an alert already produced for the same room.
- const data=dataFor(store,ownerUser),result=analyzeUtilities({data,input:{}}),allowedRooms=new Set(data.rooms.map(room=>room.id));
- const owner=ownerId(user),existing=store.list('notifications',owner).filter(row=>row.source==='utility-ai'&&allowedRooms.has(row.roomId));
- const current=new Set(result.alerts.map(alert=>alert.id));
- for(const row of existing)if(!current.has(row.sourceKey))store.remove('notifications',row.id);
- for(const alert of result.alerts){
-  const previous=existing.find(row=>row.sourceKey===alert.id),body=`${alert.explanation}\n${alert.recommendation}`;
-  if(previous?.body===body)continue;
-  store.put('notifications',{id:previous?.id||id('not'),ownerId:owner,propertyId:alert.propertyId,roomId:alert.roomId,title:`Kiểm tra ${alert.utility==='electric'?'điện':'nước'} phòng ${alert.roomCode} · ${alert.period}`,body,kind:'general',readBy:[],source:'utility-ai',sourceKey:alert.id,createdAt:previous?.createdAt||now()});
+ const latest=new Map();
+ for(const reading of store.list('readings',ownerUser.id)){
+  if(reading.confirmed&&(!latest.has(reading.roomId)||latest.get(reading.roomId).period<reading.period))latest.set(reading.roomId,reading);
  }
+ for(const reading of latest.values())syncReadingAlerts(store,ownerUser,reading);
 }

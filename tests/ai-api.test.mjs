@@ -118,6 +118,23 @@ function usageHistory(store){
  }
 }
 
+test('UC70 finalization delivers scoped alerts before either user opens the dashboard',async t=>{
+ const {app,owner,tenant,other}=await fixture(t);usageHistory(app.store);
+ app.store.remove('invoices','HD-10-101');
+ const reading=app.store.get('readings','alert_reading_10');
+ app.store.put('readings',{...reading,confirmed:false});
+ const finalize=()=>owner('/actions/reading-finalize',post({id:reading.id,confirmAnomaly:true}));
+ assert.equal((await finalize()).status,200);
+ const notices=app.store.list('notifications','owner_demo').filter(row=>row.readingId===reading.id);
+ assert.deepEqual(notices.map(row=>row.recipientUserId).sort(),['owner_demo','user_tenant']);
+ assert.match(notices.find(row=>row.recipientUserId==='user_tenant').body,/500 kWh/);
+ assert.equal((await tenant('/notifications/'+notices.find(row=>row.recipientUserId==='user_tenant').id)).status,200);
+ assert.equal((await other('/notifications/'+notices[0].id)).status,404);
+ assert.equal((await finalize()).status,409);
+ await owner('/bootstrap');
+ assert.equal(app.store.list('audits','owner_demo').filter(row=>row.action==='utility-alert-send'&&notices.some(n=>n.id===row.recordId)).length,2);
+});
+
 test('utility alerts respect scope, persist per-user review, deduplicate notifications and disappear after correction',async t=>{
  const {app,owner,tenant,other}=await fixture(t);usageHistory(app.store);
  const invoiceSnapshot=JSON.stringify(app.store.list('invoices','owner_demo'));

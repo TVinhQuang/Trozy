@@ -4,7 +4,6 @@ import {api} from './api';
 type Fields=Record<string,string>;
 type Target={roomId:string;collection:'contracts'|'tenants';id?:string};
 const labels:Fields={name:'Họ tên người thuê',phone:'Điện thoại',email:'Email',birthDate:'Ngày sinh',roomId:'Phòng',tenantId:'Người thuê',startDate:'Ngày bắt đầu',endDate:'Ngày kết thúc',rent:'Tiền thuê mỗi tháng',deposit:'Tiền cọc'};
-const encode=(file:File)=>new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(new Error('Không đọc được ảnh.'));reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.readAsDataURL(file);});
 export function PaperContractInput({collection,id,onApply}:{collection:Target['collection'];id?:string;onApply?:(fields:Fields)=>void}){
   const container=useRef<HTMLDivElement>(null),request=useRef(0);
   const [open,setOpen]=useState(false),[allowed,setAllowed]=useState(false),[file,setFile]=useState<File|null>(null),[url,setUrl]=useState('');
@@ -20,7 +19,10 @@ export function PaperContractInput({collection,id,onApply}:{collection:Target['c
     try{
       const t=target();if(!allowed||!file)throw new Error('Chọn ảnh hợp đồng giấy.');
       if(file.size>5*1024*1024)throw new Error('Ảnh hợp đồng tối đa 5 MB.');
-      const result=await api('/paper-contract/extract',{method:'POST',body:JSON.stringify({...t,geminiConsent:allowed,source:'paper-contract',fileName:file.name,image:await encode(file)})});
+      const {readContractPage}=await import('./contract-ocr');
+      const contractText=await readContractPage(file);
+      if(seq!==request.current||target().roomId!==t.roomId)return;
+      const result=await api('/paper-contract/extract',{method:'POST',body:JSON.stringify({...t,geminiConsent:allowed,source:'paper-contract',contractText})});
       if(seq===request.current){setFields(result.fields);setScope(t);}
     }catch(e){if(seq===request.current)setFeedback((e as Error).message);}finally{if(seq===request.current)setBusy(false);}
   }
@@ -40,7 +42,7 @@ export function PaperContractInput({collection,id,onApply}:{collection:Target['c
   }
   function display(key:string,value:string){const el=container.current?.closest('form')?.elements.namedItem(key);return el instanceof HTMLSelectElement?Array.from(el.options).find(o=>o.value===value)?.text||value:value;}
   return <div className="stack" ref={container}>{!open?<button type="button" className="btn" onClick={()=>{setFeedback('');setOpen(true);}}>Nhập từ hợp đồng giấy</button>:<fieldset className="stack"><legend>Đọc hợp đồng giấy</legend>
-    <label className="inline"><input type="checkbox" checked={allowed} onChange={e=>{setAllowed(e.target.checked);setFile(null);setFields({});setSelected([]);}} disabled={busy}/>Tôi đồng ý gửi ảnh hợp đồng này đến Google Gemini để đọc các trường. Tôi chỉ chọn trang hợp đồng và che số CCCD trước khi gửi.</label>
+    <label className="inline"><input type="checkbox" checked={allowed} onChange={e=>{setAllowed(e.target.checked);setFile(null);setFields({});setSelected([]);}} disabled={busy}/>Tôi đồng ý gửi phần chữ đã lọc đến Google Gemini để gợi ý điền biểu mẫu. Ảnh được đọc trên thiết bị. Tôi chỉ chọn trang hợp đồng và che số CCCD.</label>
     {allowed&&<input type="file" accept="image/png,image/jpeg,image/webp" aria-label="Ảnh hợp đồng giấy" disabled={busy} onChange={e=>{
       const candidate=e.target.files?.[0]||null;setFields({});setSelected([]);setFeedback('');
       if(candidate&&/cccd|cmnd|can[ _-]*cuoc|chung[ _-]*minh|identity[ _-]*card/i.test(candidate.name.normalize('NFD').replace(/\p{M}/gu,''))){setFile(null);e.target.value='';setFeedback('Chỉ chọn ảnh hợp đồng giấy. Số CCCD nhập tay.');}else setFile(candidate);

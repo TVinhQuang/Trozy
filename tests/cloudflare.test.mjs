@@ -83,6 +83,57 @@ test('UC67 Worker scopes linked requests, preserves account email and commits a 
   assert.equal((await (await request('t','/bootstrap')).json()).data.privacyRequests.length,1);
 });
 
+test('UC70 Worker finalization saves private alerts and queues email once according to recipient preferences',async t=>{
+  const {env,sql,request}=fixture(t),owner={id:'o',role:'landlord'};
+  env.MAILER={fetch(){throw Error('No real mail in this test');}};
+  sql.prepare('UPDATE users SET notification_preferences=? WHERE id=?').run(JSON.stringify({email_alerts:false}),'t');
+  const store=await openOwnerStore(env,owner);
+  let electric=0,water=0;
+  for(let month=1;month<=4;month++){
+    const usage=month===4?400:100;
+    store.put('readings',{id:'read'+month,ownerId:'o',propertyId:'p',roomId:'r',period:'2026-0'+month,
+      confirmed:month<4,electricOld:electric,electricNew:electric+usage,waterOld:water,waterNew:water+5});
+    electric+=usage;water+=5;
+  }
+  await store.commit();
+  const step=()=>request('o','/actions/reading-finalize',{id:'read4',confirmAnomaly:true});
+  assert.equal((await step()).status,200);
+  const fresh=await openOwnerStore(env,owner);
+  const notices=fresh.list('notifications').filter(row=>row.readingId==='read4');
+  assert.deepEqual(notices.map(row=>row.recipientUserId).sort(),['o','t']);
+  const tenantNotice=notices.find(row=>row.recipientUserId==='t');
+  assert.equal((await request('t','/notifications/'+tenantNotice.id)).status,200);
+  assert.equal((await request('neighbor','/notifications/'+tenantNotice.id)).status,404);
+  assert.equal((await step()).status,409);
+  assert.deepEqual(sql.prepare('SELECT user_id FROM notification_mail_outbox').all().map(row=>row.user_id),['o']);
+});
+
+test('UC37/39 concurrent retries return the persisted payment and one ledger entry per receipt',async t=>{
+  const {env,request}=fixture(t);
+  const owner={id:'o',role:'landlord'};
+  const store=await openOwnerStore(env,owner);
+  store.put('invoices',{id:'bill',ownerId:'o',propertyId:'p',roomId:'r',tenantId:'tenant',status:'issued',total:10000,paid:0});await store.commit();
+  async function duplicate(actor,action,input){
+    const responses=await Promise.all([request(actor,'/actions/'+action,input),request(actor,'/actions/'+action,input)]);
+    const results=await Promise.all(responses.map(response=>response.json()));
+    assert.deepEqual(responses.map(response=>response.status),[200,200],JSON.stringify(results));
+    assert.equal(results[0].id,results[1].id);return results[0];
+  }
+  const report={invoiceId:'bill',amount:2000,requestId:'tenant-first'};
+  const pending=await duplicate('t','payment-report-transfer',report);
+  const secondTab={...report,requestId:'tenant-second-tab'};
+  assert.equal((await (await request('t','/actions/payment-report-transfer',secondTab)).json()).id,pending.id);
+  const receipt=await duplicate('o','payment-confirm-transfer',{id:pending.id});
+  assert.equal(receipt.status,'confirmed');
+  assert.equal((await (await request('t','/actions/payment-report-transfer',report)).json()).id,receipt.id);
+  assert.equal((await (await request('t','/actions/payment-report-transfer',secondTab)).json()).id,receipt.id);
+  assert.equal((await request('other','/actions/payment-confirm-transfer',{id:receipt.id})).status,404);
+  assert.equal((await request('neighbor','/actions/payment-report-transfer',report)).status,404);
+  await duplicate('o','payment-record',{invoiceId:'bill',method:'cash',amount:500,requestId:'owner-first',expectedBalance:8000});
+  const fresh=await openOwnerStore(env,owner);
+  assert.equal(fresh.get('invoices','bill').paid,2500);assert.equal(fresh.list('transactions').length,2);
+});
+
 test('cloud receipt correction, authorized PDF and all-device logout use the same confirmed figures', async t=>{
   const {request,env}=fixture(t);
   const store=await openOwnerStore(env,{id:'o',role:'landlord'});
@@ -298,10 +349,11 @@ test('public binary upload enforces size and capacity before any KV write',async
   assert.equal(blobs.size,1);
 });
 
-test('UC16 checks authorization and consent, sends only the contract image to Gemini and returns draft fields',async t=>{
+test('UC16 rejects identity and unknown documents before Gemini and sends only screened contract text',async t=>{
   const {env,blobs,request}=fixture(t);
   const image='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jgT8AAAAASUVORK5CYII=';
-  const input={roomId:'r',collection:'contracts',source:'paper-contract',fileName:'contract.png',geminiConsent:true,image};
+  const contractText='HỢP ĐỒNG THUÊ PHÒNG\nBên thuê: Nguyễn An\nPhòng: 101\nGiá thuê: 3.500.000 đồng\nSố CCCD: 012345678901';
+  const input={roomId:'r',collection:'contracts',source:'paper-contract',fileName:'contract.png',geminiConsent:true,contractText};
   const extract=(user,changes={})=>request(user,'/paper-contract/extract',{...input,...changes});
   assert.equal((await extract('o')).status,503);
   Object.assign(env,{GEMINI_API_KEY:'fixture-private-key',GEMINI_MODELS:'test-model'});
@@ -310,7 +362,9 @@ test('UC16 checks authorization and consent, sends only the contract image to Ge
     calls++;
     assert.equal(new URL(url).hostname,'generativelanguage.googleapis.com');
     const payload=JSON.parse(init.body);
-    assert.deepEqual(payload.contents[0].parts[1].inlineData,{data:image,mimeType:'image/png'});
+    assert.equal(payload.contents[0].parts.length,1);
+    assert.match(payload.contents[0].parts[0].text,/3\.500\.000/);
+    assert(!init.body.includes('012345678901'));assert(!init.body.includes('inlineData'));
     assert(!init.body.includes('fixture-private-key'));
     return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(output)}]}}]});
   });
@@ -319,6 +373,10 @@ test('UC16 checks authorization and consent, sends only the contract image to Ge
   assert.equal((await extract('o',{geminiConsent:false})).status,400);
   assert.equal((await extract('o',{fileName:'CCCD.png'})).status,400);
   assert.equal((await extract('o',{id:'c'})).status,409);
+  for(const contractText of ['CĂN CƯỚC CÔNG DÂN\nHọ tên: Ví Dụ','Ảnh chụp không rõ','HỢP ĐỒNG THUÊ NHÀ\nCITIZEN IDENTITY CARD\nGiá thuê: 500000']){
+    assert.equal((await extract('o',{contractText})).status,422);
+  }
+  assert.equal((await extract('o',{contractText:undefined,image})).status,422);
   assert.equal(calls,0);
   assert.deepEqual(await (await extract('o')).json(),{fields:{roomId:'r',rent:'3500000'}});
   assert.equal((await request('o','/paper-contract/confirm',{roomId:'r',collection:'contracts'})).status,200);

@@ -461,12 +461,17 @@ test('verified transfer overpayment creates one receipt and a usable credit',asy
   const invoice=store.get('invoices','HD-10-101'),due=invoice.total-invoice.paid;
   const report=await request('/api/actions/payment-report-transfer',post(tenant,{invoiceId:invoice.id,amount:due+10000}));
   assert.equal(report.status,200,report.body.error);
+  const retry=await request('/api/actions/payment-report-transfer',post(tenant,{invoiceId:invoice.id,amount:due+10000}));
+  assert.equal(retry.status,200);assert.equal(retry.body.id,report.body.id);
   const outdated=await request('/api/actions/payment-confirm-transfer',post(owner,{id:report.body.id,amount:due+12000,expectedBalance:due-1}));
   assert.equal(outdated.status,409);assert.equal(store.get('payments',report.body.id).status,'pending');
   const confirm=()=>request('/api/actions/payment-confirm-transfer',post(owner,{id:report.body.id,amount:due+12000}));
   const actual=await confirm();assert.equal(actual.status,200,actual.body.error);
   assert.equal(actual.body.appliedAmount,due);assert.equal(actual.body.creditAmount,12000);
-  assert.equal(store.get('invoices',invoice.id).paid,invoice.total);assert.notEqual((await confirm()).status,200);
+  assert.equal(store.get('invoices',invoice.id).paid,invoice.total);
+  const repeated=await confirm();assert.equal(repeated.status,200);assert.deepEqual(repeated.body,actual.body);
+  assert.equal(store.list('transactions','owner_demo').filter(row=>row.sourceId===actual.body.id).length,1);
+  assert.equal(store.list('audits','owner_demo').filter(row=>row.action==='payment-confirm-transfer'&&row.recordId===actual.body.id).length,1);
 });
 
 test('PA3 UC02/06/07 keeps the old email until the exact replacement is verified',async t=>{
@@ -622,7 +627,7 @@ test('UC16 paper OCR is scoped and fills only supported proposals, without savin
   let calls=0;
   const {store,login,request}=await fixture(t,{readPaperContract:async()=>{calls++;return ['Bên thuê: Nguyễn Văn An','Phòng: 101','Giá thuê: 3.500.000 đồng','Tiền cọc: 0 đồng','CCCD: 000000000123'];}});
   const owner=await login(),tenant=await login('thue@trozy.vn');
-  const body={geminiConsent:true,source:'paper-contract',fileName:'hop-dong.png',image:'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jgT8AAAAASUVORK5CYII=',collection:'tenants',roomId:'room_101'};
+  const body={geminiConsent:true,source:'paper-contract',fileName:'hop-dong.png',contractText:'HỢP ĐỒNG THUÊ PHÒNG\nBên thuê: Nguyễn Văn An\nGiá thuê: 3.500.000 đồng',collection:'tenants',roomId:'room_101'};
   const run=(data,actor=owner)=>request('/api/paper-contract/extract',post(actor,data));
   const before=store.get('tenants','tenant_01'),fileCount=()=>store.db.prepare('SELECT COUNT(*) AS n FROM files').get().n;
   const count=fileCount();

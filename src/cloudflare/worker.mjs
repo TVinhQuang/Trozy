@@ -7,7 +7,7 @@ import {meterWorkflow} from '../backend/meter-workflow.mjs';
 import {accessLogQuery} from '../backend/access-log.mjs';
 import {classifyMaintenance} from '../ai/maintenance-engine.mjs';
 import {workerGemini} from '../ai/llm.mjs';
-import {contractTarget,contractImage,readPaperContract,proposedFields} from '../backend/paper-contract.mjs';
+import {contractTarget,contractExcerpt,readPaperContract,proposedFields} from '../backend/paper-contract.mjs';
 import {answerQuestion} from '../ai/copilot-engine.mjs';
 import {analyzeUtilities} from '../ai/anomalies.mjs';
 import {scopeInput,validateResult,syncUtilityNotifications,alertFingerprint} from '../backend/ai-scope.mjs';
@@ -149,9 +149,9 @@ async function api(request,env,url,path) {
   } else if(post&&['/paper-contract/extract','/paper-contract/confirm'].includes(path)){
     contractTarget(store,user,input);
     if(path.endsWith('/confirm'))return json({ok:true});
-    const bytes=contractImage(input);
+    const excerpt=contractExcerpt(input);
     await limit(env,'paper-ocr:'+user.id,12);
-    const lines=await readPaperContract(bytes,input.collection,workerGemini(env));
+    const lines=await readPaperContract(excerpt,input.collection,workerGemini(env));
     const fresh=await openOwnerStore(env,user);
     const room=contractTarget(fresh,user,input);
     const fields=proposedFields(fresh,room,input.collection,lines);
@@ -236,7 +236,17 @@ async function api(request,env,url,path) {
     }else if(method==='DELETE'&&key) result=deleteRecord(store,user,collection,key);
     else fail(405,'Phương thức không hợp lệ.');
   }
-  await store.commit(extra);
+  if(post&&(path.startsWith('/meter/submissions/')||path.startsWith('/readings')||['/actions/reading-finalize','/actions/invoice-adjust'].includes(path))){
+    extra.push(...queueAutomaticReminders(env,store,ownerId(user)));
+  }
+  try{await store.commit(extra);}
+  catch(error){
+    const replayable=['/actions/payment-report-transfer','/actions/payment-confirm-transfer'].includes(path)||path==='/actions/payment-record'&&input.requestId;
+    if(error.status!==409||!replayable)throw error;
+    const fresh=await openOwnerStore(env,user);
+    result=performAction(fresh,user,path.slice(9),input);
+    await fresh.commit();
+  }
   return json(result,status);
 }
 

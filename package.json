@@ -53,13 +53,15 @@
     "ai:gold-eval": "node scripts/run-project.mjs scripts/meter-gold.mjs evaluate"
   },
   "dependencies": {
+    "@tesseract.js-data/vie": "1.0.0",
     "exceljs": "^4.4.0",
     "lucide-react": "^0.468.0",
     "nodemailer": "^10.2.1",
     "pdfmake": "^0.2.23",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "tesseract.js": "6.0.1"
   },
   "overrides": {
     "exceljs": {

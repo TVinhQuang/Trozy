@@ -40,6 +40,18 @@ test('photo-only submissions wait for manual review and only two explicit approv
  assert.throws(()=>f.service.review(f.owner,electric.id,input),status(409));
 });
 
+test('UC70 photo review creates recipient alerts only after both meter readings are approved',t=>{
+ const {store,owner,tenant,service,request,prior}=fixture(t);
+ const electric=service.submitPhotos(tenant,request()),water=service.submitPhotos(tenant,request('water'));
+ const approve=(submission,value)=>service.review(owner,submission.id,{decision:'approve',version:1,value,imageChecked:true,note});
+ const first=approve(electric,prior.electricNew+500);
+ const notices=()=>store.list('notifications',owner.id).filter(row=>row.readingId===first.reading.id);
+ assert.equal(notices().length,0);
+ approve(water,prior.waterNew+5);
+ const recipients=notices().filter(row=>row.sourceKey.includes(':electric:')).map(row=>row.recipientUserId);
+ assert.deepEqual(recipients.sort(),[owner.id,tenant.id].sort());
+});
+
 test('submission authorization rejects client readings, foreign evidence, duplicate photos and fake image signatures',t=>{
  const f=fixture(t),request=f.request();
  for(const extra of [{value:123},{electricNew:123},{result:{}},{analysisIds:['x']}])assert.throws(()=>f.service.submitPhotos(f.tenant,{...request,...extra}),status(400));

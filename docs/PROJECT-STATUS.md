@@ -33,7 +33,7 @@ Chủ trọ xem trước kết quả từng trường rồi xác nhận xử lý
 ## Điều kiện vận hành và phạm vi còn lại
 
 - **B03 OCR công tơ** đang thử nghiệm trên máy. PaddleOCR PP-OCRv6 small dùng cho công tơ điện cơ và YOLO + VisionState Wheel Reader cho công tơ nước cơ. Chủ trọ xem đề xuất và đối chiếu ảnh trước khi ghi chỉ số. Trên Cloudflare, chủ trọ xem ảnh và nhập chỉ số thủ công. [Quy trình công tơ](METER-READER.md) · [Danh mục model và SHA-256](../MODELS-OCR/README.md)
-- **UC16 OCR hợp đồng giấy** trên Worker và Node dùng Gemini sau khi chủ trọ đồng ý gửi ảnh. Chủ trọ đối chiếu từng trường và chọn dữ liệu điền vào bản nháp. Khi dịch vụ gián đoạn, có thể nhập tay. [Cấu hình và điều kiện dữ liệu](CLOUDFLARE.md#gemini)
+- **UC16 OCR hợp đồng giấy** đọc ảnh ngay trên thiết bị cho cả Worker và Node và dùng Gemini sau khi chủ trọ đồng ý gửi phần chữ hợp đồng đã lọc. Chủ trọ đối chiếu từng trường và chọn dữ liệu điền vào bản nháp. Khi dịch vụ gián đoạn, có thể nhập tay. [Cấu hình và điều kiện dữ liệu](CLOUDFLARE.md#gemini)
 - **UC64/B05** dự báo công nợ, doanh thu và phòng trống thuộc nghiên cứu tùy chọn. Ký số, đối soát ngân hàng tự động, chat thời gian thực và ứng dụng native nằm ngoài phạm vi phát hành hiện tại.
 - Nghiệm thu từng luồng thay thế của 73 use case, việc giao email đến hộp thư, độ chính xác OCR và thao tác trên các thiết bị thực tế cần minh chứng theo từng môi trường. Build có cảnh báo kích thước một số gói JavaScript.
 

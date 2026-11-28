@@ -39,7 +39,8 @@ export function queueAutomaticReminders(env,store,owner){
   const writes=[];
   for(const notice of store.list('notifications',owner).filter(n=>n.automatic&&n.phase&&n.mailQueuedPhase!==n.phase)){
     const tenant=notice.tenantId&&store.get('tenants',notice.tenantId);
-    for(const account of [store.account(owner),tenant?.userId&&store.account(tenant.userId)]){
+    const accounts=notice.recipientUserId?[store.account(notice.recipientUserId)]:[store.account(owner),tenant?.userId&&store.account(tenant.userId)];
+    for(const account of accounts){
       if(!account?.email||account.id!==owner&&(account.landlord_id!==owner||account.tenant_id!==notice.tenantId))continue;
       if(!acceptsNotice(JSON.parse(account.notification_preferences||'{}'),notice,'email'))continue;
       writes.push(env.DB.prepare(queueReminderSql).bind(reminderMailId(notice,account.id),notice.id,owner,account.id,account.email,now()));
@@ -71,7 +72,7 @@ export async function deliverQueuedNotifications(env) {
         (notice?.tenantId?notice.tenantId===tenant.id:tenant.status==='active'&&tenant.propertyId===notice?.propertyId&&
           (!notice.roomIds?.length||notice.roomIds.includes(tenant.roomId))&&(!notice.roomId||notice.roomId===tenant.roomId));
       const samePhase=!notice?.automatic||item.id===reminderMailId(notice,item.user_id);
-      if (notice && authorized && samePhase && item.current_email===item.email && acceptsNotice(prefs,notice,'email')) {
+      if (notice && (!notice.recipientUserId||notice.recipientUserId===item.user_id) && authorized && samePhase && item.current_email===item.email && acceptsNotice(prefs,notice,'email')) {
         const message={to:item.email,subject:notice.title,text:notice.body,id:item.id};
         if(notice.fileId){
           const file=await env.DB.prepare("SELECT id,name FROM files WHERE id=? AND owner_id=? AND purpose='attachment' AND state='ready'")
